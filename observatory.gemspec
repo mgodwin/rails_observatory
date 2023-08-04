@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_dependency "rails", ">= 7.0.6"
-  spec.add_dependency "redis-time-series", "~> 0.8.0"
+  spec.add_runtime_dependency 'redis-client'
 end
