@@ -1,7 +1,7 @@
 require_relative "lib/observatory/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "observatory"
+  spec.name        = "observatory-rails"
   spec.version     = Observatory::VERSION
   spec.authors     = ["Mark Godwin"]
   spec.email       = ["godwin.mark@gmail.com"]

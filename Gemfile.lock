@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    observatory (0.1.0)
+    observatory-rails (0.1.0)
       rails (>= 7.0.6)
       redis-time-series (~> 0.8.0)
 
@@ -169,7 +169,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  observatory!
+  observatory-rails!
   puma
   sprockets-rails
   sqlite3

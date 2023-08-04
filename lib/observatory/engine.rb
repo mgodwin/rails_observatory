@@ -3,8 +3,8 @@ module Observatory
     isolate_namespace Observatory
 
   
-    initializer "observatory" do
-      
+    initializer "observatory.assets.precompile" do |app|
+      app.config.assets.precompile += %w( observatory/application.css )
     end
   end
 end
