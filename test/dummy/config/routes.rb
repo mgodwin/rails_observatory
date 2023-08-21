@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Observatory::Engine => "/observatory"
+  mount RailsObservatory::Engine => "/observatory"
 end

@@ -1,0 +1,97 @@
+We did it!
+
+<div style="display:grid;grid-template-columns: 1fr 1fr;">
+  <div id="requests-chart" data-controller="chart"></div>
+  <div id="latency-chart"></div>
+</div>
+<div>
+  <% @all_series.each do |c| %>
+    <div><%= c.key %></div>
+  <% end %>
+</div>
+
+
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', () => {-->
+<!--        const chart = new window.Apex(document.querySelector('#latency-chart'), {-->
+<!--            chart: {-->
+<!--                type: 'line',-->
+<!--                height: 350,-->
+<!--                animations: {-->
+<!--                    enabled: false-->
+<!--                },-->
+<!--                toolbar: {-->
+<!--                    show: false-->
+<!--                },-->
+<!--            },-->
+<!--            series: [{-->
+<!--                data: <%#== @latency_range.to_a.to_json %>-->
+<!--            }],-->
+<!--            xaxis: {-->
+<!--                type: 'datetime',-->
+<!--                min: <%#= @latency_range.start_timestamp %>,-->
+<!--                max: <%#= @latency_range.end_timestamp %>-->
+<!--            },-->
+<!--            yaxis: {-->
+<!--                decimalsInFloat: 0,-->
+<!--            },-->
+
+<!--            stroke: {-->
+<!--                width: 2,-->
+<!--            },-->
+<!--            tooltip: {-->
+<!--                x: {-->
+<!--                    format: 'dd MMM yyyy HH:mm'-->
+<!--                }-->
+<!--            }-->
+<!--        })-->
+<!--        chart.render()-->
+
+<!--        const count = new window.Apex(document.querySelector('#requests-chart'), {-->
+<!--            chart: {-->
+<!--                type: 'bar',-->
+<!--                height: 350,-->
+<!--                animations: {-->
+<!--                    enabled: false-->
+<!--                },-->
+<!--                toolbar: {-->
+<!--                    show: false-->
+<!--                },-->
+<!--            },-->
+<!--            title: {-->
+<!--                text: "requests",-->
+<!--                align: 'center'-->
+<!--            },-->
+<!--            series: [{-->
+<!--                data: <%#== @request_count_range.to_a.to_json %>-->
+<!--            }],-->
+<!--            xaxis: {-->
+<!--                type: 'datetime',-->
+<!--                min: <%#= @request_count_range.start_timestamp %>,-->
+<!--                max: <%#= @request_count_range.end_timestamp %>-->
+<!--            },-->
+<!--            yaxis: {-->
+<!--                decimalsInFloat: 0,-->
+<!--            },-->
+<!--            dataLabels: {-->
+<!--                enabled: false-->
+<!--            },-->
+<!--            fill: {-->
+<!--                opacity: .4,-->
+<!--            },-->
+<!--            stroke: {-->
+<!--                show: true,-->
+<!--                width: 1,-->
+<!--            },-->
+<!--            tooltip: {-->
+<!--                followCursor: true,-->
+<!--                x: {-->
+<!--                    format: 'dd MMM yyyy HH:mm'-->
+<!--                }-->
+<!--            }-->
+<!--        })-->
+<!--        count.render()-->
+<!--    })-->
+
+
+<!--</script>-->

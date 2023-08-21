@@ -1,3 +1,3 @@
-Observatory::Engine.routes.draw do
+RailsObservatory::Engine.routes.draw do
   root to: 'main#index'
 end

@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer components {
+  .nav-btn-base {
+    @apply rounded-md px-3 py-2 text-sm font-medium;
+  }
+
+  .nav-btn-active {
+    @apply nav-btn-base bg-gray-900 text-white;
+  }
+
+  .nav-btn {
+    @apply text-gray-300 hover:bg-gray-700 hover:text-white nav-btn-base;
+  }
+}

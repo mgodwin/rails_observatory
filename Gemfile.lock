@@ -1,9 +1,10 @@
 PATH
   remote: .
   specs:
-    observatory-rails (0.1.0)
+    rails_observatory (0.1.0)
       rails (>= 7.0.6)
-      redis-time-series (~> 0.8.0)
+      redis-client
+      zeitwerk
 
 GEM
   remote: https://rubygems.org/
@@ -144,12 +145,8 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
-    redis (5.0.6)
-      redis-client (>= 0.9.0)
     redis-client (0.15.0)
       connection_pool
-    redis-time-series (0.8.0)
-      redis (>= 3.3)
     sprockets (4.2.0)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
@@ -159,6 +156,10 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.6.3-arm64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
+    tailwindcss-rails (2.0.30-arm64-darwin)
+      railties (>= 6.0.0)
+    tailwindcss-rails (2.0.30-x86_64-linux)
+      railties (>= 6.0.0)
     thor (1.2.2)
     timeout (0.4.0)
     tzinfo (2.0.6)
@@ -173,10 +174,11 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  observatory-rails!
   puma
+  rails_observatory!
   sprockets-rails
   sqlite3
+  tailwindcss-rails
 
 BUNDLED WITH
    2.4.10
