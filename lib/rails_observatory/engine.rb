@@ -16,7 +16,7 @@ module RailsObservatory
     end
 
     initializer "rails_observatory.instrumentation" do
-
+      require_relative 'controller_subscriber'
     end
   end
 end

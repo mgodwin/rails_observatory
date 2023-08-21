@@ -61,13 +61,17 @@ module RailsObservatory
 
     def rollup(buckets:)
       # "LATEST", "AGGREGATION", "SUM", to_ms(5.minutes), "EMPTY")
-      if @key =~ /_count\Z/
+      if @key =~ /_sum/
         @agg_type = :sum
       else
         @agg_type = :avg
       end
       @agg_duration = ((end_time - start_time) / buckets * 1000).to_i
       self
+    end
+
+    def reduce
+      rollup(buckets: 1).to_a.first.last
     end
 
     def start_timestamp
@@ -79,14 +83,30 @@ module RailsObservatory
     end
 
     def to_a
-      args = ["TS.RANGE", @key, start_timestamp, end_timestamp]
+      args = ["TS.RANGE", @key]
+      if @range.begin.nil?
+        args.push "-"
+      else
+        args.push start_timestamp
+      end
+      if @range.end.nil?
+        args.push "+"
+      else
+        args.push end_timestamp
+      end
       args << "LATEST" if @range.end.nil?
       # When range.end is nil, we also want to align 0 so that our buckets don't change as the time range changes
       if @agg_type && @agg_duration
+        if @range.end.present?
+          args.push("ALIGN", 'end')
+        elsif @range.begin.present?
+          args.push("ALIGN", 'start')
+        end
         args.push("AGGREGATION", @agg_type.to_s.upcase, @agg_duration, "EMPTY")
       end
-      puts "ARGS ARE #{args}"
+      puts "ARGS ARE #{args.join(" ")}"
       values = $redis.call(*args)
+      puts values.length
       # Replace "NaN" with nil
       # values is an array of arrays of [[timestamp, value]] pairs
       values.map { |v| v[1] == "NaN" ? [v[0], nil] : v }

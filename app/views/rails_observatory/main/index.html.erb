@@ -1,51 +1,59 @@
-We did it!
-
 <div style="display:grid;grid-template-columns: 1fr 1fr;">
-  <div id="requests-chart" data-controller="chart"></div>
-  <div id="latency-chart"></div>
+  <div data-controller="chart"
+       data-chart-type-value="line">
+    <div class="border-b border-gray-200 pb-5 ml-4 mr-1">
+      <h3 class="text-base font-semibold leading-4 text-gray-600">Latency</h3>
+    </div>
+    <div data-chart-target="chart"></div>
+    <script type="application/json" data-chart-target="data">
+      <%== @latency_range.to_a.to_json %>
+    </script>
+  </div>
+  <div data-controller="chart" data-chart-type-value="bar">
+    <div class="border-b border-gray-200 pb-5 ml-4 mr-1">
+      <h3 class="text-base font-semibold leading-4 text-gray-600">Requests</h3>
+    </div>
+    <div data-chart-target="chart"></div>
+    <script type="application/json" data-chart-target="data">
+      <%== @request_count_range.to_a.to_json %>
+    </script>
+  </div>
 </div>
-<div>
-  <% @all_series.each do |c| %>
-    <div><%= c.key %></div>
-  <% end %>
-</div>
 
+<table class="min-w-full divide-y divide-gray-300">
+      <thead>
+      <tr>
+        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Controller
+          Action
+        </th>
+        <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Requests</th>
+        <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Avg
+          Latency
+        </th>
+        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Role</th>
+        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
+          <span class="sr-only">Edit</span>
+        </th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 bg-white">
+      <% @all_series.each do |series| %>
+        <% info = series.info %>
+        <tr>
+          <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><%= info['labels']['action'] %></td>
+          <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell"><%= series[@time_frame].reduce %></td>
+          <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell">25ms</td>
+          <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Member</td>
+          <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Lindsay Walton</span></a>
+          </td>
+        </tr>
+      <% end %>
 
-<!--<script>-->
-<!--    document.addEventListener('DOMContentLoaded', () => {-->
-<!--        const chart = new window.Apex(document.querySelector('#latency-chart'), {-->
-<!--            chart: {-->
-<!--                type: 'line',-->
-<!--                height: 350,-->
-<!--                animations: {-->
-<!--                    enabled: false-->
-<!--                },-->
-<!--                toolbar: {-->
-<!--                    show: false-->
-<!--                },-->
-<!--            },-->
-<!--            series: [{-->
-<!--                data: <%#== @latency_range.to_a.to_json %>-->
-<!--            }],-->
-<!--            xaxis: {-->
-<!--                type: 'datetime',-->
-<!--                min: <%#= @latency_range.start_timestamp %>,-->
-<!--                max: <%#= @latency_range.end_timestamp %>-->
-<!--            },-->
-<!--            yaxis: {-->
-<!--                decimalsInFloat: 0,-->
-<!--            },-->
+      <!-- More people... -->
+      </tbody>
+    </table>
 
-<!--            stroke: {-->
-<!--                width: 2,-->
-<!--            },-->
-<!--            tooltip: {-->
-<!--                x: {-->
-<!--                    format: 'dd MMM yyyy HH:mm'-->
-<!--                }-->
-<!--            }-->
-<!--        })-->
-<!--        chart.render()-->
 
 <!--        const count = new window.Apex(document.querySelector('#requests-chart'), {-->
 <!--            chart: {-->

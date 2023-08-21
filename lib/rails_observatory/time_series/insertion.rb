@@ -10,7 +10,7 @@ module RailsObservatory
     def increment(name, labels: {})
       label_combinations(labels).each do |label_slice|
         upsert_ts(name, label_slice, [:sum])
-        $redis.call("TS.INCRBY", ts_key(name, labels), 1)
+        $redis.call("TS.ADD", ts_key(name, label_slice), '*', 1, 'ON_DUPLICATE', 'SUM')
       end
     end
 
