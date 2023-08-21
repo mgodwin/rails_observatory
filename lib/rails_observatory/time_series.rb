@@ -104,9 +104,8 @@ module RailsObservatory
         end
         args.push("AGGREGATION", @agg_type.to_s.upcase, @agg_duration, "EMPTY")
       end
-      puts "ARGS ARE #{args.join(" ")}"
+      # puts "ARGS ARE #{args.join(" ")}"
       values = $redis.call(*args)
-      puts values.length
       # Replace "NaN" with nil
       # values is an array of arrays of [[timestamp, value]] pairs
       values.map { |v| v[1] == "NaN" ? [v[0], nil] : v }

@@ -1,4 +1,4 @@
 module RailsObservatory
-  module MainHelper
+  module ControllerMetricsHelper
   end
 end
