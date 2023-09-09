@@ -8,7 +8,7 @@ module RailsObservatory
           else
             "#{k}=#{v}"
           end
-        end.tap { |x| puts x })
+        end.to_a.tap { |a| puts a.join(",")})
 
         keys.map { |key| self.new(key) }
       end

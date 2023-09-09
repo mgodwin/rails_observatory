@@ -98,7 +98,7 @@
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </span>
-                      <span class="block truncate ml-2">Past 1 hour</span>
+                      <span class="block truncate ml-2">Past <%= duration.inspect %></span>
                       <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
@@ -107,28 +107,13 @@
                     </span>
                   </button>
 
-                  <!--
-                    Select popover, show/hide based on select state.
-
-                    Entering: ""
-                      From: ""
-                      To: ""
-                    Leaving: "transition ease-in duration-100"
-                      From: "opacity-100"
-                      To: "opacity-0"
-                  -->
                   <ul class="dropdown-menu opacity-0 transition-all invisible absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm" tabindex="-1" role="listbox" aria-labelledby="listbox-label" aria-activedescendant="listbox-option-3">
-                    <!--
-                      Select option, manage highlight styles based on mouseenter/mouseleave and keyboard navigation.
-
-                      Highlighted: "bg-indigo-600 text-white", Not Highlighted: "text-gray-900"
-                    -->
                     <% [5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hour, 4.hours, 1.day, 2.days, 7.days, 1.month].each do |time_frame| %>
-                      <li class="text-gray-900 relative cursor-default select-none py-2 pl-11 pr-4 hover:bg-gray-600 hover:text-white focus-within:bg-gray-600 focus-within:text-white" id="listbox-option-0" role="option">
-                        <a href="?duration=<%= time_frame %>">
+                      <li class="text-gray-900 relative cursor-default select-none p-0 hover:bg-gray-600 hover:text-white focus-within:bg-gray-600 focus-within:text-white" id="listbox-option-0" role="option">
+                        <a href="?duration=<%= time_frame %>" class="py-2 pl-11 pr-4 block">
                           <!-- Selected: "font-semibold", Not Selected: "font-normal" -->
-                          <span class="font-normal block truncate">Past <%= time_frame.inspect %></span>
-                          <span class="hidden absolute inset-y-0 left-0 flex items-center pl-4">
+                          <span class="font-normal block truncate <%= 'font-semibold' if time_frame == duration %>">Past <%= time_frame.inspect %></span>
+                          <span class="<%= 'hidden' if time_frame != duration %> absolute inset-y-0 left-0 flex items-center pl-4">
                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                               <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                             </svg>
@@ -219,20 +204,17 @@
           </div>
           <div class="mt-2 md:flex md:items-center md:justify-between">
             <div class="min-w-0 flex-1">
-              <h1 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight"><%= yield
-                                                                                                                :title %></h1>
+              <h1 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight"><%= yield :title %></h1>
             </div>
           </div>
         </div>
       </div>
-
-
     </header>
   </div>
 
   <main class="-mt-32">
     <div class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 bg-white shadow rounded-md">
+      <div class="px-6 py-6 bg-white shadow rounded-md">
         <%= yield %>
       </div>
     </div>

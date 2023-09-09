@@ -1,0 +1,10 @@
+<div data-controller="chart"
+  data-chart-type-value="line">
+  <div class="border-b border-gray-200 pb-5 ">
+    <h3 class="text-base font-semibold leading-4 text-gray-600">Latency</h3>
+  </div>
+  <div data-chart-target="chart"></div>
+  <script type="application/json" data-chart-target="data">
+    <%== @latency_range.to_a.to_json %>
+  </script>
+</div>

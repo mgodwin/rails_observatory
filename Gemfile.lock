@@ -80,6 +80,8 @@ GEM
     crass (1.0.6)
     date (3.3.3)
     erubi (1.12.0)
+    faker (3.2.1)
+      i18n (>= 1.8.11, < 2)
     globalid (1.1.0)
       activesupport (>= 5.0)
     i18n (1.14.1)
@@ -174,6 +176,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  faker
   puma
   rails_observatory!
   sprockets-rails

@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_development_dependency "tailwindcss-rails"
+  spec.add_development_dependency "faker"
   spec.add_dependency "rails", ">= 7.0.6"
   spec.add_dependency 'redis-client'
   spec.add_dependency 'zeitwerk'

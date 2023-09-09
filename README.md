@@ -1,25 +1,23 @@
-# Observatory
-Short description and motivation.
+# Rails Observatory
+Simple metrics tracking for your Rails app.
 
-## Usage
-How to use my plugin.
+Rails observatory hooks into ActiveSupport::Instrumentation with RedisTimeSeries to provide
+a simple way to track metrics in your Rails app.
+
+## Requirements
+
+- Redis w/ [TimeSeries module](https://github.com/RedisTimeSeries/RedisTimeSeries) (or [RedisStack](https://github.com/redis-stack))
+- Rails 6+
 
 ## Installation
-Add this line to your application's Gemfile:
 
-```ruby
-gem "observatory-rails"
+```shell
+bundle add observatory-rails
 ```
 
-And then execute:
-```bash
-$ bundle
-```
+## Getting Started
+Check out the Getting Started wiki page.
 
-Or install it yourself as:
-```bash
-$ gem install observatory-rails
-```
 
 ## Development
 
