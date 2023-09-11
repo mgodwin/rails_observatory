@@ -38,5 +38,9 @@ module RailsObservatory
     def request_count(time_frame)
       TimeSeries.where(name: 'process_action.action_controller.count', action: @action, method: nil, format: nil, status: nil).first[time_frame].reduce
     end
+
+    def avg_latency(time_frame)
+      TimeSeries.where(name: 'process_action.action_controller.latency', action: @action, method: nil, format: nil, status: nil, compaction: 'avg').first[time_frame].reduce
+    end
   end
 end

@@ -72,7 +72,7 @@ SCRIPT = <<~LUA
           local compaction_key = ts_name .. "_" .. compaction
           if redis.call("EXISTS", compaction_key) == 0 then
               redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "LABELS","name", metric_name, "compaction", compaction, unpack(label_set))
-              redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", compaction, compaction_retention)
+              redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", compaction, 10000)
           end
       end
       redis.call("TS.ADD", ts_name, "*", value_to_add)

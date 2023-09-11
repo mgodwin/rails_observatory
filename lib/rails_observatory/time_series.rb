@@ -71,7 +71,8 @@ module RailsObservatory
     end
 
     def reduce
-      rollup(buckets: 1).to_a.first.last
+      _ts, value = rollup(buckets: 1).to_a.first
+      value
     end
 
     def start_timestamp
@@ -104,7 +105,7 @@ module RailsObservatory
         end
         args.push("AGGREGATION", @agg_type.to_s.upcase, @agg_duration, "EMPTY")
       end
-      puts "ARGS ARE #{args.join(" ")}"
+      # puts "ARGS ARE #{args.join(" ")}"
       values = $redis.call(*args)
       # Replace "NaN" with nil
       # values is an array of arrays of [[timestamp, value]] pairs
