@@ -6,7 +6,7 @@ module RailsObservatory
     def index
       @time_range = (duration.seconds.ago..)
       @request_count_range = TimeSeries.where(name: "process_action.action_controller.count", action: nil, method: nil, format: nil, status: nil).first[@time_range].rollup(buckets: 80)
-      @latency_range = TimeSeries.where(name:"process_action.action_controller.latency", action:nil, method: nil, format: nil, status: nil).first[@time_range].rollup(buckets: 120)
+      @latency_series = TimeSeries.where(name:"process_action.action_controller.latency", action:nil, method: nil, format: nil, status: nil).first[@time_range].rollup(buckets: 120)
       @controller_metrics = ControllerMetric.find_all_in_time_frame(@time_range)
       @runtime_breakdown = ControllerMetric.runtime_breakdown[@time_range].rollup(buckets: 120)
     end

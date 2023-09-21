@@ -14,8 +14,8 @@ module RailsObservatory
       end
 
       TimeSeries.timing("#{event.name}.latency", event.duration, labels: labels)
-      TimeSeries.timing("#{event.name}.db_runtime", db_runtime || 0, labels: labels)
-      TimeSeries.timing("#{event.name}.view_runtime", view_runtime || 0, labels: labels)
+      TimeSeries.timing("#{event.name}.latency/db_runtime", db_runtime || 0, labels: labels)
+      TimeSeries.timing("#{event.name}.latency/view_runtime", view_runtime || 0, labels: labels)
       TimeSeries.increment("#{event.name}.count", labels: labels)
     end
   end

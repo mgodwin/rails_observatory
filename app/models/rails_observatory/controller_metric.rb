@@ -11,7 +11,9 @@ module RailsObservatory
     end
 
     def self.runtime_breakdown
-      TimeSeries.where(name: 'process_action.action_controller.view_runtime', action: '*', method: nil, format: nil, status: nil).first
+      # total_series = TimeSeries.where(name: 'process_action.action_controller.latency', action: '*', method: nil, format: nil, status: nil).first
+      TimeSeries.where(parent: 'process_action.action_controller.latency', action: '*', method: nil, format: nil, status: nil)
+
     end
 
     def self.requests

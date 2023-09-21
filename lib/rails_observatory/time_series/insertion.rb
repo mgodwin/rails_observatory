@@ -10,6 +10,7 @@ SCRIPT = <<~LUA
       return table.concat(key_parts, ":")
   end
 
+
   -- Helper function to get all combinations of a table
   local function generate_key_combinations(keys)
       local n = #keys
@@ -34,12 +35,24 @@ SCRIPT = <<~LUA
       return combs
   end
 
+  local function extract_parent_label(base_name)
+      local index = string.find(base_name, "/")
+      if index then
+          return string.sub(base_name, 1, index - 1)
+      else
+          return nil
+      end
+  end
+
   -- Main script begins here
   local metric_name = tostring(ARGV[1])  -- Ensure it's a string
   local value_to_add = tonumber(ARGV[2]) -- Ensure it's a number
   local raw_retention = 10000 -- Hardcoded to 10ms
   local compaction_retention = 31536000000 -- Hardcoded to 1 year in ms (365*24*60*60*1000)
   local compactions = {"avg", "min", "max"}
+
+  -- Assuming base_name is defined somewhere above
+  local parent_label = extract_parent_label(metric_name)
 
   -- Extracting labels
   local labels = {}
@@ -57,6 +70,12 @@ SCRIPT = <<~LUA
   for _, comb_keys in ipairs(key_combinations) do
       local ts_name = metric_name
       local label_set = {}
+      
+      if parent_label then
+        table.insert(label_set, "parent")
+        table.insert(label_set, parent_label)
+      end
+       
       for _, key in ipairs(comb_keys) do
           ts_name = ts_name .. ":" .. labels[key]
           table.insert(label_set, key)
@@ -73,9 +92,10 @@ SCRIPT = <<~LUA
           if redis.call("EXISTS", compaction_key) == 0 then
               redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "LABELS","name", metric_name, "compaction", compaction, unpack(label_set))
               redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", compaction, 10000)
+              return redis.call("TS.INFO", compaction_key)
           end
       end
-      redis.call("TS.ADD", ts_name, "*", value_to_add)
+      redis.call("TS.ADD", ts_name, "*", value_to_add) 
   end
 
   return "OK"
@@ -139,8 +159,7 @@ INCREMENT_SCRIPT = <<~LUA
       local label_set = {}
       for _, key in ipairs(comb_keys) do
           ts_name = ts_name .. ":" .. labels[key]
-          table.insert(label_set, key)
-          table.insert(label_set, labels[key])
+          label_set[key] = labels[key]
       end
       
       if redis.call("EXISTS", ts_name) == 0 then
@@ -188,12 +207,11 @@ end
 TIMING_SCRIPT = RedisScript.new(SCRIPT)
 INCREMENT_CALL = RedisScript.new(INCREMENT_SCRIPT)
 
-
-
 module RailsObservatory
   module TimeSeries::Insertion
     def timing(name, value, labels: {})
-      TIMING_SCRIPT.call(name, value, labels.to_a.flatten.map(&:to_s))
+      res = TIMING_SCRIPT.call(name, value, labels.to_a.flatten.map(&:to_s))
+      puts "result is #{res}"
     end
 
     def increment(name, labels: {})

@@ -1,6 +1,6 @@
 <% content_for(:title, 'Controllers') %>
 <div style="display:grid;grid-template-columns: 1fr 1fr;" class="gap-4">
-  <%= render 'chart' %>
+  <%= render 'chart', name: 'Latency', series: @latency_series %>
   <div data-controller="chart" data-chart-type-value="bar">
     <div class="border-b border-gray-200 pb-5">
       <h3 class="text-base font-semibold leading-4 text-gray-600">Requests</h3>
@@ -31,35 +31,35 @@
 </div>
 
 <table class="min-w-full divide-y divide-gray-300">
-      <thead>
-      <tr>
-        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Controller
-          Action
-        </th>
-        <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Requests</th>
-        <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Avg
-          Latency
-        </th>
-        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-          <span class="sr-only">Edit</span>
-        </th>
-      </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 bg-white">
-      <% @controller_metrics.each do |controller_metric| %>
-        <tr>
-          <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><%= controller_metric.action %></td>
-          <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell"><%= controller_metric.request_count(@time_range) %></td>
-          <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell"><%= controller_metric.avg_latency(@time_range) %></td>
-          <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-            <a href="#" class="text-indigo-600 hover:text-indigo-900"><%= link_to 'View', controller_metric_path(controller_metric.id) %></a>
-          </td>
-        </tr>
-      <% end %>
+  <thead>
+  <tr>
+    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Controller
+      Action
+    </th>
+    <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Requests</th>
+    <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Avg
+      Latency
+    </th>
+    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
+      <span class="sr-only">Edit</span>
+    </th>
+  </tr>
+  </thead>
+  <tbody class="divide-y divide-gray-200 bg-white">
+  <% @controller_metrics.each do |controller_metric| %>
+    <tr>
+      <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><%= controller_metric.action %></td>
+      <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell"><%= controller_metric.request_count(@time_range) %></td>
+      <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell"><%= controller_metric.avg_latency(@time_range) %></td>
+      <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+        <a href="#" class="text-indigo-600 hover:text-indigo-900"><%= link_to 'View', controller_metric_path(controller_metric.id) %></a>
+      </td>
+    </tr>
+  <% end %>
 
-      <!-- More people... -->
-      </tbody>
-    </table>
+  <!-- More people... -->
+  </tbody>
+</table>
 
 
 <!--        const count = new window.Apex(document.querySelector('#requests-chart'), {-->
