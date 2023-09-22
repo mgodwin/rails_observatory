@@ -16,7 +16,7 @@ module RailsObservatory
     end
 
     def info
-      info_hash = $redis.call("TS.INFO", key).each_slice(2).to_h
+      info_hash = Hash[*$redis.call("TS.INFO", key)]
       info_hash["labels"] = info_hash["labels"].to_h if info_hash["labels"].present?
       info_hash
     end

@@ -17,6 +17,9 @@ module RailsObservatory
       TimeSeries.timing("#{event.name}.latency/db_runtime", db_runtime || 0, labels: labels)
       TimeSeries.timing("#{event.name}.latency/view_runtime", view_runtime || 0, labels: labels)
       TimeSeries.increment("#{event.name}.count", labels: labels)
+      if status >= 500
+        TimeSeries.increment("#{event.name}.count/errors", labels: labels)
+      end
     end
   end
 end

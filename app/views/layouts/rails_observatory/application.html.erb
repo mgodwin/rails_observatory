@@ -22,7 +22,7 @@
       }
 
       connect() {
-        const data = JSON.parse(this.dataTarget.innerHTML)
+        const series = this.dataTargets.map((target) => ({name: target.dataset.seriesName, data: JSON.parse(target.innerHTML)}));
 
         this.chart = new Apexcharts(this.chartTarget, {
           chart: {
@@ -35,22 +35,20 @@
               show: false
             }
           },
-          series: [{
-            data: data
-          }],
+          series,
           xaxis: {
             type: 'datetime',
             min: <%= @time_range.begin.to_i * 1000 %>,
             max: <%= (@time_range.end.nil? ? Time.now.to_i : @time_range.end.to_i) * 1000 %>,
           },
-          yaxis: {
-            decimalsInFloat: 0,
-          }
-          ,
+          dataLabels: {
+            enabled: false
+          },
+          yaxis: {decimalsInFloat: 0},
           stroke: {
-            width: 2
-          }
-          ,
+            width: 2,
+            curve: 'straight'
+          },
           tooltip: {
             x: {
               format: 'dd MMM yyyy HH:mm'
