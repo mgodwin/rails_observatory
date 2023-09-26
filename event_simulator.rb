@@ -3,9 +3,6 @@
 require 'active_support/notifications'
 require 'faker'
 
-# Define the number of events you want to emit
-EVENT_COUNT = 100
-
 # Possible HTTP methods and statuses
 HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"]
 HTTP_STATUSES = [200, 201, 204, 400, 401, 403, 404, 500]
@@ -14,7 +11,14 @@ Faker::Config.random = Random.new(42)
 names = (0..30).map { Faker::App.name }
 controller_actions = ["index", "show", "create", "update", "destroy", "new", "edit"]
 
-EVENT_COUNT.times do |i|
+# trap CTRL + C and exit
+trap("SIGINT") do
+  puts "Done"
+  exit!
+end
+
+emitted_count = 0
+while true do
   # Use Faker to generate controller names like "UsersController", "ProductsController", etc.
   controller_name = "#{names.sample}Controller"
 
@@ -33,18 +37,18 @@ EVENT_COUNT.times do |i|
     path: "/#{controller_name.underscore}/#{id}",
     status: status,
     view_runtime: rand(10..100),
-    db_runtime: rand(1..10)
+    db_runtime: rand(1..100)
   }
 
-  # Define start and finish times to calculate duration
-  # start_time = Time.now
-  # Simulate the duration by adding a random number of seconds
-  # finish_time = start_time + rand(0.1..1.5)
-
   # Publish the event
-  ActiveSupport::Notifications.instrument('process_action.action_controller', payload)
+  ActiveSupport::Notifications.instrument('process_action.action_controller', payload) do
+    # Simulate some work
+    sleep(rand(0.1..0.8))
+  end
 
-  puts "Emitted event ##{i + 1} with payload: #{payload}"
+  emitted_count +=1
+
+  if emitted_count % 1000 == 0
+    puts "Emitted #{emitted_count} events"
+  end
 end
-
-puts "Done"

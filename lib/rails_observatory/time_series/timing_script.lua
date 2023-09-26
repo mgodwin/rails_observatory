@@ -77,7 +77,7 @@ for _, comb_keys in ipairs(key_combinations) do
   for _, compaction in ipairs(compactions) do
     local compaction_key = ts_name .. "_" .. compaction
     if redis.call("EXISTS", compaction_key) == 0 then
-      redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "LABELS","name", metric_name, "compaction", compaction, unpack(label_set))
+      redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "CHUNK_SIZE", 48, "LABELS","name", metric_name, "compaction", compaction, unpack(label_set))
       redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", compaction, 10000)
       return redis.call("TS.INFO", compaction_key)
     end

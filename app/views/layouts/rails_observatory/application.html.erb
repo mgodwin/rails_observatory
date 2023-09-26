@@ -18,11 +18,15 @@
       static targets = ["chart", "data"]
 
       static values = {
-        type: String
+        type: String,
+        palette: String,
       }
 
       connect() {
-        const series = this.dataTargets.map((target) => ({name: target.dataset.seriesName, data: JSON.parse(target.innerHTML)}));
+        const series = this.dataTargets.map((target) => ({
+          name: target.dataset.seriesName,
+          data: JSON.parse(target.innerHTML)
+        }));
 
         this.chart = new Apexcharts(this.chartTarget, {
           chart: {
@@ -43,6 +47,9 @@
           },
           dataLabels: {
             enabled: false
+          },
+          theme: {
+            palette: this.paletteValue
           },
           yaxis: {decimalsInFloat: 0},
           stroke: {

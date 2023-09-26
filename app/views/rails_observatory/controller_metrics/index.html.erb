@@ -3,7 +3,7 @@
   <%= render 'chart', name: 'Latency', series: @latency_series, type: 'line' %>
   <%= render 'chart', name: 'Requests', series: @request_count_range, type: 'bar' %>
   <%= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
-  <%= render 'chart', name: 'Errors', series: @errors, type: 'bar' %>
+  <%= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
 </div>
 
 <table class="min-w-full divide-y divide-gray-300">

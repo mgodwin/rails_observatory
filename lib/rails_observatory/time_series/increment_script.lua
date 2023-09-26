@@ -57,7 +57,7 @@ for _, comb_keys in ipairs(key_combinations) do
 
   local compaction_key = ts_name .. "_" .. "sum"
   if redis.call("EXISTS", compaction_key) == 0 then
-    redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "LABELS", "name", metric_name, "compaction", "sum", unpack(label_set))
+    redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "CHUNK_SIZE", 48, "LABELS", "name", metric_name, "compaction", "sum", unpack(label_set))
     redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", "sum", 10000)
   end
   redis.call("TS.ADD", ts_name, "*", 1, 'ON_DUPLICATE', 'SUM')

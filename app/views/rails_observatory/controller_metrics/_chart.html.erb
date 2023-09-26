@@ -1,4 +1,4 @@
-<div data-controller="chart" data-chart-type-value="<%= local_assigns[:type] %>">
+<div data-controller="chart" data-chart-type-value="<%= local_assigns[:type] %>" data-chart-palette-value="<%= local_assigns[:palette] || 'palette1' %>">
   <div class="border-b border-gray-200 pb-5">
     <h3 class="text-base font-semibold leading-4 text-gray-600"><%= local_assigns[:name] %></h3>
   </div>
@@ -6,7 +6,7 @@
     <div data-chart-target="chart"></div>
     <% Array.wrap(local_assigns[:series]).each do |series| %>
       <script type="application/json" data-chart-target="data" data-series-name="<%= series.info["labels"]["name"] %>">
-        <%== series[@time_range].rollup(buckets: 120).to_a.to_json %>
+        <%== series[@time_range].rollup(buckets: buckets_for_chart(@time_range)).to_a.to_json %>
       </script>
     <% end %>
   <% else %>
