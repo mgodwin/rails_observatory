@@ -1,8 +1,12 @@
 # Rails Observatory
+<img src="https://raw.githubusercontent.com/mgodwin/rails_observatory/main/.github/logo_with_text.svg" height="80">
+
 Simple metrics tracking for your Rails app.
 
 Rails observatory hooks into ActiveSupport::Instrumentation with RedisTimeSeries to provide
 a simple way to track metrics in your Rails app.
+
+<img src="https://github.com/mgodwin/rails_observatory/blob/main/.github/observatory_screenshot.png?raw=true">
 
 ## Requirements
 
