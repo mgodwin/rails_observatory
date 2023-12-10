@@ -14,7 +14,6 @@ module RailsObservatory
     end
 
     def self.latency_composition_series_set
-      # total_series = TimeSeries.where(name: '#{EVENT_PREFIX}.latency', action: '*', method: nil, format: nil, status: nil).first
       TimeSeries.where(**global_scope.merge(parent: "#{EVENT_PREFIX}.latency", compaction: 'avg'))
     end
 

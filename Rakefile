@@ -11,3 +11,5 @@ desc "watch with tailwindcss"
 task 'tailwindcss:watch' do
   sh "bundle exec tailwindcss -i app/assets/stylesheets/rails_observatory/application.tailwind.css -o app/assets/stylesheets/rails_observatory/builds/tailwind.css -c config/tailwind.config.js --watch"
 end
+
+load 'lib/tasks/rails_observatory_tasks.rake'

@@ -1,38 +1,124 @@
 <% content_for(:title, 'Controllers') %>
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+<style>
+  table {
+    width: 100%;
+    border-spacing: 0;
+    /*border: 1px solid var(--divider);*/
+
+    /*padding:0;*/
+
+    & th {
+      text-align: left;
+      font-weight: 400;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+
+      &:first-child {
+        border-top-left-radius: .5rem;
+      }
+
+      &:last-child {
+        border-top-right-radius: .5rem;
+      }
+
+    }
+
+    & td {
+      padding: 0.75rem 1rem;
+    }
+  }
+
+  .card {
+    border-radius: 0.5rem;
+    background-color: var(--surface-card);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+
+    &.table {
+      padding: 0;
+
+      & h2 {
+        padding: 1rem;
+        margin: 0;
+      }
+    }
+  }
+
+
+  .library-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    & .card {
+      grid-column: span 2;
+    }
+
+  }
+</style>
+<div class="library-grid">
   <%= render 'chart', name: 'Latency', series: @latency_series, type: 'line' %>
   <%= render 'chart', name: 'Requests', series: @request_count_range, type: 'bar' %>
   <%= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
   <%= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
+
+
+
+
+  <div class="card table">
+    <h2>Controllers</h2>
+    <table>
+      <thead>
+      <tr>
+        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Controller
+          Action
+        </th>
+        <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Requests</th>
+        <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Avg
+          Latency
+        </th>
+        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
+          <span class="sr-only">View</span>
+        </th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 bg-white">
+      <% @controller_metrics.each do |controller_metric| %>
+        <tr>
+          <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><%= controller_metric.action %></td>
+          <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell"><%= controller_metric.request_count(@time_range) %></td>
+          <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell"><%= controller_metric.avg_latency(@time_range).to_f.round(2) %>
+            ms
+          </td>
+          <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+            <a href="#" class="text-indigo-600 hover:text-indigo-900"><%= link_to 'View', controller_metric_path(controller_metric.id) %></a>
+          </td>
+        </tr>
+      <% end %>
+
+      <!-- More people... -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card table">
+    <h2>Recent Events</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Happened At</th>
+        <th>Name</th>
+        <th>Duration</th>
+      </tr>
+      </thead>
+      <% @events.each do |e| %>
+        <tr>
+          <td><%= e.timestamp.to_fs(:db) %></td>
+          <td><%= e.name %></td>
+          <td><%= e.duration %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
 </div>
-
-<table class="min-w-full divide-y divide-gray-300">
-  <thead>
-  <tr>
-    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Controller
-      Action
-    </th>
-    <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Requests</th>
-    <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Avg
-      Latency
-    </th>
-    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-      <span class="sr-only">Edit</span>
-    </th>
-  </tr>
-  </thead>
-  <tbody class="divide-y divide-gray-200 bg-white">
-  <% @controller_metrics.each do |controller_metric| %>
-    <tr>
-      <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><%= controller_metric.action %></td>
-      <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell"><%= controller_metric.request_count(@time_range) %></td>
-      <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell"><%= controller_metric.avg_latency(@time_range).to_f.round(2) %>ms</td>
-      <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-        <a href="#" class="text-indigo-600 hover:text-indigo-900"><%= link_to 'View', controller_metric_path(controller_metric.id) %></a>
-      </td>
-    </tr>
-  <% end %>
-
-  <!-- More people... -->
-  </tbody>
-</table>

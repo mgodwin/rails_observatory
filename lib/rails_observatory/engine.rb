@@ -27,13 +27,14 @@ end
 module RailsObservatory
   class Engine < ::Rails::Engine
     isolate_namespace RailsObservatory
+    config.rails_observatory = ActiveSupport::OrderedOptions.new
 
     initializer "rails_observatory.assets.precompile" do |app|
       app.config.assets.precompile += %w( rails_observatory/builds/tailwind.css )
     end
 
     initializer "rails_observatory.redis" do |app|
-      puts "Setting up redis"
+
       redis_config = RedisClient.config(host: "localhost", port: 6379, db: 0, middlewares: [RedisClientInstrumentation])
       $redis = redis_config.new_pool(timeout: 0.5, size: Integer(ENV.fetch("RAILS_MAX_THREADS", 5)))
 
@@ -41,8 +42,9 @@ module RailsObservatory
     end
 
     initializer "rails_observatory.instrumentation" do
-      puts "Subscribed to ActionController events"
-      require_relative 'controller_subscriber'
+      ActiveSupport::Notifications.subscribe(/.*/) do |event|
+        $redis.call("XADD", "events", "*", "event", event.name, "payload", JSON.generate(event.payload), "duration", event.duration)
+      end
     end
   end
 end

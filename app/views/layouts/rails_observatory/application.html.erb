@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html class="h-full bg-gray-100" lang="en">
+<html lang="en">
 <head>
   <title>Observatory</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <%= stylesheet_link_tag "rails_observatory/builds/tailwind", media: "all" %>
+  <%#= stylesheet_link_tag "rails_observatory/builds/tailwind", media: "all" %>
 
   <script type="module">
     import Apexcharts from "https://jspm.dev/apexcharts"
@@ -72,159 +72,209 @@
     window.Stimulus = Stimulus
     window.Apex = Apexcharts
   </script>
+  <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&display=swap');
+
+    :root {
+      --red: #ba181b;
+      --black: #161a1d;
+      --gray: #b1a7a6;
+      --white: #eee;
+      --divider: color-mix(in oklab, var(--black) 88%, white);
+      --divider-active: color-mix(in oklab, var(--black) 75%, white);
+      --surface-active: color-mix(in oklab, var(--black) 92%, white);
+      --surface-hover: color-mix(in oklab, var(--black) 96%, white);
+      --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
+      --surface-card: color-mix(in oklab, var(--black) 96%, white);
+    }
+
+    html, body {
+      font-family: 'Fira Sans', sans-serif;
+      font-weight: 200;
+      color: var(--white);
+      height: 100%;
+      background-color: var(--black);
+    }
+
+    body {
+      display: grid;
+      grid-template-areas: 'side-nav top-nav'
+                            'side-nav main';
+      grid-template-columns: 16rem 1fr;
+      grid-template-rows: auto 1fr;
+      margin: 0;
+    }
+
+    button {
+      font-family: inherit;
+      display: flex;
+      font-size: 1rem;
+      align-items: center;
+      padding: .5rem .75rem;
+      border-radius: .5rem;
+      gap: .5rem;
+      font-weight: 400;
+
+      &.secondary {
+        background-color: transparent;
+        border: 1px solid var(--divider);
+        color: var(--white);
+
+        &:hover, &:focus-within {
+          border: 1px solid var(--divider-active);
+          background-color: var(--surface-hover);
+        }
+      }
+    }
+
+    main {
+      grid-area: main;
+      padding: 1rem;
+    }
+
+    .side-nav {
+      grid-area: side-nav;
+      grid-row: 1 / -1;
+      border-right: 1px solid var(--divider);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+
+      & > img {
+        align-self: start;
+      }
+
+
+      & > ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+
+        & a {
+          display: block;
+          padding: .5rem .75rem;
+          color: var(--white);
+          background-color: var(--surface-active);
+          border-radius: .5rem;
+          text-decoration: none;
+          font-weight: 400;
+
+          &:hover {
+            background-color: var(--surface-hover);
+          }
+        }
+      }
+    }
+
+    .top-nav {
+      grid-area: top-nav;
+      border-bottom: 1px solid var(--divider);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      & h1 {
+        margin: 0;
+      }
+    }
+
+    .dropdown {
+      position: relative;
+
+      & > ul {
+        background-color: var(--surface-dropdown);
+        opacity: 0;
+        visibility: hidden;
+        transform: translate(0, -1rem);
+        transition: opacity .2s ease-in-out, visibility .2s ease-in-out, transform .2s ease-in-out;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+
+        & > li {
+          padding: .5rem .75rem;
+          border-bottom: 1px solid var(--divider);
+          text-align: left;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          & > a {
+            display: block;
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 400;
+
+            &:hover {
+              background-color: var(--surface-hover);
+            }
+          }
+        }
+      }
+
+      &:focus-within {
+        & > ul {
+          opacity: 100;
+          visibility: visible;
+          transform: translate(0, 0);
+        }
+      }
+    }
+  </style>
 </head>
-<body class="h-full">
-<div class="min-h-full">
-  <div class="bg-gray-800 pb-32">
-    <nav class="bg-gray-800">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="border-b border-gray-700">
-          <div class="flex h-16 items-center justify-between px-4 sm:px-0">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <img class="h-8" src="<%= image_path "rails_observatory/logo_with_text.svg" %>" alt="RailsObservatory">
-              </div>
-              <div class="hidden md:block">
-                <div class="ml-10 flex items-baseline space-x-4">
-                  <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                  <a href="#" class="nav-btn-active" aria-current="page">Controllers</a>
-                  <a href="#" class="nav-btn">Mailers</a> <a href="#" class="nav-btn">Jobs</a>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end">
-              <div class="w-full max-w-lg lg:max-w-xs">
-                <!-- Dropdown Menu -->
-                <div class="relative dropdown">
-                  <button type="button" class="relative w-full cursor-default rounded-md bg-gray-800 py-1.5 pl-3 pr-10 text-left text-gray-300 shadow-sm ring-1 ring-inset ring-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 sm:text-sm sm:leading-6" aria-haspopup="listbox" aria-expanded="true" aria-labelledby="listbox-label">
-                    <span class="flex items-center">
-                      <span class="text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </span>
-                      <span class="block truncate ml-2">Past <%= duration.inspect %></span>
-                      <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                          <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
-                        </svg>
-                      </span>
-                    </span>
-                  </button>
+<body>
+<nav class="side-nav">
+  <img height="40" src="<%= image_path "rails_observatory/logo_with_text.svg" %>" alt="RailsObservatory">
+  <ul>
+    <li><a href="/">Dashboard</a></li>
+    <li><a href="/mailers">Mailers</a></li>
+    <li><a href="/jobs">Jobs</a></li>
 
-                  <ul class="dropdown-menu opacity-0 transition-all invisible absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm" tabindex="-1" role="listbox" aria-labelledby="listbox-label" aria-activedescendant="listbox-option-3">
-                    <% [5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hour, 4.hours, 1.day, 2.days, 7.days, 1.month].each do |time_frame| %>
-                      <li class="text-gray-900 relative cursor-default select-none p-0 hover:bg-gray-600 hover:text-white focus-within:bg-gray-600 focus-within:text-white" id="listbox-option-0" role="option">
-                        <a href="?duration=<%= time_frame %>" class="py-2 pl-11 pr-4 block">
-                          <!-- Selected: "font-semibold", Not Selected: "font-normal" -->
-                          <span class="font-normal block truncate <%= 'font-semibold' if time_frame == duration %>">Past <%= time_frame.inspect %></span>
-                          <span class="<%= 'hidden' if time_frame != duration %> absolute inset-y-0 left-0 flex items-center pl-4">
-                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                            </svg>
-                          </span>
-                        </a>
-                      </li>
-                    <% end %>
+  </ul>
 
-                  </ul>
-                </div>
+</nav>
+<nav class="top-nav">
+  <h1><%= yield :title %></h1>
+  <div class="dropdown">
+    <button class="secondary">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>Past <%= duration.inspect %></span>
+      <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" height="20">
+        <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+      </svg>
+    </button>
 
-              </div>
-            </div>
-            <div class="-mr-2 flex md:hidden">
-              <!-- Mobile menu button -->
-              <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" aria-controls="mobile-menu" aria-expanded="false">
-                <span class="absolute -inset-0.5"></span>
-                <span class="sr-only">Open main menu</span>
-                <!-- Menu open: "hidden", Menu closed: "block" -->
-                <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-                <!-- Menu open: "block", Menu closed: "hidden" -->
-                <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <ul>
+      <% [5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hour, 4.hours, 1.day, 2.days, 7.days, 1.month].each do |time_frame| %>
+        <li>
+          <a href="?duration=<%= time_frame %>" class="py-2 pl-11 pr-4 block">
+            <!-- Selected: "font-semibold", Not Selected: "font-normal" -->
+            <span class="font-normal block truncate <%= 'font-semibold' if time_frame == duration %>">Past <%= time_frame.inspect %></span>
+            <span class="<%= 'hidden' if time_frame != duration %> absolute inset-y-0 left-0 flex items-center pl-4">
+              <svg height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </a>
+        </li>
+      <% end %>
 
-      <!-- Mobile menu, show/hide based on menu state. -->
-      <div class="border-b border-gray-700 md:hidden" id="mobile-menu">
-        <div class="space-y-1 px-2 py-3 sm:px-3">
-          <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-          <a href="#" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Dashboard</a>
-          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Team</a>
-          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
-          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Calendar</a>
-          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Reports</a>
-        </div>
-      </div>
-    </nav>
-    <header class="py-10">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div>
-          <div>
-            <% if has_breadcrumbs? %>
-              <nav class="sm:hidden" aria-label="Back">
-                <a href="<%= breadcrumbs.last[1] %>" class="flex items-center text-sm font-medium text-gray-400 hover:text-gray-200">
-                  <svg class="-ml-1 mr-1 h-5 w-5 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                  </svg>
-                  Back </a>
-              </nav>
-              <nav class="hidden sm:flex" aria-label="Breadcrumb">
-
-                <ol role="list" class="flex items-center space-x-4">
-                  <li>
-                    <div class="flex">
-                      <% text, path = breadcrumbs.first %>
-                      <a href="<%= path %>" class="text-sm font-medium text-gray-400 hover:text-gray-200"><%= text %></a>
-                    </div>
-                  </li>
-                  <% breadcrumbs.slice(1)&.each do |crumb| %>
-                    <li>
-                      <div class="flex items-center">
-                        <svg class="h-5 w-5 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                          <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                        </svg>
-                        <a href="#" class="ml-4 text-sm font-medium text-gray-400 hover:text-gray-200">TODO</a>
-                      </div>
-                    </li>
-                  <% end %>
-                  <li>
-                    <div class="flex items-center">
-                      <svg class="h-5 w-5 flex-shrink-0 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                      </svg>
-                      <a href="#" aria-current="page" class="ml-4 text-sm font-medium text-gray-400"><%= yield :title
-                      %></a>
-                    </div>
-                  </li>
-                </ol>
-              </nav>
-            <% end %>
-          </div>
-          <div class="mt-2 md:flex md:items-center md:justify-between">
-            <div class="min-w-0 flex-1">
-              <h1 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight"><%= yield :title %></h1>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
+    </ul>
   </div>
-
-  <main class="-mt-32">
-    <div class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-      <div class="px-6 py-6 bg-white shadow rounded-md">
-        <%= yield %>
-      </div>
-    </div>
-  </main>
-</div>
-
+</nav>
+<main>
+  <%= yield %>
+</main>
 </body>
 </html>

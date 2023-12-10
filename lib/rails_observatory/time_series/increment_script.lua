@@ -52,7 +52,7 @@ for _, comb_keys in ipairs(key_combinations) do
   end
 
   if redis.call("EXISTS", ts_name) == 0 then
-    redis.call("TS.CREATE", ts_name, "RETENTION", raw_retention)
+    redis.call("TS.CREATE", ts_name, "RETENTION", raw_retention, "CHUNK_SIZE", 48)
   end
 
   local compaction_key = ts_name .. "_" .. "sum"

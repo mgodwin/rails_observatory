@@ -4,9 +4,14 @@
 Simple metrics tracking for your Rails app.
 
 Rails observatory hooks into ActiveSupport::Instrumentation with RedisTimeSeries to provide
-a simple way to track metrics in your Rails app.
+a simple way to track metrics in your Rails app, without third party integrations like Datadog, Grafana, InfluxDB, etc.
 
 <img src="https://github.com/mgodwin/rails_observatory/blob/main/.github/observatory_screenshot.png?raw=true">
+
+## Features
+Out of the box, it tracks the need-to-know metrics for Controllers, Mailers (coming soon), Jobs (coming soon), and Models (coming soon).
+
+Eventually it will also allow you to track arbitrary metrics.
 
 ## Requirements
 
@@ -48,7 +53,7 @@ You may configure the retention duration for your metrics.  Want to keep them fo
 The only penalty is that the more data you keep, the more space it will take up.  The default is 1 year.
 
 To store metrics, we use RedisTimeSeries and a few compaction rules to make querying speedy.
-Raw Metrics are retained for 1 minute, then downsampled to per second 
+Raw Metrics are retained for 1 minute, then downsampled to 10 second resolution.
 
 > Uncompressed, the timestamp and the value each consume 8 bytes (or 16 bytes/128 bits in total) for each sample.
 
@@ -66,24 +71,6 @@ each tag/label creates a new time series, so be careful not to create too many.
 The combination of the tags and labels will be the number of time series created,
 so if you're creating dynamic tags, you need to be careful to use **low cardinality**
 tag values or you could end up eating all your space.
-
-Q: Configuring Retention Periods
-
-By default there is a geared retention period based on the resolution of the metric.
-This means that the raw data is kept for 1 minute, then downsampled to per second
-for 1 hour, then downsampled to per minute for 1 day, then downsampled to per hour
-for 1 week, then downsampled to per day for 1 month, then downsampled to per week
-for 1 year.
-
-You can configure this to your liking, but be aware that you will be using more space
-if you keep more data.
-
-For estimation purposes, you can use the following formula:
-
-16bytes per event * number of events expected = size in bytes
-
-You should be able to go from there to figure out how much space you need.
-
 
 ## Labels
 
