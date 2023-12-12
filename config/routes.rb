@@ -1,5 +1,6 @@
 RailsObservatory::Engine.routes.draw do
 
-  resources :controller_metrics, only: [:index, :show]
-  root to: "controller_metrics#index"
+  resources :requests, only: [:index, :show]
+  resources :jobs, only: :index
+  root to: "requests#index"
 end

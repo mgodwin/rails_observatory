@@ -1,0 +1,177 @@
+<% content_for :subtitle, "Request" %>
+<% content_for :title, params[:id] %>
+<style>
+  @scope {
+    :scope {
+      padding: 0;
+    }
+  }
+</style>
+<style>
+
+  h2 {
+    border-bottom: 1px solid var(--divider);
+    padding: 1rem 2rem;
+    margin: 0;
+    font-family: var(--font-mono);
+    background-color: var(--surface-hover);
+  }
+
+  .headers, .params {
+    ._arrow-right {
+      transform: rotate(0deg);
+      transition: transform 100ms linear;
+    }
+
+
+    & + & {
+      border-top: 1px solid var(--divider);
+    }
+
+    &[open] {
+      ._arrow-right {
+        transform: rotate(90deg);
+      }
+    }
+
+    & summary {
+      list-style: none;
+      display: flex;
+      gap: .5rem;
+      padding: 1rem 2rem;
+      background-color: var(--surface-hover);
+      font-weight: 400;
+      position: sticky;
+      top: 0;
+    }
+
+    & dl {
+      margin: 0;
+      padding: 1rem 2rem;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      white-space: break-spaces;
+      grid-row-gap: .3rem;
+      overflow: auto;
+
+      & dt {
+        font-weight: 400;
+      }
+    }
+  }
+
+  .request-stats {
+    display: flex;
+    border-bottom: 1px solid var(--divider);
+    margin: 0;
+
+    & > * {
+      padding: 2rem 2rem;
+      flex-grow: 1;
+
+      & + & {
+        border-left: 1px solid var(--divider);
+      }
+
+      & > dt {
+        font-weight: bold;
+        color: var(--black-secondary);
+        margin-bottom: .75rem;
+      }
+
+      & > dd {
+        font-size: 2.5rem;
+        font-weight: 400;
+        margin: 0;
+      }
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    /*margin: 0;*/
+    padding: 1rem 2rem;
+  }
+
+  .event {
+    display: flex;
+    border: 1px solid var(--divider);
+    border-radius: .5rem;
+    margin:1rem;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 400;
+    gap: 1rem;
+
+    & > ._name {
+      flex-grow: 1;
+    }
+
+    & > ._duration {
+      font-weight: 400;
+    }
+  }
+</style>
+<h2>
+  <%= @req.payload['method'] %>
+  <%= @req.payload['path'] %>
+  <%= @req.payload['format'] %>
+</h2>
+<dl class="request-stats">
+  <div>
+    <dt>Status</dt>
+    <dd><%= @req.payload['status'] %></dd>
+  </div>
+  <div>
+    <dt>Duration</dt>
+    <dd><%= @req.duration.to_f.round(2) %></dd>
+  </div>
+  <div>
+    <dt>View Runtime</dt>
+    <dd><%= @req.payload['view_runtime'].to_f.round(2) %></dd>
+  </div>
+  <div>
+    <dt>DB Runtime</dt>
+    <dd><%= @req.payload['db_runtime'].to_f.round(2) %></dd>
+  </div>
+</dl>
+<details class="headers">
+  <summary>
+    <svg class="_arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+    Headers
+  </summary>
+  <dl>
+    <% @req.payload['headers'].sort.each do |k, v| %>
+      <dt><%= k %></dt>
+      <dd><%= v %></dd>
+    <% end %>
+  </dl>
+</details>
+<details class="params">
+  <summary>
+    <svg class="_arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+
+    Params
+  </summary>
+  <dl>
+    <% @req.payload['params'].sort.each do |k, v| %>
+      <dt><%= k %></dt>
+      <dd><%= v %></dd>
+    <% end %>
+  </dl>
+</details>
+
+<h3>Events</h3>
+<% @events.each do |event| %>
+  <div class="event">
+    <div class="_name"><%= event.name %></div>
+    <div class="_duration"><%= event.duration.to_f.round(2) %></div>
+    <div class="_time"><%= event.timestamp %></div>
+  </div>
+<% end %>
+

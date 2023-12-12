@@ -1,0 +1,19 @@
+<div data-controller="chart" data-chart-name="<%= local_assigns[:name] %>" data-chart-type-value="<%= local_assigns[:type] %>" data-chart-palette-value="<%= local_assigns[:palette] || 'palette1' %>">
+  <div class="border-b border-gray-200 pb-5" hidden="">
+    <h3 class="text-base font-semibold leading-4 text-gray-600"></h3>
+  </div>
+  <% if local_assigns[:series] %>
+    <div data-chart-target="chart"></div>
+    <% Array.wrap(local_assigns[:series]).each do |series| %>
+      <script type="application/json" data-chart-target="data" data-series-name="<%= series.info["labels"]["name"].split('/').last %>">
+        <%== series[@time_range].rollup(buckets: buckets_for_chart(@time_range)).to_a.to_json %>
+      </script>
+    <% end %>
+  <% else %>
+    <div class="text-center">
+      <h3 class="mt-2 text-sm font-semibold text-gray-400">No data available in this timeframe</h3>
+    </div>
+  <% end %>
+
+
+</div>

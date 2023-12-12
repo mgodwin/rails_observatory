@@ -39,11 +39,36 @@
               show: false
             }
           },
+          grid: {
+            borderColor: 'var(--divider)',
+            strokeDashArray: 4,
+            xaxis: {
+              lines: {
+                show: true
+              }
+            },
+            yaxis: {
+              lines: {
+                show: true
+              }
+            },
+            padding: {
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 8
+            },
+          },
           series,
           xaxis: {
             type: 'datetime',
             min: <%= @time_range.begin.to_i * 1000 %>,
             max: <%= (@time_range.end.nil? ? Time.now.to_i : @time_range.end.to_i) * 1000 %>,
+            style: {
+              colors: 'var(--gray)',
+              fontSize: '0.75rem',
+              fontFamily: 'var(--font-mono)'
+            },
           },
           dataLabels: {
             enabled: false
@@ -59,7 +84,8 @@
           tooltip: {
             x: {
               format: 'dd MMM yyyy HH:mm'
-            }
+            },
+            theme: 'dark',
           }
         })
 
@@ -74,11 +100,13 @@
   </script>
   <style>
 
-    @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Mono&family=Fira+Sans:wght@200;400&display=swap');
 
     :root {
       --red: #ba181b;
       --black: #161a1d;
+      --black-secondary: color-mix(in oklab, var(--black) 60%, white);
+      --blue: #003a61;
       --gray: #b1a7a6;
       --white: #eee;
       --divider: color-mix(in oklab, var(--black) 88%, white);
@@ -87,6 +115,8 @@
       --surface-hover: color-mix(in oklab, var(--black) 96%, white);
       --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
       --surface-card: color-mix(in oklab, var(--black) 96%, white);
+
+      --font-mono: 'Fira Mono', monospace;
     }
 
     html, body {
@@ -128,9 +158,48 @@
       }
     }
 
+    table {
+      width: 100%;
+      border-spacing: 0;
+      white-space: nowrap;
+
+      & th {
+        text-align: left;
+        font-weight: 400;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--divider);
+
+        &:first-child {
+          border-top-left-radius: .5rem;
+        }
+
+        &:last-child {
+          border-top-right-radius: .5rem;
+        }
+
+        position: sticky;
+        top: 0;
+
+      }
+
+      & tr:last-child td {
+        border-bottom: none;
+      }
+
+      & td {
+        padding: 0.25rem 1rem;
+        border-bottom: 1px solid var(--divider);
+
+        & + & {
+          border-left: 1px solid var(--divider);
+        }
+      }
+    }
+
     main {
       grid-area: main;
       padding: 1rem;
+      overflow: auto;
     }
 
     .side-nav {
@@ -143,8 +212,25 @@
       gap: 1rem;
       align-items: stretch;
 
+      ._active {
+        background-color: var(--blue);
+        color: var(--white);
+
+        &:hover {
+          background-color: var(--blue);
+        }
+      }
+
+      ._redis-stats {
+        align-self: center;
+        color: var(--black-secondary);
+        font-size: .85rem;
+
+      }
+
       & > img {
         align-self: start;
+        padding-inline: .75rem;
       }
 
 
@@ -155,15 +241,17 @@
         display: flex;
         flex-direction: column;
         gap: .25rem;
+        flex-grow: 1;
 
         & a {
-          display: block;
+          display: flex;
+          align-items: center;
           padding: .5rem .75rem;
-          color: var(--white);
-          background-color: var(--surface-active);
+          gap: .5rem;
           border-radius: .5rem;
           text-decoration: none;
           font-weight: 400;
+          color: color-mix(in oklab, var(--black) 20%, white);
 
           &:hover {
             background-color: var(--surface-hover);
@@ -180,8 +268,20 @@
       justify-content: space-between;
       align-items: center;
 
-      & h1 {
-        margin: 0;
+      ._subtitle {
+        font-weight: 200;
+        color: var(--black-secondary);
+      }
+
+
+      & > span {
+        display: flex;
+        align-items: baseline;
+        gap: .5rem;
+
+        & h1 {
+          margin: 0;
+        }
       }
     }
 
@@ -233,17 +333,49 @@
 </head>
 <body>
 <nav class="side-nav">
-  <img height="40" src="<%= image_path "rails_observatory/logo_with_text.svg" %>" alt="RailsObservatory">
+  <img height="36" src="<%= image_path "rails_observatory/logo_with_text.svg" %>" alt="RailsObservatory">
   <ul>
-    <li><a href="/">Dashboard</a></li>
-    <li><a href="/mailers">Mailers</a></li>
-    <li><a href="/jobs">Jobs</a></li>
+    <li><%= link_to root_path, class: "#{'_active' if request.path == root_path || request.path =~ /requests/}" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+        </svg>
+        Requests
+      <% end %></li>
+    <li><%= link_to jobs_path, class: "#{'_active' if request.path =~ /jobs/}" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+        </svg>
+        Jobs
+      <% end %></li>
+    <li><%= link_to root_path do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+        </svg>
 
+        Mailers
+      <% end %></li>
+    <li><%= link_to root_path do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+        </svg>
+        Logs
+      <% end %></li>
+    <li><a href="/errors">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12.75c1.148 0 2.278.08 3.383.237 1.037.146 1.866.966 1.866 2.013 0 3.728-2.35 6.75-5.25 6.75S6.75 18.728 6.75 15c0-1.046.83-1.867 1.866-2.013A24.204 24.204 0 0112 12.75zm0 0c2.883 0 5.647.508 8.207 1.44a23.91 23.91 0 01-1.152 6.06M12 12.75c-2.883 0-5.647.508-8.208 1.44.125 2.104.52 4.136 1.153 6.06M12 12.75a2.25 2.25 0 002.248-2.354M12 12.75a2.25 2.25 0 01-2.248-2.354M12 8.25c.995 0 1.971-.08 2.922-.236.403-.066.74-.358.795-.762a3.778 3.778 0 00-.399-2.25M12 8.25c-.995 0-1.97-.08-2.922-.236-.402-.066-.74-.358-.795-.762a3.734 3.734 0 01.4-2.253M12 8.25a2.25 2.25 0 00-2.248 2.146M12 8.25a2.25 2.25 0 012.248 2.146M8.683 5a6.032 6.032 0 01-1.155-1.002c.07-.63.27-1.222.574-1.747m.581 2.749A3.75 3.75 0 0115.318 5m0 0c.427-.283.815-.62 1.155-.999a4.471 4.471 0 00-.575-1.752M4.921 6a24.048 24.048 0 00-.392 3.314c1.668.546 3.416.914 5.223 1.082M19.08 6c.205 1.08.337 2.187.392 3.314a23.882 23.882 0 01-5.223 1.082" />
+      </svg>
+      Errors</a></li>
   </ul>
-
+  <div class="_redis-stats">
+    <strong>Redis</strong> <%= redis_mem_info['used_memory_human'] %> /
+    <%= redis_mem_info['used_memory_rss_human'] %>
+  </div>
 </nav>
 <nav class="top-nav">
-  <h1><%= yield :title %></h1>
+  <span>
+
+    <h1><span class="_subtitle"><% if content_for? :subtitle %><%= yield :subtitle %> <% end %></span><%= yield :title %></h1>
+  </span>
   <div class="dropdown">
     <button class="secondary">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20">

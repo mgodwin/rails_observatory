@@ -41,9 +41,12 @@ module RailsObservatory
       puts $redis.call("PING")
     end
 
-    initializer "rails_observatory.instrumentation" do
-      ActiveSupport::Notifications.subscribe(/.*/) do |event|
-        $redis.call("XADD", "events", "*", "event", event.name, "payload", JSON.generate(event.payload), "duration", event.duration)
+    initializer "rails_observatory.request_instrumentation" do |app|
+      ActiveSupport::Notifications.subscribe(/process_action.action_controller/) do |event|
+        payload = event.payload.except(:request)
+        payload[:request_id] = event.payload[:request].request_id
+        payload[:headers] = event.payload[:headers].to_h
+        $redis.call("XADD", "events", "*", "event", event.name, "payload", JSON.generate(payload), "duration", event.duration)
       end
     end
   end
