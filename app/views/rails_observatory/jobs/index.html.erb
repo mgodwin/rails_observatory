@@ -1,2 +1,23 @@
 <% content_for(:title, 'Jobs') %>
-yoyoyo
+
+<style>
+  @scope {
+    :scope {
+      display: grid;
+      gap: 2rem;
+    }
+  }
+</style>
+
+<div class="card table">
+  <h2>By Queue</h2>
+</div>
+
+<div class="card table">
+  <h2>By Job</h2>
+</div>
+
+<div class="card table">
+  <h2>Recent Jobs</h2>
+  <%= @recent_jobs.to_a %>
+</div>

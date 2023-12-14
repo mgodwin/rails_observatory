@@ -4,6 +4,7 @@ module RailsObservatory
     before_action :set_duration
 
     def index
+      CalculateProfitJob.perform_later
       @library = 'action_controller'
       @time_range = (duration.seconds.ago..)
       @request_count_range = TimeSeries.where(name: "process_action.action_controller.count", action: nil, method: nil, format: nil, status: nil).first
@@ -14,7 +15,7 @@ module RailsObservatory
       end
       @latency_composition = ControllerMetric.latency_composition_series_set
       @errors = ControllerMetric.errors
-      @events = EventStream.from('events').events.lazy.take(10)
+      @events = RequestsStream.all.lazy.take(10)
     end
 
     def show

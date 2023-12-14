@@ -3,21 +3,7 @@
 <style>
 
 
-  .card {
-    border-radius: 0.5rem;
-    background-color: var(--surface-card);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    padding: 1rem;
 
-    &.table {
-      padding: 0;
-
-      & h2 {
-        padding: 1rem;
-        margin: 0;
-      }
-    }
-  }
 
 
   .library-grid {
@@ -99,13 +85,13 @@
       <% @events.each do |e| %>
         <tr>
           <td><%= e.timestamp.to_fs(:db) %></td>
-          <td class="request-id"><%= link_to e.payload['request_id'], request_path(e.payload['request_id']) %></td>
+          <td class="request-id"><%= link_to e.payload[:request_id], request_path(e.payload[:request_id]) %></td>
           <% if params[:controller_action].blank? %><td><%= "#{e.payload['controller']}##{e.payload['action']}" %></td><% end %>
           <td><%= e.duration.to_f.round(2) %></td>
-          <td><%= e.payload['status'] %></td>
-          <td><%= e.payload['method'] %></td>
-          <td><%= e.payload['view_runtime'].to_f.round(2) %></td>
-          <td><%= e.payload['db_runtime'].to_f.round(2) %></td>
+          <td><%= e.payload[:status] %></td>
+          <td><%= e.payload[:method] %></td>
+          <td><%= e.payload[:view_runtime].to_f.round(2) %></td>
+          <td><%= e.payload[:db_runtime].to_f.round(2) %></td>
         </tr>
       <% end %>
     </table>

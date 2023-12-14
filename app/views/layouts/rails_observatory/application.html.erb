@@ -202,6 +202,22 @@
       overflow: auto;
     }
 
+    .card {
+      border-radius: 0.5rem;
+      background-color: var(--surface-card);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+
+      &.table {
+        padding: 0;
+
+        & h2 {
+          padding: 1rem;
+          margin: 0;
+        }
+      }
+    }
+
     .side-nav {
       grid-area: side-nav;
       grid-row: 1 / -1;

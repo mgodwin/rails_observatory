@@ -24,6 +24,23 @@ module RedisClientInstrumentation
   end
 end
 
+module Extension
+
+  attr_accessor :request_id
+  def serialize
+    hash = super
+    if ActiveSupport::ExecutionContext.to_h[:controller]&.request
+      hash["request_id"] = ActiveSupport::ExecutionContext.to_h[:controller]&.request&.request_id
+    end
+    hash
+  end
+
+  def deserialize(job_data)
+    super(job_data)
+    self.request_id = job_data['request_id']
+  end
+end
+
 module RailsObservatory
   class Engine < ::Rails::Engine
     isolate_namespace RailsObservatory
@@ -41,12 +58,39 @@ module RailsObservatory
       puts $redis.call("PING")
     end
 
+    initializer "rails_observatory.extend_active_job" do
+      ActiveSupport.on_load(:active_job) do |aj|
+        aj.prepend(Extension)
+      end
+    end
+
+    initializer "rails_observatory.logger" do |app|
+      Rails.logger.broadcast_to(EventStreamLogger.new)
+    end
+
     initializer "rails_observatory.request_instrumentation" do |app|
       ActiveSupport::Notifications.subscribe(/process_action.action_controller/) do |event|
+
+        puts "execution context"
+        puts ActiveSupport::ExecutionContext.to_h[:controller].request
         payload = event.payload.except(:request)
         payload[:request_id] = event.payload[:request].request_id
         payload[:headers] = event.payload[:headers].to_h
-        $redis.call("XADD", "events", "*", "event", event.name, "payload", JSON.generate(payload), "duration", event.duration)
+        RequestsStream.add_to_stream(type: event.name, payload:, duration: event.duration)
+      end
+    end
+
+    initializer "rails_observatory.job_instrumentation" do
+      ActiveSupport::Notifications.subscribe(/perform.active_job/) do |event|
+        job = event.payload[:job]
+        payload = event.payload.except(:job, :adapter)
+        payload[:job_id] = job.job_id
+        payload[:queue_name] = job.queue_name
+        payload[:class] = job.class.name
+        payload[:executions] = job.executions
+        payload[:request_id] = job.request_id
+
+        JobsStream.add_to_stream(type: event.name, payload: payload, duration: event.duration)
       end
     end
   end
