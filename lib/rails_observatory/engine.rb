@@ -86,7 +86,7 @@ module RailsObservatory
         payload = event.payload.except(:job, :adapter)
         payload[:job_id] = job.job_id
         payload[:queue_name] = job.queue_name
-        payload[:class] = job.class.name
+        payload[:job_class] = job.class.name
         payload[:executions] = job.executions
         payload[:request_id] = job.request_id
 

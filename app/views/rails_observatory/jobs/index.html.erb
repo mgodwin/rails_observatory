@@ -19,5 +19,5 @@
 
 <div class="card table">
   <h2>Recent Jobs</h2>
-  <%= @recent_jobs.to_a %>
+  <%= render 'events_table', events: @recent_jobs, fields: [:timestamp, :job_id, :job_class, :duration, ] %>
 </div>

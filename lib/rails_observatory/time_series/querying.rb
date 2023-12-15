@@ -1,5 +1,5 @@
 module RailsObservatory
-  module TimeSeries::Querying
+  module RedisTimeSeries::Querying
       def where(**conditions)
 
         keys = $redis.call("TS.QUERYINDEX", *conditions.map do |k, v|

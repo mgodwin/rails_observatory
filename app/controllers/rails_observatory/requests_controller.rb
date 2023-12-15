@@ -5,10 +5,10 @@ module RailsObservatory
 
     def index
       CalculateProfitJob.perform_later
-      @library = 'action_controller'
       @time_range = (duration.seconds.ago..)
-      @request_count_range = TimeSeries.where(name: "process_action.action_controller.count", action: nil, method: nil, format: nil, status: nil).first
-      @latency_series = TimeSeries.where(name:"process_action.action_controller.latency", action:nil, method: nil, format: nil, status: nil).first
+      Requests::CountMetric.series
+      @request_count_range = RedisTimeSeries.where(name: "process_action.action_controller.count", action: nil, method: nil, format: nil, status: nil).first
+      @latency_series = RedisTimeSeries.where(name:"process_action.action_controller.latency", action:nil, method: nil, format: nil, status: nil).first
 
       if params[:controller_action].blank?
         @controller_metrics = ControllerMetric.find_all_in_time_frame(@time_range)

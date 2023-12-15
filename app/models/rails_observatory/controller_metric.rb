@@ -9,12 +9,12 @@ module RailsObservatory
     end
 
     def self.find_all_in_time_frame(time_frame)
-      all = TimeSeries.where(**global_scope.merge(name: "#{EVENT_PREFIX}.count", action: '*'))
+      all = RedisTimeSeries.where(**global_scope.merge(name: "#{EVENT_PREFIX}.count", action: '*'))
       all.select { |series| series.last_timestamp > time_frame.begin.to_i }.map { |series| new(series.info['labels']['action']) }
     end
 
     def self.latency_composition_series_set
-      TimeSeries.where(**global_scope.merge(parent: "#{EVENT_PREFIX}.latency", compaction: 'avg'))
+      RedisTimeSeries.where(**global_scope.merge(parent: "#{EVENT_PREFIX}.latency", compaction: 'avg'))
     end
 
     def self.requests
@@ -26,7 +26,7 @@ module RailsObservatory
     end
 
     def self.errors
-      TimeSeries.where(**global_scope.merge(name: "#{EVENT_PREFIX}.count/errors")).first
+      RedisTimeSeries.where(**global_scope.merge(name: "#{EVENT_PREFIX}.count/errors")).first
     end
 
     attr_reader :action
@@ -40,11 +40,11 @@ module RailsObservatory
     end
 
     def request_count(time_frame)
-      TimeSeries.where(**action_scope.merge(name: "#{EVENT_PREFIX}.count")).first[time_frame].reduce
+      RedisTimeSeries.where(**action_scope.merge(name: "#{EVENT_PREFIX}.count")).first[time_frame].reduce
     end
 
     def avg_latency(time_frame)
-      TimeSeries.where(**action_scope.merge(name: "#{EVENT_PREFIX}.latency", compaction: 'avg')).first[time_frame].reduce
+      RedisTimeSeries.where(**action_scope.merge(name: "#{EVENT_PREFIX}.latency", compaction: 'avg')).first[time_frame].reduce
     end
 
     private

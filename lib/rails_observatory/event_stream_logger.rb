@@ -34,5 +34,20 @@ module RailsObservatory
       LogsStream.add_to_stream(type: "fatal.log", payload: build_payload(progname, &block), duration: 0)
     end
 
+    def unknown(progname = nil, &block)
+      LogsStream.add_to_stream(type: "unknown.log", payload: build_payload(progname, &block), duration: 0)
+    end
+
+    def add(severity, message = nil, progname = nil, &block)
+      if severity >= level
+        LogsStream.add_to_stream(type: "#{severity}.log", payload: build_payload(message, &block), duration: 0)
+      end
+    end
+    alias log add
+
+    def <<(message)
+      LogsStream.add_to_stream(type: "unknown.log", payload: build_payload(message, &block), duration: 0)
+    end
+
   end
 end

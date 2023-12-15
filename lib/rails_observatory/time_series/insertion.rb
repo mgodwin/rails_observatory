@@ -30,7 +30,7 @@ TIMING_SCRIPT = RedisScript.new(SCRIPT)
 INCREMENT_CALL = RedisScript.new(INCREMENT_SCRIPT)
 
 module RailsObservatory
-  module TimeSeries::Insertion
+  module RedisTimeSeries::Insertion
     def distribution(name, value, labels: {})
       TIMING_SCRIPT.call(name, value, labels.to_a.flatten.map(&:to_s))
     end

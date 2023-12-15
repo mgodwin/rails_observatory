@@ -11,6 +11,14 @@ module RailsObservatory
       [120, buckets_in_time_frame].min
     end
 
+    def format_event_value(value)
+      if value.is_a?(Numeric)
+        value.round(2)
+      else
+        value
+      end
+    end
+
     # {"used_memory"=>"46573752",
     #  "used_memory_human"=>"44.42M",
     #  "used_memory_rss"=>"70778880",

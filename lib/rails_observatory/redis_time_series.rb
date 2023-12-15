@@ -1,14 +1,14 @@
 
 module RailsObservatory
 
-  class TimeSeries
+  class RedisTimeSeries
     extend Querying
     extend Insertion
 
     attr_reader :key
 
     def [](range)
-      TimeSeries::Range.new(key, range)
+      RedisTimeSeries::Range.new(key, range)
     end
 
     def last_timestamp
@@ -37,7 +37,7 @@ module RailsObservatory
 
   end
 
-  class TimeSeries::Range
+  class RedisTimeSeries::Range
     def initialize(key, range)
       @key = key
       @range = range

@@ -1,0 +1,21 @@
+<div class="table-overflow">
+  <table>
+    <thead>
+    <tr>
+      <% fields.each do |f| %>
+        <th><%= f.to_s.humanize(capitalize: true, keep_id_suffix: true) %></th>
+      <% end %>
+
+    </tr>
+    </thead>
+    <tbody>
+    <% events.each do |e| %>
+      <tr>
+        <% fields.each do |f| %>
+          <td><%= format_event_value(e.respond_to?(f) ? e.send(f) : e.payload[f]) %></td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
