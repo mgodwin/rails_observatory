@@ -1,8 +1,9 @@
 module RailsObservatory
-  class EventStreamLogger
+  class EventStreamLogger < ::Logger
 
-    def level
-      Logger::Severity::DEBUG
+    def initialize(*args, **kwargs)
+      _, *rest = args
+      super(nil, *rest, **kwargs)
     end
 
     def build_payload(progname, &block)

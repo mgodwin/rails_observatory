@@ -31,6 +31,8 @@ INCREMENT_CALL = RedisScript.new(INCREMENT_SCRIPT)
 
 module RailsObservatory
   module RedisTimeSeries::Insertion
+
+    # TODO: These need to take in a timestamp
     def distribution(name, value, labels: {})
       TIMING_SCRIPT.call(name, value, labels.to_a.flatten.map(&:to_s))
     end

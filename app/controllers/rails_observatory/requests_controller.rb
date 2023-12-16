@@ -5,17 +5,18 @@ module RailsObservatory
 
     def index
       CalculateProfitJob.perform_later
-      @time_range = (duration.seconds.ago..)
-      Requests::CountMetric.series
-      @request_count_range = RedisTimeSeries.where(name: "process_action.action_controller.count", action: nil, method: nil, format: nil, status: nil).first
-      @latency_series = RedisTimeSeries.where(name:"process_action.action_controller.latency", action:nil, method: nil, format: nil, status: nil).first
+      @time_range = (duration.seconds.ago..Time.now)
+
+      @count_series = RequestTimeSeries.where(type: 'count').slice(@time_range).downsample(150, using: :sum).first
+      @latency_series = RequestTimeSeries.where(type: 'latency').slice(@time_range).downsample(150, using: :avg).first
+      # RequestTimeSeries.where(parent: 'latency').slice(@time_range)
+      # RequestTimeSeries.where(type: 'errors').slice(@time_range)
 
       if params[:controller_action].blank?
-        @controller_metrics = ControllerMetric.find_all_in_time_frame(@time_range)
+        @count_by_controller = RequestTimeSeries.where(type:'count', action: '*').slice(@time_range).downsample(1, using: :sum).sort_by { _1.data.dig(0,1).to_i * -1 }
+        @latency_by_controller = RequestTimeSeries.where(type:'latency', action: '*').slice(@time_range).downsample(1, using: :avg).index_by { _1.labels[:action] }
       end
-      @latency_composition = ControllerMetric.latency_composition_series_set
-      @errors = ControllerMetric.errors
-      @events = RequestsStream.all.lazy.take(10)
+      @events = RequestsStream.all.lazy.take(25)
     end
 
     def show

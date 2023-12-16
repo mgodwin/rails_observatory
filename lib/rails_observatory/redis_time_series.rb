@@ -2,29 +2,24 @@
 module RailsObservatory
 
   class RedisTimeSeries
-    extend Querying
     extend Insertion
 
-    attr_reader :key
+    attr_reader :labels, :name, :data
 
-    def [](range)
-      RedisTimeSeries::Range.new(key, range)
+    def self.where(**conditions)
+      QueryBuilder.new.where(**conditions)
     end
 
-    def last_timestamp
-      info['lastTimestamp'].to_i / 1000
+    def self.from_redis(redis_ts)
+      name, labels, data = redis_ts
+      new(name:, labels: Hash[*labels.flatten], data: )
     end
 
-    def info
-      info_hash = Hash[*$redis.call("TS.INFO", key)]
-      info_hash["labels"] = info_hash["labels"].to_h if info_hash["labels"].present?
-      info_hash
-    end
 
-    private
-
-    def initialize(key)
-      @key = key
+    def initialize(name:, labels: {}, data: )
+      @name = name
+      @labels = labels.deep_symbolize_keys
+      @data = data
     end
 
     def to_ms(duration)
