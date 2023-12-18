@@ -153,18 +153,18 @@
 <header>
   <h2>
     <div class="_status-indicator"></div>
-    <%= @req.payload['method'] %>
-    <%= @req.payload['path'] %>
-    <span class="_format"><%= @req.payload['format'] %></span>
+    <%= @req.request_method %>
+    <%= @req.payload[:path] %>
+    <span class="_format"><%= @req.payload[:format] %></span>
   </h2>
   <span class="_controller">
-  <%= @req.payload['controller'] %>#<%= @req.payload['action'] %>
+  <%= @req.controller_action %>
   </span>
 </header>
 <dl class="request-stats">
   <div>
     <dt>Status</dt>
-    <dd><%= @req.payload['status'] %></dd>
+    <dd><%= @req.payload[:status] %></dd>
   </div>
   <div>
     <dt>Duration</dt>
@@ -172,11 +172,11 @@
   </div>
   <div>
     <dt>View Runtime</dt>
-    <dd><%= @req.payload['view_runtime'].to_f.round(2) %><span class="_unit">ms</span></dd>
+    <dd><%= @req.payload[:view_runtime].to_f.round(2) %><span class="_unit">ms</span></dd>
   </div>
   <div>
     <dt>DB Runtime</dt>
-    <dd><%= @req.payload['db_runtime'].to_f.round(2) %><span class="_unit">ms</span></dd>
+    <dd><%= @req.payload[:db_runtime].to_f.round(2) %><span class="_unit">ms</span></dd>
   </div>
 </dl>
 <details class="headers">
@@ -187,7 +187,7 @@
     Headers
   </summary>
   <dl>
-    <% @req.payload['headers'].sort.each do |k, v| %>
+    <% @req.payload[:headers].sort.each do |k, v| %>
       <dt><%= k %></dt>
       <dd><%= v %></dd>
     <% end %>
@@ -202,7 +202,7 @@
     Params
   </summary>
   <dl>
-    <% @req.payload['params'].sort.each do |k, v| %>
+    <% @req.payload[:params].sort.each do |k, v| %>
       <dt><%= k %></dt>
       <dd><%= v %></dd>
     <% end %>
@@ -212,7 +212,7 @@
 <h3>Events</h3>
 <% @events.each do |event| %>
   <div class="event">
-    <div class="_name"><%= event.name %></div>
+    <div class="_name"><%= event.type %></div>
     <div class="_duration"><%= event.duration.to_f.round(2) %></div>
     <div class="_time"><%= event.timestamp %></div>
   </div>

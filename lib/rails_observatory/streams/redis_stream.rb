@@ -10,7 +10,7 @@ module RailsObservatory
     end
 
     def self.stream_name
-      self.name.demodulize.tableize
+      self.name.demodulize.tableize.singularize
     end
 
     def self.create_read_group_if_not_exists(group_name)
@@ -21,17 +21,22 @@ module RailsObservatory
       end
     end
 
-    def self.unread_for(group_name)
-      return enum_for(:unread_for, group_name) unless block_given?
+    def self.unread_for(group_name, reader_name)
+      return enum_for(:unread_for, group_name, reader_name) unless block_given?
 
       create_read_group_if_not_exists(group_name)
-      reader_name = "#{Process.pid}-#{Thread.current.native_thread_id}"
-      loop do
-        res = $redis.call("XREADGROUP", "GROUP", group_name, reader_name, "COUNT", 1, "STREAMS", stream_name, '>')
-        break if res.nil?
-        event = StreamEvent.from_redis(res[stream_name].first)
-        yield event
-        $redis.call('XACK', stream_name, group_name, event.id)
+
+      puts self.name
+      # id of 0 lets us fetch pending messages
+      # id of > lets us fetch new messages
+      [0, '>'].each do |id|
+        loop do
+          res = $redis.call("XREADGROUP", "GROUP", group_name, reader_name, "COUNT", 1, "STREAMS", stream_name, id)
+          break if res.nil? || res[stream_name].empty?
+          event = StreamEvent.from_redis(res[stream_name].first)
+          yield event
+          $redis.call('XACK', stream_name, group_name, event.id)
+        end
       end
     end
 

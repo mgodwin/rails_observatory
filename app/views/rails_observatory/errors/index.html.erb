@@ -1,0 +1,71 @@
+<% content_for(:title, 'Errors') %>
+
+<style>
+  @scope {
+    :scope {
+      display: flex;
+      flex-direction: column;
+      gap: 0rem;
+      padding: 0;
+    }
+  }
+
+  .error {
+    padding: 1rem;
+    border-bottom: 1px solid var(--divider);
+    display: grid;
+    grid-template-areas:
+      'name-and-location graph count'
+      'message graph count';
+    grid-template-columns: minmax(14rem, 1fr) auto auto;
+    column-gap: 1rem;
+
+    ._name-and-location {
+      display: flex;
+      gap: 1rem;
+      align-items: baseline;
+      overflow: hidden;
+
+
+      & > :first-child {
+        font-size: 1.25rem;
+        font-weight: 400;
+      }
+
+      & > :last-child {
+        color: var(--black-secondary);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+    }
+
+    ._message {
+      grid-area: message;
+    }
+
+    ._count {
+      grid-area: count;
+      text-align: right;
+    }
+    ._graph {
+      grid-area: graph;
+      text-align: right;
+    }
+
+  }
+</style>
+
+<% @errors.each do |e| %>
+  <div class="error">
+    <div class="_name-and-location">
+      <span><%= e[:class_name] %></span>
+      <span><%= e[:backtrace].first %></span>
+    </div>
+    <div class="_message"><%= e[:message] %></div>
+    <div class="_time"><%= time_ago_in_words(Time.at(e[:ts] / 1000)) %> ago</div>
+
+    <div class="_graph">tbd</div>
+    <div class="_count">95</div>
+  </div>
+<% end %>

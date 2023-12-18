@@ -21,8 +21,9 @@ module RailsObservatory
 
     def show
       @time_range = (1.hour.ago..)
-      @events = EventStream.from('events').events.select { |e| e.payload['request_id'] == params[:id]}
-      @req = @events.find { |e| e.name == 'process_action.action_controller' }
+      # TODO: Munge together all streams into one and store in redis sorted set
+      @events = RequestsStream.all.select { |e| e.payload[:request_id] == params[:id]}
+      @req = @events.find { |e| e.type == 'process_action.action_controller' }
     end
 
     private

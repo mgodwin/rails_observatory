@@ -1,0 +1,17 @@
+<% content_for(:title, 'Logs') %>
+
+<style>
+  @scope {
+    :scope {
+      display: grid;
+      gap: 2rem;
+    }
+  }
+</style>
+
+Chart!
+
+<div class="card table">
+  <h2>Recent Logs</h2>
+  <%= render 'events_table', events: @recent_logs, fields: [:timestamp, :request_id, :message] %>
+</div>

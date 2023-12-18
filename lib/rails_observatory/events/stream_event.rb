@@ -2,6 +2,10 @@ module RailsObservatory
   class StreamEvent
     attr_reader :id, :payload, :type, :duration
 
+    def redis
+      Rails.configuration.rails_observatory.redis
+    end
+
     def initialize(payload:, type:, duration:, id:)
       @id = id
       @type = type
@@ -14,10 +18,14 @@ module RailsObservatory
     end
 
     def rebroadcast_to(stream_name)
-      $redis.call('XADD', stream_name, id.split('-').first, 'name', name, 'payload', JSON.generate(payload), 'duration', duration)
+      redis.call('XADD', stream_name, id.split('-').first, 'name', name, 'payload', JSON.generate(payload), 'duration', duration)
     end
 
     def record_metrics
+      # Override in subclass
+    end
+
+    def process
       # Override in subclass
     end
 
@@ -31,8 +39,6 @@ module RailsObservatory
       klass = self.subclasses.find { |klass| klass == target_class } || self
       klass.new(**attributes)
     end
-
-
 
 
   end

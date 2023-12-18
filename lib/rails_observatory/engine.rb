@@ -4,7 +4,7 @@ require 'benchmark'
 module RedisClientInstrumentation
   def connect(redis_config)
     res = nil
-    took = Benchmark.realtime {res = super}
+    took = Benchmark.realtime { res = super }
     puts "Redis connect took #{took * 1000} ms"
     res
   end
@@ -27,6 +27,7 @@ end
 module Extension
 
   attr_accessor :request_id
+
   def serialize
     hash = super
     if ActiveSupport::ExecutionContext.to_h[:controller]&.request
@@ -47,14 +48,15 @@ module RailsObservatory
     config.rails_observatory = ActiveSupport::OrderedOptions.new
 
     initializer "rails_observatory.assets.precompile" do |app|
-      app.config.assets.precompile += %w( rails_observatory/builds/tailwind.css )
+      # app.config.assets.precompile += %w( rails_observatory/builds/tailwind.css )
     end
 
     initializer "rails_observatory.redis" do |app|
 
+
       redis_config = RedisClient.config(host: "localhost", port: 6379, db: 0, middlewares: [RedisClientInstrumentation])
       $redis = redis_config.new_pool(timeout: 0.5, size: Integer(ENV.fetch("RAILS_MAX_THREADS", 5)))
-
+      app.config.rails_observatory.redis = $redis
       puts $redis.call("PING")
     end
 
@@ -70,13 +72,11 @@ module RailsObservatory
 
     initializer "rails_observatory.request_instrumentation" do |app|
       ActiveSupport::Notifications.subscribe(/process_action.action_controller/) do |event|
-
-        puts "execution context"
-        puts ActiveSupport::ExecutionContext.to_h[:controller].request
         payload = event.payload.except(:request)
         payload[:request_id] = event.payload[:request].request_id
-        payload[:headers] = event.payload[:headers].to_h
+        payload[:headers] = event.payload[:headers].to_h.keep_if { |k, v| k.start_with?('HTTP_') }
         RequestsStream.add_to_stream(type: event.name, payload:, duration: event.duration)
+        ErrorsStream.add_to_stream(event.payload[:exception_object], request_id: event.payload[:request].request_id) if event.payload[:exception_object]
       end
     end
 
@@ -91,6 +91,7 @@ module RailsObservatory
         payload[:request_id] = job.request_id
 
         JobsStream.add_to_stream(type: event.name, payload: payload, duration: event.duration)
+        ErrorsStream.add_to_stream(event.payload[:exception_object], request_id: job.request_id) if event.payload[:exception_object]
       end
     end
   end
