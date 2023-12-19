@@ -21,7 +21,7 @@
   }
 </style>
 <div class="library-grid">
-  <%= render 'chart', name: 'Latency', series: @latency_series, type: 'line' %>
+  <%= render 'chart', name: 'Latency', series: @latency_series, type: 'area' %>
   <%= render 'chart', name: 'Requests', series: @count_series, type: 'bar' %>
   <%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
   <%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>

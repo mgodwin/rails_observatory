@@ -1,4 +1,4 @@
-<div class="chart" data-controller="chart" data-chart-name="<%= local_assigns[:name] %>" data-chart-type-value="<%= local_assigns[:type] %>" data-chart-palette-value="<%= local_assigns[:palette] || 'palette1' %>">
+<div id="<%= rand(100) %>" class="chart" data-controller="chart" data-chart-name="<%= local_assigns[:name] %>" data-chart-type-value="<%= local_assigns[:type] %>" data-chart-palette-value="<%= local_assigns[:palette] || 'palette1' %>">
   <div class="border-b border-gray-200 pb-5" hidden="">
     <h3 class="text-base font-semibold leading-4 text-gray-600"></h3>
   </div>
@@ -6,7 +6,7 @@
     <div data-chart-target="chart"></div>
     <% Array.wrap(local_assigns[:series]).each do |series| %>
       <script type="application/json" data-chart-target="data" data-series-name="<%= series.name.split('/').last %>">
-        <%== series.data.to_json %>
+        <%== series.data.map { |a| [a[0], a[1] == 'NaN' ? 0 : a[1]] }.to_json %>
       </script>
     <% end %>
   <% else %>

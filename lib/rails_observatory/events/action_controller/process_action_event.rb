@@ -38,6 +38,10 @@ module RailsObservatory
         { action: controller_action, format: request_format, status:, method: request_method }
       end
 
+      def process
+        record_metrics
+      end
+
       def record_metrics
         RedisTimeSeries.distribution("request.latency", duration, labels:)
         RedisTimeSeries.distribution("request.latency/db_runtime", db_runtime, labels:)

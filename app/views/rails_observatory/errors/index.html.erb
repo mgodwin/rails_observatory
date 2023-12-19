@@ -42,6 +42,9 @@
 
     ._message {
       grid-area: message;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     ._count {
@@ -59,7 +62,7 @@
 <% @errors.each do |e| %>
   <div class="error">
     <div class="_name-and-location">
-      <span><%= e[:class_name] %></span>
+      <a href="<%= error_path(e[:fingerprint]) %>"><%= e[:class_name] %></a>
       <span><%= e[:backtrace].first %></span>
     </div>
     <div class="_message"><%= e[:message] %></div>

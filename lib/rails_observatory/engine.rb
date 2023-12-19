@@ -46,6 +46,7 @@ module RailsObservatory
   class Engine < ::Rails::Engine
     isolate_namespace RailsObservatory
     config.rails_observatory = ActiveSupport::OrderedOptions.new
+    config.rails_observatory.streams = [:requests, :logs, :jobs, :mailers, :errors]
 
     initializer "rails_observatory.assets.precompile" do |app|
       # app.config.assets.precompile += %w( rails_observatory/builds/tailwind.css )

@@ -5,10 +5,10 @@ module RailsObservatory
 
     def index
       CalculateProfitJob.perform_later
-      @time_range = (duration.seconds.ago..Time.now)
+      @time_range = (duration.seconds.ago..)
 
-      @count_series = RequestTimeSeries.where(type: 'count').slice(@time_range).downsample(150, using: :sum).first
-      @latency_series = RequestTimeSeries.where(type: 'latency').slice(@time_range).downsample(150, using: :avg).first
+      @count_series = RequestTimeSeries.where(type: 'count').slice(@time_range).downsample(30, using: :sum).first
+      @latency_series = RequestTimeSeries.where(type: 'latency').slice(@time_range).downsample(30, using: :avg).first
       # RequestTimeSeries.where(parent: 'latency').slice(@time_range)
       # RequestTimeSeries.where(type: 'errors').slice(@time_range)
 

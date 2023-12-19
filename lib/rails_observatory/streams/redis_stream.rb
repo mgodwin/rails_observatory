@@ -22,11 +22,8 @@ module RailsObservatory
     end
 
     def self.unread_for(group_name, reader_name)
-      return enum_for(:unread_for, group_name, reader_name) unless block_given?
-
       create_read_group_if_not_exists(group_name)
 
-      puts self.name
       # id of 0 lets us fetch pending messages
       # id of > lets us fetch new messages
       [0, '>'].each do |id|
@@ -37,6 +34,18 @@ module RailsObservatory
           yield event
           $redis.call('XACK', stream_name, group_name, event.id)
         end
+      end
+    end
+
+    def self.next_unread_for(group_name, reader_name, &blk)
+      create_read_group_if_not_exists(group_name)
+      [0, '>'].each do |id|
+        res = $redis.call("XREADGROUP", "GROUP", group_name, reader_name, "COUNT", 1, "STREAMS", stream_name, '>')
+        next if res.nil? || res[stream_name].empty?
+        event = StreamEvent.from_redis(res[stream_name].first)
+        yield event
+        $redis.call('XACK', stream_name, group_name, event.id)
+        break
       end
     end
 

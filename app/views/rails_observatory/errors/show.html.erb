@@ -1,0 +1,17 @@
+<% content_for(:title, 'Error Details') %>
+
+<h1><%= @error.class_name %></h1>
+<%= @error.backtrace.first %>
+
+
+<%= @error.message %>
+<% @error.backtrace.each do |line| %>
+<div>
+  <%= line %>
+</div>
+  <% end %>
+
+<details>
+  <summary>
+  </summary>
+</details>

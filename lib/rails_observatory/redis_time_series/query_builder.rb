@@ -38,7 +38,6 @@ module RailsObservatory
       end
       mrange_args.push('FILTER', *ts_filters)
 
-      puts mrange_args.join(' ')
       res = $redis.call(mrange_args)
       return if res.nil?
       res.each { yield RedisTimeSeries.from_redis(_1) }
