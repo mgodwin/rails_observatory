@@ -5,8 +5,6 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <%#= stylesheet_link_tag "rails_observatory/builds/tailwind", media: "all" %>
-
   <script type="module">
     import Apexcharts from "https://jspm.dev/apexcharts"
     import * as Stimulus from "https://cdn.skypack.dev/stimulus"
@@ -20,6 +18,8 @@
       static values = {
         type: String,
         palette: String,
+        startX: Number,
+        endX: Number,
       }
 
       connect() {
@@ -76,8 +76,8 @@
           series,
           xaxis: {
             type: 'datetime',
-            min: <%= @time_range.begin.to_i * 1000 %>,
-            max: <%= (@time_range.end.nil? ? Time.now.to_i : @time_range.end.to_i) * 1000 %>,
+            min: this.startXValue,
+            max: this.endXValue,
             axisBorder: {
               show: false,
             },
@@ -194,6 +194,16 @@
           border: 1px solid var(--divider-active);
           background-color: var(--surface-hover);
         }
+      }
+    }
+
+    a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 400;
+
+      &:hover {
+        text-decoration: underline;
       }
     }
 

@@ -12,7 +12,7 @@ module RailsObservatory
 
     def each
       redis.call('ZRANGE', @name, 0, -1, 'REV', 'WITHSCORES').each do |fingerprint, score|
-        yield JSON.parse(redis.call('GET', "errors:#{fingerprint}")).deep_symbolize_keys.merge(ts: score)
+        yield Error.new(**JSON.parse(redis.call('GET', "errors:#{fingerprint}")).deep_symbolize_keys.merge(latest_ts: score))
       end
     end
   end

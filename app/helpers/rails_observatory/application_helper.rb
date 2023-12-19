@@ -19,6 +19,8 @@ module RailsObservatory
       end
     end
 
+
+
     # {"used_memory"=>"46573752",
     #  "used_memory_human"=>"44.42M",
     #  "used_memory_rss"=>"70778880",
@@ -61,7 +63,7 @@ module RailsObservatory
     #  "lazyfree_pending_objects"=>"0",
     #  "lazyfreed_objects"=>"0"}
     def redis_mem_info
-      @info ||= $redis.call('info', 'memory').split("\r\n").slice(1..).map { _1.split(":") }.to_h
+      @info ||= Rails.configuration.rails_observatory.redis.call('info', 'memory').split("\r\n").slice(1..).map { _1.split(":") }.to_h
     end
   end
 end

@@ -11,7 +11,7 @@
   }
 
   .error {
-    padding: 1rem;
+    padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--divider);
     display: grid;
     grid-template-areas:
@@ -62,13 +62,13 @@
 <% @errors.each do |e| %>
   <div class="error">
     <div class="_name-and-location">
-      <a href="<%= error_path(e[:fingerprint]) %>"><%= e[:class_name] %></a>
-      <span><%= e[:backtrace].first %></span>
+      <a href="<%= error_path(e.fingerprint) %>"><%= e.class_name %></a>
+      <span><%= e.backtrace.first %></span>
     </div>
-    <div class="_message"><%= e[:message] %></div>
-    <div class="_time"><%= time_ago_in_words(Time.at(e[:ts] / 1000)) %> ago</div>
+    <div class="_message"><%= e.message %></div>
+    <div class="_time"><%= time_ago_in_words(Time.at(e.latest_ts / 1000)) %> ago</div>
 
     <div class="_graph">tbd</div>
-    <div class="_count">95</div>
+    <div class="_count"><%= e.count %></div>
   </div>
 <% end %>
