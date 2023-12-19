@@ -9,12 +9,17 @@ module RailsObservatory
 
     def where(**conditions)
       @conditions.merge! conditions
-      self
+      self.clone
     end
 
     def slice(range)
       @range = range
-      self
+      self.clone
+    end
+
+    def initialize_copy(orig)
+      @conditions = @conditions.clone
+      super
     end
 
     def downsample(samples, using:)
@@ -22,7 +27,7 @@ module RailsObservatory
       end_time = @range.end || Time.now
       start_time = @range.begin || 12.months.ago.to_time
       @agg_duration = (end_time - start_time) * 1000 / samples
-      self
+      self.clone
     end
 
     def each

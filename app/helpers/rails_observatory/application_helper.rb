@@ -1,14 +1,20 @@
 module RailsObservatory
   module ApplicationHelper
 
-    def buckets_for_chart(time_range)
-
-      end_time = time_range.end.nil? ? Time.now : time_range.end
-      start_time = time_range.begin
-      duration = end_time - start_time
+    def buckets_for_chart
+      duration_sec = (time_slice_end - time_slice_start) / 1000
       # 10 second buckets are the smallest resolution we have
-      buckets_in_time_frame = (duration / 10.0).to_i
+      buckets_in_time_frame = (duration_sec / 10.0).to_i
       [120, buckets_in_time_frame].min
+    end
+
+    def time_slice_start
+      @time_range.begin.to_i * 1000
+    end
+
+    def time_slice_end
+      time = @time_range.end.nil? ? Time.now.to_i : @time_range.end.to_i
+      time * 1000
     end
 
     def format_event_value(value)
