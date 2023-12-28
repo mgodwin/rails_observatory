@@ -10,7 +10,7 @@
     margin: 0;
   }
 
-  &:has(> table) {
+  &:has(> table, >.\~scrollable>table) {
 
     & table {
       width: 100%;
@@ -31,13 +31,11 @@
           border-top-right-radius: .5rem;
         }
 
-        position: sticky;
-        top: 0;
-
       }
 
       & tr:last-child td {
         border-bottom: none;
+        padding-bottom: 1rem;
       }
 
       & td {

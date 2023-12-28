@@ -7,6 +7,7 @@
 /* Layout */
 @import url('layout/app.css');
 @import url('layout/errors-show.css');
+@import url('layout/requests-index.css');
 
 /* Application styles */
 @import url('application/_scrollable.css');

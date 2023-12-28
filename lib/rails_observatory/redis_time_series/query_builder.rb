@@ -10,15 +10,19 @@ module RailsObservatory
     end
 
     def where(**conditions)
-      conditions => {name:, **rest}
-      prefixed_name = begin
-        if name.is_a? Array
-          name.map { |n| "#{@series_class::PREFIX}.#{n}" }
-        else
-          "#{@series_class::PREFIX}.#{name}"
-        end
+      if conditions[:name].present?
+        conditions => { name:, **rest }
+        prefixed_name = begin
+                          if name.is_a? Array
+                            name.map { |n| "#{@series_class::PREFIX}.#{n}" }
+                          else
+                            "#{@series_class::PREFIX}.#{name}"
+                          end
+                        end
+        @conditions.merge! name: prefixed_name, **rest
+      else
+        @conditions.merge! conditions
       end
-      @conditions.merge! name: prefixed_name, **rest
       self.clone
     end
 

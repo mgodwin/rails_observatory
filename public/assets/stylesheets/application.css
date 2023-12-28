@@ -29,7 +29,6 @@ body {
 a {
   color: var(--white);
   text-decoration: none;
-  font-weight: 400;
   &:hover {
     text-decoration: underline;
   }
@@ -87,6 +86,17 @@ details {
   grid-template-columns: minmax(400px, 1fr) 300px;
 }
 
+/* app/assets/stylesheets/layout/requests-index.css */
+.layout\/requests-index {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 265px 1fr 1fr;
+  gap: 1rem;
+  & .card {
+    grid-column: span 2;
+  }
+}
+
 /* app/assets/stylesheets/application/_scrollable.css */
 .\~scrollable {
   overflow: auto;
@@ -103,7 +113,7 @@ details {
     padding: 1rem;
     margin: 0;
   }
-  &:has(> table) {
+  &:has(> table, > .\~scrollable > table) {
     & table {
       width: 100%;
       border-spacing: 0;
@@ -119,11 +129,10 @@ details {
         &:last-child {
           border-top-right-radius: .5rem;
         }
-        position: sticky;
-        top: 0;
       }
       & tr:last-child td {
         border-bottom: none;
+        padding-bottom: 1rem;
       }
       & td {
         padding: 0.25rem 1rem;

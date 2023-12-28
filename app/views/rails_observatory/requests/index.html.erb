@@ -1,66 +1,43 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
-<style>
+<% content_for(:main_css_class, 'layout/requests-index') %>
+<%= render 'chart', name: 'Latency', series: @latency_series, type: 'area' %>
+<%= render 'chart', name: 'Requests', series: @count_series, type: 'bar' %>
+<%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
+<%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
 
-
-  .library-grid {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-
-    & .card {
-      grid-column: span 2;
-    }
-
-  }
-</style>
-<div class="library-grid">
-  <%= render 'chart', name: 'Latency', series: @latency_series, type: 'area' %>
-  <%= render 'chart', name: 'Requests', series: @count_series, type: 'bar' %>
-  <%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
-  <%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
-
-  <% if params[:controller_action].blank? %>
-    <div class="card table">
-      <h2>By Controller Action</h2>
-      <table>
-        <thead>
-        <tr>
-          <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Controller
-            Action
-          </th>
-          <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Requests</th>
-          <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Avg
-            Latency
-          </th>
-          <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-            <span class="sr-only">View</span>
-          </th>
-        </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-        <% @count_by_controller.each do |series| %>
-          <tr>
-            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"><%= series.labels[:action] %></td>
-            <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell"><%= series.data.dig(0,1) %></td>
-            <td class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell"><%= @latency_by_controller[series.labels[:action]].data.dig(0,1).to_f.round(2) %>
-              ms
-            </td>
-            <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-              <a href="#" class="text-indigo-600 hover:text-indigo-900"><%= link_to 'View', requests_path(controller_action: series.labels[:action].to_param) %></a>
-            </td>
-          </tr>
-        <% end %>
-
-        <!-- More people... -->
-        </tbody>
-      </table>
-    </div>
-  <% end %>
-
+<% if params[:controller_action].blank? %>
   <div class="card table">
-    <h2>Recent Requests</h2>
-    <%= render 'events_table', events: @events, fields: [:timestamp, :request_id, :controller_action, :duration, :status, :request_method, :view_runtime, :db_runtime] %>
+    <h2>By Controller Action</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Controller Action</th>
+        <th>Requests</th>
+        <th>Avg Latency</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @count_by_controller.each do |series| %>
+        <tr>
+          <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param) %></td>
+          <td><%= series.data.dig(0, 1) %></td>
+          <td><%= @latency_by_controller[series.labels[:action]].data.dig(0, 1).to_f.round(2) %> ms</td>
+        </tr>
+      <% end %>
+
+      <!-- More people... -->
+      </tbody>
+    </table>
   </div>
+<% end %>
+
+<div class="card table">
+  <h2>Recent Requests</h2>
+  <%= render 'events_table', events: @events, fields: [
+    :timestamp, :request_id, :controller_action, :duration, :status, :request_method, :view_runtime, :db_runtime
+  ], formatters: {
+    request_id: ->(request_id) { link_to request_id, request_path(request_id) },
+    controller_action: ->(ca) { ca.classify }
+  } %>
 </div>

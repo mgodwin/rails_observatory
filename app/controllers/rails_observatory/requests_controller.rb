@@ -12,16 +12,26 @@ module RailsObservatory
       # RequestTimeSeries.where(parent: 'latency').slice(@time_range)
       # RequestTimeSeries.where(type: 'errors').slice(@time_range)
 
-      if params[:controller_action].blank?
-        @count_by_controller = RequestTimeSeries.where(name:'count', action: '*').slice(@time_range).downsample(1, using: :sum)
+      @events = RequestsStream.all.lazy
+      if params[:controller_action].present?
+        @events = @events.select { |e| e.controller_action == params[:controller_action] }
+        @count_series = @count_series.where(action: params[:controller_action])
+        @latency_series = @latency_series.where(action: params[:controller_action])
+      else
+        @count_by_controller = RequestTimeSeries.where(name: 'count', action: '*')
+                                                .slice(@time_range)
+                                                .downsample(1, using: :sum)
                                                 .select(&:value)
-                                                .sort_by(&:value).reverse
-        @latency_by_controller = RequestTimeSeries.where(name:'latency', action: '*').slice(@time_range).downsample(1, using: :avg)
+                                                .sort_by(&:value)
+
+        @latency_by_controller = RequestTimeSeries.where(name: 'latency', action: '*')
+                                                  .slice(@time_range)
+                                                  .downsample(1, using: :avg)
                                                   .index_by { _1.labels[:action] }
       end
-      @events = RequestsStream.all.lazy.take(25)
-    end
 
+      @events = @events.take(25)
+    end
 
     def time_slice_start
       @time_range.begin.to_i * 1000
@@ -42,7 +52,7 @@ module RailsObservatory
     def show
       @time_range = (1.hour.ago..)
       # TODO: Munge together all streams into one and store in redis sorted set
-      @events = RequestsStream.all.select { |e| e.payload[:request_id] == params[:id]}
+      @events = RequestsStream.all.select { |e| e.payload[:request_id] == params[:id] }
       @req = @events.find { |e| e.type == 'process_action.action_controller' }
     end
 
@@ -57,6 +67,7 @@ module RailsObservatory
     def duration
       ActiveSupport::Duration.build((session[:duration] || 1.hour).to_i)
     end
+
     helper_method :duration
   end
 end

@@ -12,7 +12,11 @@
     <% events.each do |e| %>
       <tr>
         <% fields.each do |f| %>
-          <td><%= format_event_value(e.respond_to?(f) ? e.send(f) : e.payload[f]) %></td>
+          <% if (formatter = local_assigns[:formatters]&.fetch(f, nil)) %>
+            <td><%= formatter.call(e.respond_to?(f) ? e.send(f) : e.payload[f]) %></td>
+          <% else %>
+            <td><%= format_event_value(e.respond_to?(f) ? e.send(f) : e.payload[f]) %></td>
+          <% end %>
         <% end %>
       </tr>
     <% end %>
