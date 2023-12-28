@@ -1,6 +1,8 @@
 module RailsObservatory
   class Error
 
+    include ActiveModel::Model
+
     def self.redis
       Rails.configuration.rails_observatory.redis
     end
@@ -10,18 +12,18 @@ module RailsObservatory
       new(**attributes)
     end
 
-    attr_accessor :fingerprint, :class_name, :message, :backtrace, :request_id, :latest_ts
-    def initialize(fingerprint:, class_name:, message:, backtrace:, request_id:, latest_ts: nil)
-      @fingerprint = fingerprint
-      @class_name = class_name
-      @message = message
-      @backtrace = backtrace
-      @request_id = request_id
-      @latest_ts = latest_ts
-    end
+    attr_accessor :fingerprint, :class_name, :message, :trace, :request_id, :latest_ts, :source_extracts, :location, :has_causes, :causes
 
     def count
-      @count ||= self.class.redis.call('ZSCAN', 'errors_by_total_count', 0, 'MATCH', fingerprint, 'COUNT', 1).dig(1,1)
+      @count ||= self.class.redis.call('ZSCAN', 'errors_by_total_count', 0, 'MATCH', fingerprint, 'COUNT', 1).dig(1, 1)
+    end
+
+    def last_seen
+
+      @last_seen ||= begin
+                       res = self.class.redis.call('ZSCAN', 'errors_by_recency', 0, 'MATCH', fingerprint, 'COUNT', 1).dig(1, 1)
+                       Time.at(res.to_i / 1000)
+                     end
     end
 
   end

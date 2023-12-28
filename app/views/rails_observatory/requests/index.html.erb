@@ -14,15 +14,10 @@
     }
 
   }
-
-  .table-overflow {
-    overflow: auto;
-    max-height: 20rem;
-  }
 </style>
 <div class="library-grid">
-  <%= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
-  <%= render 'chart', name: 'Requests', series: @count_series, type: 'bar', aggregate_using: :sum %>
+  <%= render 'chart', name: 'Latency', series: @latency_series, type: 'area' %>
+  <%= render 'chart', name: 'Requests', series: @count_series, type: 'bar' %>
   <%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
   <%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
 

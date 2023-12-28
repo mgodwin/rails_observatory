@@ -45,16 +45,12 @@ end
 module RailsObservatory
   class Engine < ::Rails::Engine
     isolate_namespace RailsObservatory
+    middleware.use(Rack::Static, urls: ["/assets"], root: config.root.join("public"))
+
     config.rails_observatory = ActiveSupport::OrderedOptions.new
     config.rails_observatory.streams = [:requests, :logs, :jobs, :mailers, :errors]
 
-    initializer "rails_observatory.assets.precompile" do |app|
-      # app.config.assets.precompile += %w( rails_observatory/builds/tailwind.css )
-    end
-
     initializer "rails_observatory.redis" do |app|
-
-
       redis_config = RedisClient.config(host: "localhost", port: 6379, db: 0, middlewares: [RedisClientInstrumentation])
       $redis = redis_config.new_pool(timeout: 0.5, size: Integer(ENV.fetch("RAILS_MAX_THREADS", 5)))
       app.config.rails_observatory.redis = $redis
@@ -90,6 +86,7 @@ module RailsObservatory
         payload[:job_class] = job.class.name
         payload[:executions] = job.executions
         payload[:request_id] = job.request_id
+        payload[:failed] = payload[:exception_object].present?
 
         JobsStream.add_to_stream(type: event.name, payload: payload, duration: event.duration)
         ErrorsStream.add_to_stream(event.payload[:exception_object], request_id: job.request_id) if event.payload[:exception_object]

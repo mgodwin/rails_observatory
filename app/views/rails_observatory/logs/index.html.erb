@@ -11,7 +11,7 @@
 
 Chart!
 
-<div class="card table">
+<div class="card">
   <h2>Recent Logs</h2>
-  <%= render 'events_table', events: @recent_logs, fields: [:timestamp, :request_id, :message] %>
+  <%= render 'events_table', events: @recent_logs, fields: [:timestamp, :message, :request_id] %>
 </div>

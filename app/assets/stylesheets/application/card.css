@@ -1,0 +1,53 @@
+.card {
+  border-radius: 0.5rem;
+  background-color: var(--surface-card);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--divider);
+  padding: 0;
+
+  & h2 {
+    padding: 1rem;
+    margin: 0;
+  }
+
+  &:has(> table) {
+
+    & table {
+      width: 100%;
+      border-spacing: 0;
+      white-space: nowrap;
+
+      & th {
+        text-align: left;
+        font-weight: 400;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--divider);
+
+        &:first-child {
+          border-top-left-radius: .5rem;
+        }
+
+        &:last-child {
+          border-top-right-radius: .5rem;
+        }
+
+        position: sticky;
+        top: 0;
+
+      }
+
+      & tr:last-child td {
+        border-bottom: none;
+      }
+
+      & td {
+        padding: 0.25rem 1rem;
+        border-bottom: 1px solid var(--divider);
+
+        & + & {
+          border-left: 1px solid var(--divider);
+        }
+      }
+    }
+  }
+}

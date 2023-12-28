@@ -1,0 +1,25 @@
+:root {
+  --red: #ba181b;
+  --black: #161a1d;
+  --black-secondary: color-mix(in oklab, var(--black) 60%, white);
+  --blue: #003a61;
+  --gray: #b1a7a6;
+  --white: #eee;
+  --divider: color-mix(in oklab, var(--black) 88%, white);
+  --divider-active: color-mix(in oklab, var(--black) 75%, white);
+  --surface-active: color-mix(in oklab, var(--black) 92%, white);
+  --surface-hover: color-mix(in oklab, var(--black) 96%, white);
+  --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
+  --surface-card: color-mix(in oklab, var(--black) 96%, white);
+
+  --font-mono: 'Roboto Mono', monospace;
+}
+
+
+html, body {
+  font-family: 'Fira Sans', sans-serif;
+  font-weight: 200;
+  color: var(--white);
+  height: 100%;
+  background-color: var(--black);
+}

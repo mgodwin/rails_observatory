@@ -4,6 +4,7 @@ PATH
     rails_observatory (0.1.0)
       rails (>= 7.1.0)
       redis-client
+      rouge
       zeitwerk
 
 GEM
@@ -178,6 +179,7 @@ GEM
       connection_pool
     reline (0.4.0)
       io-console (~> 0.5)
+    rouge (4.1.3)
     ruby2_keywords (0.0.5)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
@@ -189,10 +191,6 @@ GEM
     sqlite3 (1.6.3-arm64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
     stringio (3.0.9)
-    tailwindcss-rails (2.0.30-arm64-darwin)
-      railties (>= 6.0.0)
-    tailwindcss-rails (2.0.30-x86_64-linux)
-      railties (>= 6.0.0)
     thor (1.2.2)
     timeout (0.4.0)
     tzinfo (2.0.6)
@@ -213,7 +211,6 @@ DEPENDENCIES
   rails_observatory!
   sprockets-rails
   sqlite3
-  tailwindcss-rails
 
 BUNDLED WITH
    2.4.10

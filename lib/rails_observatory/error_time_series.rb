@@ -1,9 +1,19 @@
 module RailsObservatory
   class ErrorTimeSeries < RedisTimeSeries
 
-    TS_KEY_PREFIX = "error"
+    PREFIX = "error"
+
+    def fingerprint
+      labels[:name].split('.').last
+    end
+
     def self.where(fingerprint:)
-      super(name: [TS_KEY_PREFIX, fingerprint].join(':'))
+      puts "fingerprint: #{fingerprint}"
+      super(name: fingerprint)
+    end
+
+    def self.increment(fingerprint)
+      super(fingerprint)
     end
   end
 end

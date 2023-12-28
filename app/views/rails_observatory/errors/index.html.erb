@@ -1,4 +1,6 @@
 <% content_for(:title, 'Errors') %>
+<% content_for(:hide_duration, 'true') %>
+
 
 <style>
   @scope {
@@ -16,8 +18,9 @@
     display: grid;
     grid-template-areas:
       'name-and-location graph count'
-      'message graph count';
-    grid-template-columns: minmax(14rem, 1fr) auto auto;
+      'message graph count'
+      'time graph count';
+    grid-template-columns: minmax(14rem, 1fr) 200px minmax(min-content, 4rem);
     column-gap: 1rem;
     row-gap: .3rem;
 
@@ -50,11 +53,16 @@
 
     ._count {
       grid-area: count;
-      text-align: right;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 400;
+      align-self: center;
     }
+
     ._graph {
       grid-area: graph;
       text-align: right;
+      align-items: center;
     }
 
   }
@@ -64,12 +72,16 @@
   <div class="error">
     <div class="_name-and-location">
       <a href="<%= error_path(e.fingerprint) %>"><%= e.class_name %></a>
-      <span><%= e.backtrace.first %></span>
+      <span><%= e.location.classify %></span>
     </div>
     <div class="_message"><%= e.message %></div>
     <div class="_time"><%= time_ago_in_words(Time.at(e.latest_ts / 1000)) %> ago</div>
 
-    <div class="_graph">tbd</div>
+    <div class="_graph">
+      <% if @series_by_fingerprint[e.fingerprint] %>
+        <%= render "sparkline", type: "bar", series: @series_by_fingerprint[e.fingerprint] %>
+      <% end %>
+    </div>
     <div class="_count"><%= e.count %></div>
   </div>
 <% end %>

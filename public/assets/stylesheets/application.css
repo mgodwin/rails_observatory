@@ -1,0 +1,361 @@
+@import "https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&family=Roboto+Mono:wght@200;400&display=swap";
+
+/* app/assets/stylesheets/elements/root.css */
+:root {
+  --red: #ba181b;
+  --black: #161a1d;
+  --black-secondary: color-mix(in oklab, var(--black) 60%, white);
+  --blue: #003a61;
+  --gray: #b1a7a6;
+  --white: #eee;
+  --divider: color-mix(in oklab, var(--black) 88%, white);
+  --divider-active: color-mix(in oklab, var(--black) 75%, white);
+  --surface-active: color-mix(in oklab, var(--black) 92%, white);
+  --surface-hover: color-mix(in oklab, var(--black) 96%, white);
+  --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
+  --surface-card: color-mix(in oklab, var(--black) 96%, white);
+  --font-mono: "Roboto Mono", monospace;
+}
+html,
+body {
+  font-family: "Fira Sans", sans-serif;
+  font-weight: 200;
+  color: var(--white);
+  height: 100%;
+  background-color: var(--black);
+}
+
+/* app/assets/stylesheets/elements/a.css */
+a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 400;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* app/assets/stylesheets/elements/button.css */
+button {
+  font-family: inherit;
+  display: flex;
+  font-size: 1rem;
+  align-items: center;
+  padding: .5rem .75rem;
+  border-radius: .5rem;
+  gap: .5rem;
+  font-weight: 400;
+  &.secondary {
+    background-color: transparent;
+    border: 1px solid var(--divider);
+    color: var(--white);
+    &:hover,
+    &:focus-within {
+      border: 1px solid var(--divider-active);
+      background-color: var(--surface-hover);
+    }
+  }
+}
+
+/* app/assets/stylesheets/elements/details.css */
+details {
+  .arrow-right {
+    transform: rotate(0deg);
+    transition: transform 100ms linear;
+  }
+  &[open] {
+    & > summary .arrow-right:first-child {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+/* app/assets/stylesheets/layout/app.css */
+.layout\/app {
+  display: grid;
+  grid-template-areas: "side-nav top-nav" "side-nav main";
+  grid-template-columns: 16rem 1fr;
+  grid-template-rows: auto 1fr;
+  margin: 0;
+}
+
+/* app/assets/stylesheets/layout/errors-show.css */
+.layout\/errors-show {
+  padding: 0;
+  display: grid;
+  grid-template-areas: "details side-panel";
+  grid-template-columns: minmax(400px, 1fr) 300px;
+}
+
+/* app/assets/stylesheets/application/_scrollable.css */
+.\~scrollable {
+  overflow: auto;
+}
+
+/* app/assets/stylesheets/application/card.css */
+.card {
+  border-radius: 0.5rem;
+  background-color: var(--surface-card);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--divider);
+  padding: 0;
+  & h2 {
+    padding: 1rem;
+    margin: 0;
+  }
+  &:has(> table) {
+    & table {
+      width: 100%;
+      border-spacing: 0;
+      white-space: nowrap;
+      & th {
+        text-align: left;
+        font-weight: 400;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--divider);
+        &:first-child {
+          border-top-left-radius: .5rem;
+        }
+        &:last-child {
+          border-top-right-radius: .5rem;
+        }
+        position: sticky;
+        top: 0;
+      }
+      & tr:last-child td {
+        border-bottom: none;
+      }
+      & td {
+        padding: 0.25rem 1rem;
+        border-bottom: 1px solid var(--divider);
+        & + & {
+          border-left: 1px solid var(--divider);
+        }
+      }
+    }
+  }
+}
+
+/* app/assets/stylesheets/application/dropdown.css */
+.dropdown {
+  position: relative;
+  & > ul {
+    background-color: var(--surface-dropdown);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(0, -1rem);
+    transition:
+      opacity .2s ease-in-out,
+      visibility .2s ease-in-out,
+      transform .2s ease-in-out;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    & > li {
+      border-bottom: 1px solid var(--divider);
+      text-align: left;
+      &:last-child {
+        border-bottom: none;
+      }
+      & > a {
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 200;
+        padding: .5rem .75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        & svg {
+          display: none;
+        }
+        &.active {
+          font-weight: 400;
+          & svg {
+            display: block;
+          }
+        }
+        &:not(.active):hover {
+          background-color: var(--surface-hover);
+        }
+      }
+    }
+  }
+  &:focus-within {
+    & > ul {
+      opacity: 100;
+      visibility: visible;
+      transform: translate(0, 0);
+    }
+  }
+}
+
+/* app/assets/stylesheets/application/side-nav.css */
+.side-nav {
+  grid-area: side-nav;
+  grid-row: 1 / -1;
+  border-right: 1px solid var(--divider);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: stretch;
+  background: rgb(0, 144, 255);
+  background:
+    radial-gradient(
+      ellipse 100% 4rem at top,
+      rgba(0, 144, 255, 0.4) 0%,
+      rgba(22, 26, 29, 1) 100%);
+  ._active {
+    background-color: var(--surface-active);
+    color: var(--white);
+    &:hover {
+      background-color: var(--surface-active);
+    }
+  }
+  ._redis-stats {
+    align-self: center;
+    color: var(--black-secondary);
+    font-size: .85rem;
+  }
+  & > img {
+    align-self: start;
+    padding-inline: .75rem;
+    transition: all 500ms ease-in-out;
+    &:hover {
+      filter: drop-shadow(0px 0px 1px rgba(255, 255, 255, .8));
+    }
+  }
+  & > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    flex-grow: 1;
+    & a {
+      display: flex;
+      align-items: center;
+      padding: .5rem .75rem;
+      gap: .5rem;
+      border-radius: .5rem;
+      text-decoration: none;
+      font-weight: 400;
+      color: color-mix(in oklab, var(--black) 20%, white);
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+    }
+  }
+}
+
+/* app/assets/stylesheets/application/top-nav.css */
+.top-nav {
+  grid-area: top-nav;
+  border-bottom: 1px solid var(--divider);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  ._subtitle {
+    font-weight: 200;
+    color: var(--black-secondary);
+  }
+  & > span {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    & h1 {
+      margin: 0;
+      align-items: baseline;
+    }
+  }
+}
+
+/* app/assets/stylesheets/errors/show/details.css */
+.errors\/show\/details {
+  grid-area: details;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  & > h2 {
+    margin-block: 1rem;
+    padding-left: 1rem;
+    font-size: 1.25rem;
+  }
+}
+
+/* app/assets/stylesheets/errors/show/side-panel.css */
+.errors\/show\/side-panel {
+  grid-area: side-panel;
+  color: var(--white);
+  padding: 2rem;
+  ._occurrence_count {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+  & dl {
+    margin: 0;
+    & dt {
+      font-weight: 400;
+      margin: 0;
+      color: var(--black-secondary);
+      font-size: 1.15rem;
+    }
+    & dd {
+      margin: 0;
+      padding-block: .5rem;
+      &[title] {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-decoration-color: var(--black-secondary);
+      }
+    }
+    & dd + dt {
+      margin-top: 2.5rem;
+    }
+  }
+}
+
+/* app/assets/stylesheets/requests/stats.css */
+.requests\/stats {
+  display: flex;
+  border-bottom: 1px solid var(--divider);
+  margin: 0;
+  ._unit {
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-left: .25rem;
+    color: var(--black-secondary);
+  }
+  & > * {
+    padding: 2rem 2rem;
+    flex-grow: 1;
+    & + & {
+      border-left: 1px solid var(--divider);
+    }
+    & > dt {
+      font-weight: 400;
+      color: var(--black-secondary);
+      margin-bottom: .75rem;
+    }
+    & > dd {
+      font-size: 2.5rem;
+      font-weight: 400;
+      margin: 0;
+      display: flex;
+      align-items: baseline;
+    }
+  }
+}
+
+/* app/assets/stylesheets/application.css */
+main {
+  grid-area: main;
+  padding: 1rem;
+  overflow: auto;
+}

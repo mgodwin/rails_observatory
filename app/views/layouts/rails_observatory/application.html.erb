@@ -4,407 +4,17 @@
   <title>Observatory</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
+  <link rel="preload" href="<%= "#{root_path}assets/stylesheets/application.css" %>" as="style">
+  <link rel="stylesheet" href="<%= "#{root_path}assets/stylesheets/application.css" %>">
+  <script type="text/javascript" src="<%= "#{root_path}assets/js/application.js" %>"></script>
 
-  <script type="module">
-    import Apexcharts from "https://jspm.dev/apexcharts"
-    import * as Stimulus from "https://cdn.skypack.dev/stimulus"
-
-
-    const application = Stimulus.Application.start();
-
-    class ChartController extends Stimulus.Controller {
-      static targets = ["chart", "data"]
-
-      static values = {
-        type: String,
-        palette: String,
-        startX: Number,
-        endX: Number,
-      }
-
-      connect() {
-        const series = this.dataTargets.map((target) => ({
-          name: target.dataset.seriesName,
-          data: JSON.parse(target.innerHTML)
-        }));
-
-        this.chart = new Apexcharts(this.chartTarget, {
-          chart: {
-            id: this.element.id,
-            group: 'requests',
-            type: this.typeValue,
-            height: 250,
-            animations: {
-              enabled: false
-            },
-            toolbar: {
-              show: false
-            },
-          },
-          title: {
-            text: this.element.dataset.chartName,
-            align: 'left',
-            offsetY: 20,
-            style: {
-              fontSize: '1rem',
-              fontWeight: 500,
-              fontFamily: 'inherit',
-              color: 'var(--white)'
-            }
-          },
-          colors: ["#7209b7"],
-          grid: {
-            borderColor: 'var(--divider)',
-            strokeDashArray: 4,
-            xaxis: {
-              lines: {
-                show: true
-              }
-            },
-            yaxis: {
-              lines: {
-                show: true
-              }
-            },
-            padding: {
-              top: 0,
-              right: 0,
-              bottom: 0,
-              left: 8
-            },
-          },
-          series,
-          xaxis: {
-            type: 'datetime',
-            min: this.startXValue,
-            max: this.endXValue,
-            axisBorder: {
-              show: false,
-            },
-            axisTicks: {
-              show: false
-            },
-            crosshairs: {
-              width: 1
-            },
-          },
-
-          yaxis: {
-            decimalsInFloat: 0,
-            labels: {
-              // offsetX: -40,
-            },
-            axisTicks: {
-              show: false
-            },
-          },
-          dataLabels: {
-            enabled: false
-          },
-          fill: {
-            gradient: {
-              enabled: true,
-              opacityFrom: 0.55,
-              opacityTo: 0
-            }
-          },
-          theme: {
-            monochrome: {
-              enabled: true,
-              color: '#0c8be8',
-              shadeTo: 'dark',
-              shadeIntensity: 0.65
-            }
-          },
-          stroke: {
-            width: 3,
-            curve: 'straight'
-          },
-          tooltip: {
-            x: {
-              format: 'dd MMM yyyy HH:mm'
-            },
-            theme: 'dark',
-          }
-        })
-
-        this.chart.render();
-      }
-    }
-
-    application.register("chart", ChartController);
-
-    window.Stimulus = Stimulus
-    window.Apex = Apexcharts
-  </script>
   <style>
-
-    @import url('https://fonts.googleapis.com/css2?family=Fira+Mono&family=Fira+Sans:wght@200;400&display=swap');
-
-    :root {
-      --red: #ba181b;
-      --black: #161a1d;
-      --black-secondary: color-mix(in oklab, var(--black) 60%, white);
-      --blue: #003a61;
-      --gray: #b1a7a6;
-      --white: #eee;
-      --divider: color-mix(in oklab, var(--black) 88%, white);
-      --divider-active: color-mix(in oklab, var(--black) 75%, white);
-      --surface-active: color-mix(in oklab, var(--black) 92%, white);
-      --surface-hover: color-mix(in oklab, var(--black) 96%, white);
-      --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
-      --surface-card: color-mix(in oklab, var(--black) 96%, white);
-
-      --font-mono: 'Fira Mono', monospace;
-    }
-
-    html, body {
-      font-family: 'Fira Sans', sans-serif;
-      font-weight: 200;
-      color: var(--white);
-      height: 100%;
-      background-color: var(--black);
-    }
-
-    body {
-      display: grid;
-      grid-template-areas: 'side-nav top-nav'
-                            'side-nav main';
-      grid-template-columns: 16rem 1fr;
-      grid-template-rows: auto 1fr;
-      margin: 0;
-    }
-
-    button {
-      font-family: inherit;
-      display: flex;
-      font-size: 1rem;
-      align-items: center;
-      padding: .5rem .75rem;
-      border-radius: .5rem;
-      gap: .5rem;
-      font-weight: 400;
-
-      &.secondary {
-        background-color: transparent;
-        border: 1px solid var(--divider);
-        color: var(--white);
-
-        &:hover, &:focus-within {
-          border: 1px solid var(--divider-active);
-          background-color: var(--surface-hover);
-        }
-      }
-    }
-
-    a {
-      color: var(--white);
-      text-decoration: none;
-      font-weight: 400;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    table {
-      width: 100%;
-      border-spacing: 0;
-      white-space: nowrap;
-
-      & th {
-        text-align: left;
-        font-weight: 400;
-        padding: 0.5rem 1rem;
-        border-bottom: 1px solid var(--divider);
-
-        &:first-child {
-          border-top-left-radius: .5rem;
-        }
-
-        &:last-child {
-          border-top-right-radius: .5rem;
-        }
-
-        position: sticky;
-        top: 0;
-
-      }
-
-      & tr:last-child td {
-        border-bottom: none;
-      }
-
-      & td {
-        padding: 0.25rem 1rem;
-        border-bottom: 1px solid var(--divider);
-
-        & + & {
-          border-left: 1px solid var(--divider);
-        }
-      }
-    }
-
-    main {
-      grid-area: main;
-      padding: 1rem;
-      overflow: auto;
-    }
-
-    .card {
-      border-radius: 0.5rem;
-      background-color: var(--surface-card);
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-      padding: 1rem;
-
-      &.table {
-        padding: 0;
-
-        & h2 {
-          padding: 1rem;
-          margin: 0;
-        }
-      }
-    }
-
-    .chart {
-      height: 265px;
-    }
-
-    .side-nav {
-      grid-area: side-nav;
-      grid-row: 1 / -1;
-      border-right: 1px solid var(--divider);
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: stretch;
-      background: rgb(0, 144, 255);
-      background: radial-gradient(ellipse 100% 4rem at top, rgba(0, 144, 255, 0.4) 0%, rgba(22, 26, 29, 1) 100%);
-
-      ._active {
-        background-color: var(--blue);
-        color: var(--white);
-
-        &:hover {
-          background-color: var(--blue);
-        }
-      }
-
-      ._redis-stats {
-        align-self: center;
-        color: var(--black-secondary);
-        font-size: .85rem;
-
-      }
-
-      & > img {
-        align-self: start;
-        padding-inline: .75rem;
-      }
-
-
-      & > ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: .25rem;
-        flex-grow: 1;
-
-        & a {
-          display: flex;
-          align-items: center;
-          padding: .5rem .75rem;
-          gap: .5rem;
-          border-radius: .5rem;
-          text-decoration: none;
-          font-weight: 400;
-          color: color-mix(in oklab, var(--black) 20%, white);
-
-          &:hover {
-            background-color: var(--surface-hover);
-          }
-        }
-      }
-    }
-
-    .top-nav {
-      grid-area: top-nav;
-      border-bottom: 1px solid var(--divider);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      ._subtitle {
-        font-weight: 200;
-        color: var(--black-secondary);
-      }
-
-
-      & > span {
-        display: flex;
-        align-items: baseline;
-        gap: .5rem;
-
-        & h1 {
-          margin: 0;
-        }
-      }
-    }
-
-    .dropdown {
-      position: relative;
-
-      & > ul {
-        background-color: var(--surface-dropdown);
-        opacity: 0;
-        visibility: hidden;
-        transform: translate(0, -1rem);
-        transition: opacity .2s ease-in-out, visibility .2s ease-in-out, transform .2s ease-in-out;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        position: absolute;
-
-        & > li {
-          padding: .5rem .75rem;
-          border-bottom: 1px solid var(--divider);
-          text-align: left;
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          & > a {
-            display: block;
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 400;
-
-            &:hover {
-              background-color: var(--surface-hover);
-            }
-          }
-        }
-      }
-
-      &:focus-within {
-        & > ul {
-          opacity: 100;
-          visibility: visible;
-          transform: translate(0, 0);
-        }
-      }
-    }
+    <%= Rouge::Theme.find('github.dark').render %>
   </style>
 </head>
-<body>
+<body class="layout/app">
 <nav class="side-nav">
-  <img height="36" src="<%= image_path "rails_observatory/logo_with_text.svg" %>" alt="RailsObservatory">
+  <img height="36" src="<%= "#{root_path}assets/logo_with_text.svg" %>" alt="RailsObservatory">
   <ul>
     <li><%= link_to root_path, class: "#{'_active' if request.path == root_path || request.path =~ /requests/}" do %>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
@@ -445,42 +55,43 @@
 </nav>
 <nav class="top-nav">
   <span>
-
     <h1>
       <span class="_subtitle">
         <% if content_for? :subtitle %><%= yield :subtitle %>
-        <% end %></span><%= yield :title %></h1>
+        <% end %>
+      </span>
+      <%= yield :title %>
+    </h1>
   </span>
-  <div class="dropdown">
-    <button class="secondary">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>Past <%= duration.inspect %></span>
-      <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" height="20">
-        <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
-      </svg>
-    </button>
+  <% unless content_for?(:hide_duration) %>
+    <div class="dropdown">
+      <button class="secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Past <%= duration.inspect %></span>
+        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" height="20">
+          <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+        </svg>
+      </button>
 
-    <ul>
-      <% [5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hour, 4.hours, 1.day, 2.days, 7.days, 1.month].each do |time_frame| %>
-        <li>
-          <a href="?duration=<%= time_frame %>" class="py-2 pl-11 pr-4 block">
-            <!-- Selected: "font-semibold", Not Selected: "font-normal" -->
-            <span class="font-normal block truncate <%= 'font-semibold' if time_frame == duration %>">Past <%= time_frame.inspect %></span>
-            <span class="<%= 'hidden' if time_frame != duration %> absolute inset-y-0 left-0 flex items-center pl-4">
-              <svg height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <ul>
+        <% [5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hour, 4.hours, 1.day, 2.days, 7.days, 1.month].each do |time_frame| %>
+          <li>
+            <a href="?duration=<%= time_frame %>" class="<%= 'active' if time_frame == duration %>">
+              <span>Past <%= time_frame.inspect %></span>
+              <svg height="18" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
               </svg>
-            </span>
-          </a>
-        </li>
-      <% end %>
+            </a>
+          </li>
+        <% end %>
 
-    </ul>
-  </div>
+      </ul>
+    </div>
+  <% end %>
 </nav>
-<main>
+<main class="<%= yield :main_css_class %>">
   <%= yield %>
 </main>
 </body>

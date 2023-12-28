@@ -1,0 +1,25 @@
+.top-nav {
+  grid-area: top-nav;
+  border-bottom: 1px solid var(--divider);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  ._subtitle {
+    font-weight: 200;
+    color: var(--black-secondary);
+  }
+
+
+  & > span {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+
+    & h1 {
+      margin: 0;
+      align-items: baseline;
+    }
+  }
+}

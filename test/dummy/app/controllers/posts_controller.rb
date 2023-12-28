@@ -1,4 +1,4 @@
-class PostsController <ApplicationController
+class PostsController < ApplicationController
   def index
     @blogs = Post.all
     raise "This is an error"

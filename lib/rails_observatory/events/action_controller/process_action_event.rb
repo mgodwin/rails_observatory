@@ -43,11 +43,11 @@ module RailsObservatory
       end
 
       def record_metrics
-        RedisTimeSeries.distribution("request.latency", duration, labels:)
-        RedisTimeSeries.distribution("request.latency/db_runtime", db_runtime, labels:)
-        RedisTimeSeries.distribution("request.latency/view_runtime", view_runtime, labels:)
-        RedisTimeSeries.increment("request.count", labels:)
-        RedisTimeSeries.increment("request.error_count", labels:) if status >= 500
+        RequestTimeSeries.distribution("latency", duration, labels:)
+        RequestTimeSeries.distribution("latency/db_runtime", db_runtime, labels:)
+        RequestTimeSeries.distribution("latency/view_runtime", view_runtime, labels:)
+        RequestTimeSeries.increment("count", labels:)
+        RequestTimeSeries.increment("error_count", labels:) if status >= 500
       end
     end
   end

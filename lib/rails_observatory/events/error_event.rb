@@ -7,6 +7,7 @@ module RailsObservatory
         r.call('ZINCRBY', 'errors_by_total_count', 1, payload[:fingerprint])
         r.call('SET', "errors:#{payload[:fingerprint]}", JSON.generate(payload))
       end
+      ErrorTimeSeries.increment(payload[:fingerprint])
     end
 
   end

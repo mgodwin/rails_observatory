@@ -2,13 +2,23 @@ module RailsObservatory
   class RedisTimeSeries::QueryBuilder
     include Enumerable
 
-    def initialize
+    def initialize(series_class)
+      @series_class = series_class
       @conditions = {}
+      @samples = nil
       @range = (nil..)
     end
 
     def where(**conditions)
-      @conditions.merge! conditions
+      conditions => {name:, **rest}
+      prefixed_name = begin
+        if name.is_a? Array
+          name.map { |n| "#{@series_class::PREFIX}.#{n}" }
+        else
+          "#{@series_class::PREFIX}.#{name}"
+        end
+      end
+      @conditions.merge! name: prefixed_name, **rest
       self.clone
     end
 
@@ -23,32 +33,47 @@ module RailsObservatory
     end
 
     def downsample(samples, using:)
+      @samples = samples
       @agg_type = using
-      end_time = @range.end || Time.now
-      start_time = @range.begin || 12.months.ago.to_time
-      @agg_duration = (end_time - start_time) * 1000 / samples
       self.clone
     end
 
     def each
+      agg_duration = build_agg_duration
       mrange_args = ['TS.MRANGE', from_ts, to_ts, 'WITHLABELS']
       mrange_args.push('LATEST') if @range.end.nil?
-      if @agg_type && @agg_duration
+      if @agg_type && @samples
         if @range.end.present?
           mrange_args.push("ALIGN", 'end')
         elsif @range.begin.present?
           mrange_args.push("ALIGN", 'start')
         end
-        mrange_args.push("AGGREGATION", @agg_type.to_s.upcase, @agg_duration.to_i, "EMPTY")
+        mrange_args.push("AGGREGATION", @agg_type.to_s.upcase, agg_duration, "EMPTY")
       end
       mrange_args.push('FILTER', *ts_filters)
 
+      puts mrange_args.join(" ")
       res = $redis.call(mrange_args)
       return if res.nil?
-      res.each { yield RedisTimeSeries.from_redis(_1) }
+
+      res.each do |name, labels, data|
+        yield @series_class.new(
+          name:,
+          labels: Hash[*labels.flatten],
+          data:,
+          time_range: @range,
+          agg_duration: agg_duration
+        )
+      end
     end
 
     private
+
+    def build_agg_duration
+      end_time = @range.end || Time.now
+      start_time = @range.begin || 12.months.ago.to_time
+      ((end_time - start_time) * 1000 / @samples).to_i
+    end
 
     def from_ts
       if @range.begin.nil?
@@ -70,6 +95,8 @@ module RailsObservatory
       @conditions.map do |k, v|
         if v == "*"
           "#{k}!="
+        elsif v.is_a? Array
+          "#{k}=(#{v.join(',')})"
         else
           "#{k}=#{v}"
         end

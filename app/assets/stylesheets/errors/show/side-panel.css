@@ -1,0 +1,36 @@
+.errors\/show\/side-panel {
+  grid-area: side-panel;
+  color: var(--white);
+  padding: 2rem;
+
+  ._occurrence_count {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+
+  & dl {
+    margin: 0;
+
+    & dt {
+      font-weight: 400;
+      margin: 0;
+      color: var(--black-secondary);
+      font-size: 1.15rem;
+    }
+
+    & dd {
+      margin: 0;
+      padding-block: .5rem;
+
+      &[title] {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-decoration-color: var(--black-secondary);
+      }
+    }
+
+    & dd + dt {
+      margin-top: 2.5rem;
+    }
+  }
+}

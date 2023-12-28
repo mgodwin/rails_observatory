@@ -1,0 +1,13 @@
+.errors\/show\/details {
+  grid-area: details;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  & > h2 {
+    margin-block: 1rem;
+    padding-left: 1rem;
+    font-size: 1.25rem;
+  }
+}

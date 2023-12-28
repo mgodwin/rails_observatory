@@ -1,0 +1,32 @@
+/* Element override styling */
+@import url('elements/root.css');
+@import url('elements/a.css');
+@import url('elements/button.css');
+@import url('elements/details.css');
+
+/* Layout */
+@import url('layout/app.css');
+@import url('layout/errors-show.css');
+
+/* Application styles */
+@import url('application/_scrollable.css');
+@import url('application/card.css');
+@import url('application/dropdown.css');
+@import url('application/side-nav.css');
+@import url('application/top-nav.css');
+
+
+/* page styles */
+@import url('errors/show/details.css');
+@import url('errors/show/side-panel.css');
+
+@import url('requests/stats.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&family=Roboto+Mono:wght@200;400&display=swap');
+
+
+main {
+  grid-area: main;
+  padding: 1rem;
+  overflow: auto;
+}

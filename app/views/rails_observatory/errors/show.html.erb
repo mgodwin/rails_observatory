@@ -1,17 +1,185 @@
-<% content_for(:title, 'Error Details') %>
+<% content_for(:title) do %>
+  <%= @error.class_name %>
+  <span class="_location">
+    in <%= @error.location.classify %>
+  </span>
+<% end %>
+<% content_for(:hide_duration, 'true') %>
+<% content_for(:main_css_class, 'layout/errors-show') %>
 
-<h1><%= @error.class_name %></h1>
-<%= @error.backtrace.first %>
+<style>
 
 
-<%= @error.message %>
-<% @error.backtrace.each do |line| %>
-<div>
-  <%= line %>
+  ._location {
+    font-weight: 200;
+  }
+
+
+  .hll {
+    background-color: #49483e;
+    /*text-underline-style: wave;*/
+    /*text-decoration: underline;*/
+
+    & pre > span {
+      text-decoration-line: underline;
+      text-decoration-style: wavy;
+      text-decoration-color: var(--red);
+    }
+  }
+
+  .highlight {
+    background-color: var(--surface-card);
+    width: 100%;
+    overflow: auto;
+
+    & table {
+      border-spacing: 0;
+      width: 100%;
+    }
+
+    & tr td:first-child {
+      padding-inline: .25rem;
+      position: sticky;
+      left: 0;
+      background-color: var(--surface-card);
+
+      .hll & {
+        background-color: #49483e;
+      }
+    }
+  }
+
+  .backtrace-line {
+    padding: .5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--divider);
+    gap: 1rem;
+    color: var(--black-secondary);
+
+    &.--application-frame {
+      & summary::after {
+        content: 'Application Frame';
+        font-size: .75rem;
+        text-align: right;
+        color: color-mix(in oklab, #0c8be8 5%, var(--white));
+        padding: .1rem .35rem;
+        border-radius: .35rem;
+        font-weight: 400;
+        /* text gradient fill, blue to white */
+        background: color-mix(in oklab, #0c8be8 80%, var(--black));
+        border: 1px solid color-mix(in oklab, #0c8be8 60%, var(--white));
+        /*background-clip: text;*/
+
+      }
+    }
+
+    & > :not(summary) {
+      margin-top: 1rem;
+    }
+
+    summary {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      color: var(--white);
+
+      & > :not(svg) {
+        flex-grow: 1;
+      }
+
+      & > svg {
+        flex-shrink: 0;
+      }
+    }
+
+    ._path {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+
+  }
+
+  .framework-trace-chunk {
+    border-top: 1px solid var(--divider);
+    font-style: italic;
+    color: var(--black-secondary);
+
+
+    &[open] {
+
+      color: color-mix(in oklab, var(--black-secondary) 40%, var(--white));
+    }
+
+    & > summary {
+      &:hover {
+        /*background-color: var(--surface-active);*/
+      }
+
+      padding: .5rem 1rem;
+      display: flex;
+      gap: .5rem;
+    }
+  }
+</style>
+
+<div class="errors/show/side-panel">
+  <dl>
+    <dt>Occurrences</dt>
+    <dd class="_occurrence_count"><%= @error.count %></dd>
+    <dt>Last Seen</dt>
+    <dd title="<%= @error.last_seen %>"><%= time_ago_in_words(@error.last_seen) %> ago</dd>
+
+    <dt>Past 24 Hours</dt>
+    <dd>
+      <%= render "sparkline", type: "bar", series: @past_24_hours %>
+    </dd>
+
+    <dt>Past 7 Days</dt>
+    <dd>
+      <%= render "sparkline", type: "bar", series: @past_7_days %>
+    </dd>
+
+    <dt>Past 30 Days</dt>
+    <dd><%= render "sparkline", type: "bar", series: @past_30_days %></dd>
+  </dl>
 </div>
-  <% end %>
 
-<details>
-  <summary>
-  </summary>
-</details>
+<div class="errors/show/details">
+  <h2><%= @error.message %></h2>
+
+  <div class="card">
+    <h2>Trace</h2>
+    <% @error.trace.slice_when { _1[:is_application_trace] != _2[:is_application_trace] }.each do |trace_chunk| %>
+      <% if !trace_chunk.first[:is_application_trace] %>
+        <details class="framework-trace-chunk">
+          <summary>
+            <svg class="arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+            Plus <%= trace_chunk.length %> Framework frames
+          </summary>
+      <% end %>
+      <% trace_chunk.each do |trace_line| %>
+        <details class="backtrace-line <%= '--application-frame' if trace_line[:is_application_trace] %>" <%= 'open' if trace_line[:is_application_trace] %>>
+          <summary>
+            <svg class="arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+            <span class="_path"><%= trace_line[:trace] %></span>
+          </summary>
+          <div class="highlight">
+            <%== highlight_source_extract(@error.source_extracts[trace_line[:id]]) %>
+          </div>
+        </details>
+      <% end %>
+      <% if !trace_chunk.first[:is_application_trace] %>
+        </details>
+      <% end %>
+    <% end %>
+  </div>
+
+
+</div>

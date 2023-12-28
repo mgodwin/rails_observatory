@@ -1,3 +1,4 @@
+require 'rouge'
 module RailsObservatory
   module ApplicationHelper
 
@@ -6,6 +7,18 @@ module RailsObservatory
       # 10 second buckets are the smallest resolution we have
       buckets_in_time_frame = (duration_sec / 10.0).to_i
       [120, buckets_in_time_frame].min
+    end
+
+    def highlight_source_extract(source_extract)
+      source_extract => {code:, line_number:}
+      fmt = Rouge::Formatters::HTMLLineTable.new(Rouge::Formatters::HTML.new, start_line: code.keys.first.to_s.to_i)
+      html = Nokogiri::HTML4(Rouge.highlight(code.values.flatten.join(""), 'ruby', fmt))
+      html.css("#line-#{line_number}").add_class('hll')
+      line = code[line_number.to_s.to_sym]
+      if line.length > 1
+        html.css("#line-#{line_number}").attr('data-highlight-start', line[0].length).attr('data-highlight-length', line[1].length)
+      end
+      html.to_html
     end
 
     def time_slice_start
@@ -25,7 +38,21 @@ module RailsObservatory
       end
     end
 
+    def pretty_backtrace_location(backtrace_line)
+      path, lineno, method = backtrace_line.split(':')
+      path = path.sub(Gem.paths.home, '')
+      # remove 'in ' from method name
+      method = method.match(/in `([^']+) (:?in .*)'/)
+      method = method[1] if method
+      tag.div(class: 'backtrace-line') do
+        tag.span(path, class: '_path') +
+          ' in ' +
+          tag.span(method, class: '_method') +
+          ' at line ' +
+          tag.span(lineno, class: '_lineno')
 
+      end
+    end
 
     # {"used_memory"=>"46573752",
     #  "used_memory_human"=>"44.42M",

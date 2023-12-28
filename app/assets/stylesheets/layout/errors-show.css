@@ -1,0 +1,6 @@
+.layout\/errors-show {
+  padding: 0;
+  display: grid;
+  grid-template-areas:'details side-panel';
+  grid-template-columns: minmax(400px, 1fr) 300px;
+}

@@ -1,0 +1,8 @@
+.layout\/app {
+  display: grid;
+  grid-template-areas:  'side-nav top-nav'
+                        'side-nav main';
+  grid-template-columns: 16rem 1fr;
+  grid-template-rows: auto 1fr;
+  margin: 0;
+}

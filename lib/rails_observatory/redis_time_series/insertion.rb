@@ -34,11 +34,26 @@ module RailsObservatory
 
     # TODO: These need to take in a timestamp
     def distribution(name, value, labels: {})
-      TIMING_SCRIPT.call(name, value, labels.to_a.flatten.map(&:to_s))
+      prefixed_name = begin
+                        if defined?(self::PREFIX)
+                          [self::PREFIX, name].join('.')
+                        else
+                          name
+                        end
+                      end
+      TIMING_SCRIPT.call(prefixed_name, value, labels.to_a.flatten.map(&:to_s))
     end
 
     def increment(name, labels: {})
-      INCREMENT_CALL.call(name, labels.to_a.flatten.map(&:to_s))
+
+      prefixed_name = begin
+                        if defined?(self::PREFIX)
+                        [self::PREFIX, name].join('.')
+                        else
+                          name
+                        end
+                      end
+      INCREMENT_CALL.call(prefixed_name, labels.to_a.flatten.map(&:to_s))
     end
   end
 end

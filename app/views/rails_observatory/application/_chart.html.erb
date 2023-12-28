@@ -1,0 +1,17 @@
+<% series = local_assigns[:series] %>
+<div id="<%= rand(100) %>"
+     class="chart"
+     data-controller="chart"
+     data-chart-name="<%= local_assigns[:name] %>"
+     data-chart-type-value="<%= local_assigns[:type] %>"
+     data-chart-start-x-value="<%= series.first.start_time_ms %>"
+     data-chart-end-x-value="<%= series.first.end_time_ms %>">
+  <% if local_assigns[:series] %>
+    <div data-chart-target="chart"></div>
+    <% local_assigns[:series].each do |series| %>
+      <script type="application/json" data-chart-target="data" data-series-name="<%= series.name.split('/').last %>">
+        <%== series.filled_data.to_json %>
+      </script>
+    <% end %>
+  <% end %>
+</div>

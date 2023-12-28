@@ -1,0 +1,12 @@
+details {
+  .arrow-right {
+    transform: rotate(0deg);
+    transition: transform 100ms linear;
+  }
+
+  &[open] {
+    & >summary .arrow-right:first-child {
+      transform: rotate(90deg);
+    }
+  }
+}
