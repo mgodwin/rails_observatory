@@ -1,4 +1,4 @@
 module RailsObservatory
-  class MailersStream < RedisStream
+  class MailersStream < Redis::Stream
   end
 end

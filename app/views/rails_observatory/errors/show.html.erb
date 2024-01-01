@@ -149,6 +149,11 @@
 
 <div class="errors/show/details">
   <h2><%= @error.message %></h2>
+  <% @error.causes.each do |cause| %>
+    <div>caused by:</div>
+    <h2><%= cause[:class_name] %></h2>
+    <%= cause[:message] %>
+  <% end %>
 
   <div class="card">
     <h2>Trace</h2>

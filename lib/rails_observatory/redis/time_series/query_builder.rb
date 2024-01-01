@@ -1,5 +1,5 @@
 module RailsObservatory
-  class RedisTimeSeries::QueryBuilder
+  class Redis::TimeSeries::QueryBuilder
     include Enumerable
 
     def initialize(series_class)

@@ -1,4 +1,4 @@
 module RailsObservatory
-  class LogsStream < RedisStream
+  class LogsStream < Redis::Stream
   end
 end

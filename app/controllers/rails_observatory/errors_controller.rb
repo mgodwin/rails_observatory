@@ -5,7 +5,7 @@ module RailsObservatory
 
     def index
       @time_range = (24.hours.ago..)
-      @errors = ErrorSet.new('errors_by_recency').take(25)
+      @errors = Redis::ErrorSet.new('errors_by_recency').take(25)
       @series_by_fingerprint = ErrorTimeSeries.where(fingerprint: @errors.map(&:fingerprint))
                                               .slice(@time_range)
                                               .downsample(12, using: :sum)

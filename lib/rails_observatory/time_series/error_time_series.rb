@@ -1,5 +1,5 @@
 module RailsObservatory
-  class ErrorTimeSeries < RedisTimeSeries
+  class ErrorTimeSeries < Redis::TimeSeries
 
     PREFIX = "error"
 
@@ -8,7 +8,6 @@ module RailsObservatory
     end
 
     def self.where(fingerprint:)
-      puts "fingerprint: #{fingerprint}"
       super(name: fingerprint)
     end
 

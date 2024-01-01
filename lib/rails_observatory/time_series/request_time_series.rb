@@ -1,5 +1,5 @@
 module RailsObservatory
-  class RequestTimeSeries < RedisTimeSeries
+  class RequestTimeSeries < Redis::TimeSeries
 
     PREFIX = "request"
     def self.where(name: nil, action: nil, method: nil, format: nil, status: nil, parent: nil)

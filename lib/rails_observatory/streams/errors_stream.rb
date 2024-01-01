@@ -1,12 +1,12 @@
 module RailsObservatory
-  class ErrorsStream < RedisStream
+  class ErrorsStream < Redis::Stream
 
     def self.add_to_stream(exception, **payload)
       ex_wrapper = ActionDispatch::ExceptionWrapper.new(Rails.backtrace_cleaner, exception)
       payload = payload_for_wrapped_exception(ex_wrapper)
       payload[:request_id] = contextual_request_id
       payload[:location] = contextual_location
-      payload[:has_causes] = ex_wrapper.has_cause?
+      payload[:has_causes] = !!ex_wrapper.has_cause?
       payload[:causes] = ex_wrapper.wrapped_causes.map { payload_for_wrapped_exception(_1) }
       payload[:fingerprint] = build_fingerprint(ex_wrapper)
       super(type: 'error', payload: payload, duration: 0)

@@ -1,0 +1,10 @@
+<%= content_for :title, 'Mail' %>
+<% content_for(:hide_duration, 'true') %>
+
+<div class="card">
+  <h2>Mail Preview</h2>
+  <div>To: <%= @mail.to.join(', ') %></div>
+  <div>From: <%= @mail.from.join(', ') %></div>
+  <div>Subject: <%= @mail.subject %></div>
+  <%== @mail.body %>
+</div>

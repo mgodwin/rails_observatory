@@ -10,7 +10,7 @@
 </style>
 
 <%#= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
-<%= render 'chart', name: 'Performed', series: @perform_count, type: 'bar', aggregate_using: :sum %>
+<%= render 'chart', name: 'Performed', series: @perform_count, type: 'bar' %>
 
 <div class="card table">
   <h2>By Queue</h2>

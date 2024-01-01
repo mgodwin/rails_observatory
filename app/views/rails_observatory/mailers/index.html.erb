@@ -1,1 +1,36 @@
 <% content_for(:title, 'Mailers') %>
+
+<%= render 'chart', type: 'bar', series: @count_series %>
+
+<div class="card">
+  <h2>By Mailer Action</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>Mailer Action</th>
+      <th>Executions</th>
+      <th>Errors</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @by_mailer_action.each do |series| %>
+      <tr>
+        <td><%= series.mailer_action.classify %></td>
+        <td><%= series.value %></td>
+        <td></td>
+      </tr>
+    <% end %>
+
+    <!-- More people... -->
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Recent Mail</h2>
+  <%= render 'events_table', events: @events, fields: [
+    :timestamp, :request_id, :message_id, :mailer, :action, :subject, :duration, :to, :from, :date, :db_runtime, :name
+  ], formatters: {
+    message_id: ->(message_id, e) { link_to message_id, mailer_path(e.id) },
+  } %>
+</div>

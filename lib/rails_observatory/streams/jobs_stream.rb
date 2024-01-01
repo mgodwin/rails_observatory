@@ -1,4 +1,4 @@
 module RailsObservatory
-  class JobsStream < RedisStream
+  class JobsStream < Redis::Stream
   end
 end

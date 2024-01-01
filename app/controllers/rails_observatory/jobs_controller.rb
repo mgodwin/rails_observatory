@@ -9,15 +9,15 @@ module RailsObservatory
       @recent_jobs = JobsStream.all.take(10)
       @by_queue = JobTimeSeries.where(name: "count", queue_name: '*').slice(@time_range)
                                .downsample(1, using: :sum)
-                               .reject(&:empty?)
                                .sort_by(&:value)
 
       @by_job = JobTimeSeries.where(name: "count", job_class: '*').slice(@time_range)
                              .downsample(1, using: :sum)
-                             .reject(&:empty?)
                              .sort_by(&:value)
 
-      @perform_count = JobTimeSeries.where(name: "count").slice(@time_range)
+      @perform_count = JobTimeSeries.where(name: "count")
+                                    .slice(@time_range)
+                                    .downsample(buckets_for_chart, using: :sum)
     end
   end
 end

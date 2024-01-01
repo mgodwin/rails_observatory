@@ -5,13 +5,14 @@
     :scope {
       display: grid;
       gap: 2rem;
+      grid-template-columns: minmax(400px, 1fr);
     }
   }
 </style>
 
-Chart!
+<%= render 'chart', type: 'bar', series: @logs_by_type, name: 'Log Volume' %>
 
 <div class="card">
   <h2>Recent Logs</h2>
-  <%= render 'events_table', events: @recent_logs, fields: [:timestamp, :message, :request_id] %>
+  <%= render 'events_table', events: @recent_logs, fields: [:timestamp, :level, :message, :request_id] %>
 </div>

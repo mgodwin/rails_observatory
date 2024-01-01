@@ -13,7 +13,11 @@
       <tr>
         <% fields.each do |f| %>
           <% if (formatter = local_assigns[:formatters]&.fetch(f, nil)) %>
+            <% if formatter.arity == 2 %>
+            <td><%= formatter.call(e.respond_to?(f) ? e.send(f) : e.payload[f], e) %></td>
+              <% else %>
             <td><%= formatter.call(e.respond_to?(f) ? e.send(f) : e.payload[f]) %></td>
+            <% end %>
           <% else %>
             <td><%= format_event_value(e.respond_to?(f) ? e.send(f) : e.payload[f]) %></td>
           <% end %>

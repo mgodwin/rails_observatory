@@ -132,10 +132,9 @@ details {
       }
       & tr:last-child td {
         border-bottom: none;
-        padding-bottom: 1rem;
       }
       & td {
-        padding: 0.25rem 1rem;
+        padding: .5rem 1rem;
         border-bottom: 1px solid var(--divider);
         & + & {
           border-left: 1px solid var(--divider);
