@@ -1,3 +1,4 @@
+require_relative '../redis/time_series'
 module RailsObservatory
   class RequestTimeSeries < Redis::TimeSeries
 

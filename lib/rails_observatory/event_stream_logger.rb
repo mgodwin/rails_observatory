@@ -1,3 +1,4 @@
+require_relative 'streams/logs_stream'
 module RailsObservatory
   class EventStreamLogger < ::Logger
 

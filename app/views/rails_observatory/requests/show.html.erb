@@ -1,184 +1,67 @@
-<% content_for :title, "Request Details" %>
-<%# content_for :title, params[:id] %>
-<style>
-  @scope {
-    :scope {
-      padding: 0;
-    }
-  }
-</style>
-<style>
-
-  header {
-    border-bottom: 1px solid var(--divider);
-    padding: 1rem 2rem;
-    /*font-family: var(--font-mono);*/
-    background-color: var(--surface-hover);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    & h2 {
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      font-size: 1.25rem;
-
-      ._format {
-        color: var(--black-secondary);
-      }
-
-      ._status-indicator {
-        display: inline-block;
-        width: .75rem;
-        height: .75rem;
-        border-radius: 50%;
-        background-color: color-mix(in oklab, #066839 80%, white);
-        border:4px solid color-mix(in oklab, #066839 30%, var(--surface-hover));
-        margin-right: .5rem;
-      }
-    }
-
-    ._controller {
-      color: var(--black-secondary);
-    }
-  }
-
-  .request-headers, .request-params {
-    ._arrow-right {
-      transform: rotate(0deg);
-      transition: transform 100ms linear;
-    }
-
-
-    & + & {
-      border-top: 1px solid var(--divider);
-    }
-
-    &[open] {
-      ._arrow-right {
-        transform: rotate(90deg);
-      }
-    }
-
-    & summary {
-      list-style: none;
-      display: flex;
-      gap: .5rem;
-      padding: 1rem 2rem;
-      background-color: var(--surface-hover);
-      font-weight: 400;
-      position: sticky;
-      top: 0;
-    }
-
-    & dl {
-      margin: 0;
-      padding: 1rem 2rem;
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      white-space: break-spaces;
-      grid-row-gap: .3rem;
-      overflow: auto;
-
-      & dt {
-        font-weight: 400;
-      }
-    }
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    /*margin: 0;*/
-    padding: 1rem 2rem;
-  }
-
-  .event {
-    display: flex;
-    border: 1px solid var(--divider);
-    border-radius: .5rem;
-    margin:1rem;
-    padding: 1rem 2rem;
-    font-size: 1rem;
-    font-weight: 400;
-    gap: 1rem;
-
-    & > ._name {
-      flex-grow: 1;
-    }
-
-    & > ._duration {
-      font-weight: 400;
-    }
-  }
-</style>
-<header>
-  <h2>
-    <div class="_status-indicator"></div>
-    <%= @req.request_method %>
-    <%= @req.payload[:path] %>
-    <span class="_format"><%= @req.payload[:format] %></span>
-  </h2>
-  <span class="_controller">
-  <%= @req.controller_action %>
-  </span>
-</header>
-<dl class="requests/stats">
-  <div>
-    <dt>Status</dt>
-    <dd><%= @req.payload[:status] %></dd>
-  </div>
-  <div>
-    <dt>Duration</dt>
-    <dd><%= @req.duration.to_f.round(2) %><span class="_unit">ms</span></dd>
-  </div>
-  <div>
-    <dt>View Runtime</dt>
-    <dd><%= @req.payload[:view_runtime].to_f.round(2) %><span class="_unit">ms</span></dd>
-  </div>
-  <div>
-    <dt>DB Runtime</dt>
-    <dd><%= @req.payload[:db_runtime].to_f.round(2) %><span class="_unit">ms</span></dd>
-  </div>
-</dl>
-<details class="request-headers">
-  <summary>
-    <svg class="_arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-    </svg>
-    Headers
-  </summary>
-  <dl>
-    <% @req.payload[:headers].sort.each do |k, v| %>
-      <dt><%= k %></dt>
-      <dd><%= v %></dd>
-    <% end %>
-  </dl>
-</details>
-<details class="request-params">
-  <summary>
-    <svg class="_arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-    </svg>
-
-    Params
-  </summary>
-  <dl>
-    <% @req.payload[:params].sort.each do |k, v| %>
-      <dt><%= k %></dt>
-      <dd><%= v %></dd>
-    <% end %>
-  </dl>
-</details>
-
-<h3>Events</h3>
-<% @events.each do |event| %>
-  <div class="event">
-    <div class="_name"><%= event.type %></div>
-    <div class="_duration"><%= event.duration.to_f.round(2) %></div>
-    <div class="_time"><%= event.timestamp %></div>
-  </div>
+<% content_for :title do %>
+  <span style="font-weight:200"><%= @request.http_method %></span> <%= @request.action.classify %>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="18">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+</svg>
+  <span class="status-<%= 'success' if @request.status.to_s.start_with?('2') %>"><%= @request.status %> <%= Rack::Utils::HTTP_STATUS_CODES[@request.status] %></span>
+  <br><span style="font-size: 1rem; font-weight: 200;"><%= @request.time %> | <%= @request.duration.round(2) %>ms <%= @request.path %></span>
 <% end %>
+<% content_for :top_nav do %>
 
+<% end %>
+<% content_for(:hide_duration, 'true') %>
+
+<% content_for(:main_css_class, 'requests') %>
+
+<div class="details tabs">
+  <%= render 'chart', type: 'icicle', series: @events, autobound: true %>
+  <nav class="tab-nav">
+    <ul>
+      <li><a href="">Event Details</a></li>
+      <li><a href="">Logs</a></li>
+      <li><a href="">Mail</a></li>
+      <li><a href="">Jobs</a></li>
+      <li><a href="">Request</a></li>
+      <li><a href="">Response</a></li>
+      <li><a href="">Middleware <%= @middleware_events.pluck('self_time').sum.round(2) %>ms</a></li>
+      <li><a href="">Errors</a></li>
+    </ul>
+  </nav>
+  <div class="tab-content event-details" data-controller="event-details" data-action="chart:selected@window->event-details#show">
+    <% @filtered_events.each do |e| %>
+      <div id="<%= e['start_at'] %>" hidden>
+        <div><%= e['name'] %>
+          <span><%= e['duration'].round(2) %>ms</span>
+          <span><%= e['self_time'].to_f.round(2) %>ms</span>
+        </div>
+        <dl>
+          <dt>Payload</dt>
+          <% if e['payload'].empty? %>
+            <dd>Nothing in payload</dd>
+          <% else %>
+            <dd>
+              <pre><%= JSON.pretty_generate(e['payload']) %></pre>
+            </dd>
+          <% end %>
+
+        </dl>
+
+      </div>
+    <% end %>
+  </div>
+  <div class="logs-tab-content">
+
+  </div>
+  <div class="tab-content middleware">
+
+    <div class="table-bar-chart">
+      <div>Middleware Stack</div><div></div><div></div><div></div>
+      <% total_time = @middleware_events.pluck('self_time').sum %>
+
+    <% @middleware_events.each do |e| %>
+        <% percent = e['self_time'] / total_time * 100 %>
+        <div><%= e['payload']['middleware'] %></div><div><%= percent.round(1) %>%</div><div class="bar"><div style="width: <%= percent.round(1) %>%"></div></div><div> <%= e['self_time'].to_f.round(2) %>ms</div>
+    <% end %>
+    </div>
+  </div>
+</div>

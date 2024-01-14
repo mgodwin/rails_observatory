@@ -48,6 +48,7 @@ for i=3, #ARGV, 2 do
   local key = tostring(ARGV[i])
   local value = tostring(ARGV[i+1])
   labels[key] = value
+  redis.call("SADD", metric_name .. ':labels', key)
   table.insert(keys, key)
 end
 

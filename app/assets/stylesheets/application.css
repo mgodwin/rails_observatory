@@ -6,7 +6,7 @@
 
 /* Layout */
 @import url('layout/app.css');
-@import url('layout/errors-show.css');
+@import url('layout/details-side-panel.css');
 @import url('layout/requests-index.css');
 
 /* Application styles */
@@ -15,11 +15,13 @@
 @import url('application/dropdown.css');
 @import url('application/side-nav.css');
 @import url('application/top-nav.css');
+@import url('application/tab-nav.css');
+@import url('application/side-panel.css');
+@import url('application/chart.css');
 
 
 /* page styles */
 @import url('errors/show/details.css');
-@import url('errors/show/side-panel.css');
 
 @import url('requests/stats.css');
 
@@ -28,6 +30,5 @@
 
 main {
   grid-area: main;
-  padding: 1rem;
   overflow: auto;
 }

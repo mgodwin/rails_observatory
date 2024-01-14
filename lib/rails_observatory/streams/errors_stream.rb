@@ -1,3 +1,5 @@
+require_relative '../redis/stream'
+
 module RailsObservatory
   class ErrorsStream < Redis::Stream
 

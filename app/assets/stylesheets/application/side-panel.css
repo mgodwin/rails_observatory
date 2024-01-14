@@ -1,5 +1,4 @@
-.errors\/show\/side-panel {
-  grid-area: side-panel;
+.side-panel {
   color: var(--white);
   padding: 2rem;
 

@@ -21,6 +21,10 @@ module RailsObservatory
       html.to_html
     end
 
+    def series_for(name:, aggregate_using:, time_range: @time_range, downsample: buckets_for_chart,  **opts)
+      RailsObservatory::TimeSeries.where(name:, **opts).slice(time_range).downsample(downsample, using: aggregate_using)
+    end
+
     def time_slice_start
       @time_range.begin.to_i * 1000
     end

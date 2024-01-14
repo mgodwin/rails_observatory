@@ -12,7 +12,7 @@ window.Apex = {
       show: false
     },
   },
-  colors: ["#7209b7"],
+  // colors: ["#7209b7"],
   grid: {
     borderColor: 'var(--divider)',
     strokeDashArray: 4,

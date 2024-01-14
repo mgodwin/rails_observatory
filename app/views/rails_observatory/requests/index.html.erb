@@ -1,8 +1,8 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
 <% content_for(:main_css_class, 'layout/requests-index') %>
-<%= render 'chart', name: 'Latency', series: @latency_series, type: 'area' %>
-<%= render 'chart', name: 'Requests', series: @count_series, type: 'bar' %>
+<%= render 'chart', title: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg) %>
+<%= render 'chart', title: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum)  %>
 <%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
 <%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
 
@@ -22,7 +22,7 @@
         <tr>
           <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param) %></td>
           <td><%= series.data.dig(0, 1) %></td>
-          <td><%= @latency_by_controller[series.labels[:action]].data.dig(0, 1).to_f.round(2) %> ms</td>
+          <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
         </tr>
       <% end %>
 
@@ -34,10 +34,12 @@
 
 <div class="card table">
   <h2>Recent Requests</h2>
+
+
   <%= render 'events_table', events: @events, fields: [
-    :timestamp, :request_id, :controller_action, :duration, :status, :request_method, :view_runtime, :db_runtime
+    :time, :http_method, :action, :duration, :status , :request_id,
   ], formatters: {
     request_id: ->(request_id) { link_to request_id, request_path(request_id) },
-    controller_action: ->(ca) { ca.classify }
+    action: ->(ca) { ca.classify }
   } %>
 </div>

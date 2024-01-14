@@ -18,6 +18,8 @@ module RailsObservatory
             puts "Processing #{event.class.name}"
             count += 1
             event.process
+            # Processor.process_event(event) if Processor.can_process?(event)
+            # RequestEventSet.new(event.request_id).add(event) if event.respond_to?(:request_id)
           end
         end
         sleep 0.1 if count == 0

@@ -33,3 +33,19 @@
     }
   }
 }
+
+
+.table-bar-chart {
+  display: grid;
+  grid-template-columns: min-content min-content 3rem min-content;
+  column-gap: 1rem;
+  row-gap: .5rem;
+
+  .bar {
+    background-color: var(--surface-card);
+    & > * {
+      background-color: var(--blue);
+      height: 100%;
+    }
+  }
+}

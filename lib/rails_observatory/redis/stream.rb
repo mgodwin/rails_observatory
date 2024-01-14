@@ -1,9 +1,21 @@
+require_relative '../serializers/serializer'
+require_relative '../events/stream_event'
 module RailsObservatory
   module Redis
     class Stream
+      extend Serializer
 
-      def self.add_to_stream(type:, duration:, payload:)
-        $redis.call('XADD', stream_name, '*', 'type', type, 'payload', JSON.generate(payload), 'duration', duration)
+      def self.add_to_stream(event)
+        options = {
+          type: event.name,
+          payload: JSON.generate(serialize_payload(event.payload)),
+          duration: event.duration,
+          start_at: event.time,
+          end_at: event.end,
+          failed: event.payload[:exception_object].present?.to_s
+        }
+
+        $redis.call('XADD', stream_name, '*', options)
       end
 
       def self.stream_info

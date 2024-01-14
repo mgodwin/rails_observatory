@@ -1,5 +1,5 @@
 module RailsObservatory
-  class LogEvent < StreamEvent
+  class LogEvent
 
     def level
       payload[:level]

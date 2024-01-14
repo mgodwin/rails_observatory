@@ -1,7 +1,27 @@
 module RailsObservatory
   module ActionController
-    class ProcessActionEvent < StreamEvent
+    class ProcessActionEvent
+      include ActiveModel::Attributes
+      include ActiveModel::Serializers::JSON
 
+
+      attribute :duration
+      attribute :db_runtime
+      attribute :view_runtime
+      attribute :status
+      attribute :controller
+      attribute :action
+      attribute :request_format
+      attribute :request_method
+
+
+      def self.from_event(event)
+
+      end
+
+      def duration
+        payload[:duration]
+      end
       def db_runtime
         payload[:db_runtime] || 0
       end
@@ -34,21 +54,7 @@ module RailsObservatory
         "#{controller.underscore}##{action}"
       end
 
-      def labels
-        { action: controller_action, format: request_format, status:, method: request_method }
-      end
 
-      def process
-        record_metrics
-      end
-
-      def record_metrics
-        RequestTimeSeries.distribution("latency", duration, labels:)
-        RequestTimeSeries.distribution("latency/db_runtime", db_runtime, labels:)
-        RequestTimeSeries.distribution("latency/view_runtime", view_runtime, labels:)
-        RequestTimeSeries.increment("count", labels:)
-        RequestTimeSeries.increment("error_count", labels:) if status >= 500
-      end
     end
   end
 end

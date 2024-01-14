@@ -1,6 +1,145 @@
 import {Controller} from "@hotwired/stimulus";
 import Apexcharts from "apexcharts";
 
+const icicleChartOptions = function(controller) {
+  return {
+    chart: {
+      id: controller.element.id,
+      group: controller.groupValue,
+      type: 'rangeBar',
+      height: 300,
+      events: {
+        dataPointSelection: function(event, chartContext, config) {
+          controller.dispatch('selected', {detail: {
+              ...config.w.config.series[config.seriesIndex].data[config.dataPointIndex]
+            }})
+        }
+      },
+    },
+    title: {
+      text: controller.element.dataset.chartName,
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        rangeBarGroupRows: true,
+        dataLabels: {
+          position: 'bottom'
+        },
+        // barHeight: '80%'
+      }
+    },
+    series: controller.series(),
+
+    xaxis: {
+
+      type: 'numeric',
+      position: 'top',
+      axisTicks: {
+        show: true
+      },
+      tooltip: {
+        enabled: true,
+      }
+    },
+    yaxis: {
+      labels: {
+        show: false,
+
+      },
+
+    },
+    tooltip: {
+      x: {
+        formatter: function (value, obj) {
+          if (obj) {
+            return obj.w.config.series[obj.seriesIndex].data[obj.dataPointIndex].event_name
+          } else {
+            return value + 'ms'
+
+          }
+        }
+      },
+    },
+    legend: {
+      position: 'right',
+      showForSingleSeries: true,
+      formatter: function (seriesName, opts) {
+        const seriesSelfTime = controller.series()[opts.seriesIndex].data.reduce((acc, val) => {
+          return acc + val['event_self_time']
+        }, 0)
+        const totalSelfTime = controller.series().reduce((acc, val) => { return acc + val.data.reduce((acc, val) => { return acc + val['event_self_time'] }, 0) }, 0)
+        const percent = seriesSelfTime / totalSelfTime * 100
+        return `${seriesName} <span class="percent">${percent.toFixed(1)}% <div class="bar"><div  style="width:${percent.toFixed(1)}%"></div></div></span> `
+      },
+      itemMargin: {
+        horizontal: '14'
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (value, {seriesIndex, dataPointIndex, w}) {
+        return `${w.config.series[seriesIndex].data[dataPointIndex].event_name} (${(value[1] - value[0]).toFixed(2)}ms)`
+      },
+      offsetX: 0,
+      textAnchor: 'start'
+    },
+    theme: {
+      palette: 'palette6',
+    },
+    stroke: {
+      width: 2,
+      curve: 'straight'
+    }
+  }
+
+}
+
+const defaultOptions = function(controller) {
+  return {
+    chart: {
+      id: controller.element.id,
+      group: controller.groupValue,
+      type: controller.typeValue,
+      height: 250,
+    },
+    title: {
+      text: controller.element.dataset.chartName,
+    },
+    series: controller.series(),
+    xaxis: {
+      min: controller.startXValue,
+      max: controller.endXValue,
+      type: 'datetime',
+    },
+    tooltip: {
+      x: {
+        format: 'dd MMM yyyy HH:mm'
+      },
+    },
+    fill: {
+      gradient: {
+        enabled: true,
+        opacityFrom: 0.55,
+        opacityTo: 0
+      }
+    },
+    theme: {
+      monochrome: {
+        enabled: true,
+        color: '#0c8be8',
+        shadeTo: 'dark',
+        shadeIntensity: 0.65
+      }
+    },
+    stroke: {
+      width: 2,
+      curve: 'straight'
+    }
+  }
+
+}
+
 export class ChartController extends Controller {
   static targets = ["chart", "data"]
 
@@ -13,46 +152,11 @@ export class ChartController extends Controller {
   }
 
   chartOptions() {
-    return {
-      chart: {
-        id: this.element.id,
-        group: this.groupValue,
-        type: this.typeValue,
-        height: 250,
-      },
-      title: {
-        text: this.element.dataset.chartName,
-      },
-      series: this.series(),
-      xaxis: {
-        min: this.startXValue,
-        max: this.endXValue,
-        type: 'datetime',
-      },
-      tooltip: {
-        x: {
-          format: 'dd MMM yyyy HH:mm'
-        },
-      },
-      fill: {
-        gradient: {
-          enabled: true,
-          opacityFrom: 0.55,
-          opacityTo: 0
-        }
-      },
-      theme: {
-        monochrome: {
-          enabled: true,
-          color: '#0c8be8',
-          shadeTo: 'dark',
-          shadeIntensity: 0.65
-        }
-      },
-      stroke: {
-        width: 2,
-        curve: 'straight'
-      }
+    switch (this.typeValue) {
+      case 'icicle':
+        return icicleChartOptions(this)
+      default:
+        return defaultOptions(this)
     }
   }
 
@@ -65,7 +169,6 @@ export class ChartController extends Controller {
 
   connect() {
     this.chart = new Apexcharts(this.chartTarget, this.chartOptions())
-
     this.chart.render();
   }
 }

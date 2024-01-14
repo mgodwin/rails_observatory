@@ -22,4 +22,12 @@
       align-items: baseline;
     }
   }
+
+  .status-success {
+    /*color: #3ad23a;*/
+    background-color: #38a238;
+    padding: .25rem .5rem;
+    border-radius: .5rem;
+    font-size:1.25rem;
+  }
 }
