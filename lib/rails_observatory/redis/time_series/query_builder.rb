@@ -7,31 +7,69 @@ module RailsObservatory
         @series_class = series_class
         @conditions = {}
         @samples = nil
+        @range_set = false
+        @group = nil
         @range = (nil..)
       end
 
       def where(**conditions)
-        @conditions.merge! conditions
-        self.clone
+        clone = self.clone
+        clone.instance_variable_set(:@conditions, @conditions.merge(conditions))
+        clone
+      end
+
+      def group(label)
+        clone = self.clone
+        clone.instance_variable_set(:@group, label)
+        clone
       end
 
       def slice(range)
-        @range = range
-        self.clone
-      end
-
-      def initialize_copy(orig)
-        @conditions = @conditions.clone
-        super
+        clone = self.clone
+        clone.instance_variable_set(:@range_set, true)
+        clone.instance_variable_set(:@range, range)
+        clone
       end
 
       def downsample(samples, using:)
-        @samples = samples
-        @agg_type = using
-        self.clone
+        clone = self.clone
+        clone.instance_variable_set(:@samples, samples)
+        clone.instance_variable_set(:@agg_type, using)
+        clone
+      end
+
+      def sum
+        if @group
+          @agg_type = :sum
+          @samples = 1
+          to_a.index_by { _1.labels[@group] }
+        else
+          raise "Cannot sum without grouping"
+        end
+      end
+
+      def avg
+        if @group
+          @agg_type = :avg
+          @samples = 1
+          to_a.index_by { _1.labels[@group] }
+        else
+          raise "Cannot avg without grouping"
+        end
+      end
+
+      def last
+        if @group
+          @agg_type = :last
+          @samples = 1
+          to_a.index_by { _1.labels[@group] }
+        else
+          raise "Cannot last without grouping"
+        end
       end
 
       def each
+        @range = ActiveSupport::IsolatedExecutionState[:observatory_slice] || (nil..) unless @range_set
         agg_duration = build_agg_duration
         mrange_args = ['TS.MRANGE', from_ts, to_ts, 'WITHLABELS']
         mrange_args.push('LATEST') if @range.end.nil?
@@ -45,7 +83,7 @@ module RailsObservatory
         end
         mrange_args.push('FILTER', *ts_filters)
 
-        puts mrange_args.join(" ")
+        # puts mrange_args.join(" ")
         res = $redis.call(mrange_args)
         return if res.nil?
 
@@ -65,7 +103,9 @@ module RailsObservatory
       def build_agg_duration
         end_time = @range.end || Time.now
         start_time = @range.begin || 12.months.ago.to_time
-        ((end_time - start_time) * 1000 / @samples).to_i
+        available_datapoints = ((end_time - start_time) / 10.0).to_i
+        datapoints = [@samples, available_datapoints].min
+        ((end_time - start_time) * 1000 / datapoints).to_i
       end
 
       def from_ts
@@ -87,8 +127,9 @@ module RailsObservatory
       def ts_filters
         raise 'Must specify name' if @conditions[:name].blank?
 
+        @conditions[@group] = "*" if @group
         labels = $redis.call('SMEMBERS', "#{@conditions[:name]}:labels")
-        labels = labels.map { |l| [l.to_sym, nil]}.to_h
+        labels = labels.map { |l| [l.to_sym, nil] }.to_h
         @conditions.reverse_merge!(labels)
         @conditions.map do |k, v|
           if v == "*"

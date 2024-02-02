@@ -15,6 +15,7 @@
   --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
   --surface-card: color-mix(in oklab, var(--black) 96%, white);
   --font-mono: "Roboto Mono", monospace;
+  --font-weight-bold: 400;
 }
 html,
 body {
@@ -69,13 +70,37 @@ details {
   }
 }
 
+/* app/assets/stylesheets/elements/section.css */
+section {
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0;
+    padding: 1rem;
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--divider);
+  }
+}
+
 /* app/assets/stylesheets/layout/app.css */
-.layout\/app {
-  display: grid;
-  grid-template-areas: "side-nav top-nav" "side-nav main";
-  grid-template-columns: 16rem 1fr;
-  grid-template-rows: auto 1fr;
-  margin: 0;
+@layer layout {
+  .layout-app {
+    display: grid;
+    grid-template-areas: "side-nav top-nav" "side-nav main";
+    grid-template-columns: 16rem 1fr;
+    grid-template-rows: auto 1fr;
+    margin: 0;
+    & > .layout-app-side-nav {
+      grid-area: side-nav;
+    }
+    & > .layout-app-top-nav {
+      grid-area: top-nav;
+    }
+    & > .layout-app-main {
+      grid-area: main;
+      overflow: auto;
+    }
+  }
 }
 
 /* app/assets/stylesheets/layout/details-side-panel.css */
@@ -92,19 +117,36 @@ details {
   }
 }
 
-/* app/assets/stylesheets/layout/requests-index.css */
-.layout\/requests-index {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 265px 1fr 1fr;
-  gap: 1rem;
-  & .card {
-    grid-column: span 2;
+/* app/assets/stylesheets/layout/requests.css */
+@layer layout {
+  .layout-requests_index {
+    display: grid;
+    grid-template-areas: "glance glance" "chart chart" "bycontroller bycontroller" "events events";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 265px auto auto;
+    gap: 1rem;
+    & > .layout-requests_index-glance {
+      grid-area: glance;
+    }
+    & > .layout-requests_index-chart {
+      grid-area: chart;
+    }
+    & > .layout-requests_index-by_controller {
+      grid-area: bycontroller;
+    }
+    & > .layout-requests_index-events {
+      grid-area: events;
+    }
+  }
+  .layout-events-breakdown {
+    display: grid;
+    grid-template-rows: auto minmax(50px, 1fr);
+    gap: 1rem;
   }
 }
 
-/* app/assets/stylesheets/application/_scrollable.css */
-.\~scrollable {
+/* app/assets/stylesheets/application/global_modifiers.css */
+.--scrollable {
   overflow: auto;
 }
 
@@ -206,10 +248,8 @@ details {
   }
 }
 
-/* app/assets/stylesheets/application/side-nav.css */
+/* app/assets/stylesheets/application/side_nav.css */
 .side-nav {
-  grid-area: side-nav;
-  grid-row: 1 / -1;
   border-right: 1px solid var(--divider);
   padding: 1rem;
   display: flex;
@@ -259,14 +299,14 @@ details {
       text-decoration: none;
       font-weight: 400;
       color: color-mix(in oklab, var(--black) 20%, white);
-      &:hover {
+      &:is(:hover, :focus-visible) {
         background-color: var(--surface-hover);
       }
     }
   }
 }
 
-/* app/assets/stylesheets/application/top-nav.css */
+/* app/assets/stylesheets/application/top_nav.css */
 .top-nav {
   grid-area: top-nav;
   border-bottom: 1px solid var(--divider);
@@ -295,36 +335,77 @@ details {
   }
 }
 
-/* app/assets/stylesheets/application/tab-nav.css */
+/* app/assets/stylesheets/application/tab_nav.css */
 .tabs {
-  .tab-nav {
+  display: flex;
+  flex-direction: column;
+  .tabs-nav {
     border-bottom: 1px solid var(--divider);
     border-top: 1px solid var(--divider);
     padding-block: .5rem;
-    & > ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      gap: .5rem;
-      flex-grow: 1;
-      padding-inline: 1.25rem;
-      & a {
-        display: flex;
-        align-items: center;
-        padding: .5rem .75rem;
-        gap: .5rem;
-        border-radius: .5rem;
-        text-decoration: none;
-        font-weight: 400;
-        color: color-mix(in oklab, var(--black) 20%, white);
-        &:hover {
-          background-color: var(--surface-hover);
-        }
-      }
+    padding-inline: 1.25rem;
+    display: flex;
+    gap: .25rem;
+  }
+  &:has(:nth-child(1 of .tabs-button) input:checked) {
+    :nth-child(1 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(2 of .tabs-button) input:checked) {
+    :nth-child(2 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(3 of .tabs-button) input:checked) {
+    :nth-child(3 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(4 of .tabs-button) input:checked) {
+    :nth-child(4 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(5 of .tabs-button) input:checked) {
+    :nth-child(5 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(6 of .tabs-button) input:checked) {
+    :nth-child(6 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(7 of .tabs-button) input:checked) {
+    :nth-child(7 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(8 of .tabs-button) input:checked) {
+    :nth-child(8 of .tab-content) {
+      display: block;
+    }
+  }
+  &:has(:nth-child(9 of .tabs-button) input:checked) {
+    :nth-child(9 of .tab-content) {
+      display: block;
+    }
+  }
+  .tabs-button {
+    & input {
+      position: absolute;
+      opacity: 0;
+    }
+    &:has(:focus-visible) {
+      outline: -webkit-focus-ring-color auto 1px;
+    }
+    &:has(:checked) {
+      background-color: var(--surface-active);
     }
   }
   .tab-content {
+    display: none;
     padding: 1rem 2rem;
     & dd {
       margin-left: 0;
@@ -337,7 +418,7 @@ details {
   }
 }
 
-/* app/assets/stylesheets/application/side-panel.css */
+/* app/assets/stylesheets/application/side_panel.css */
 .side-panel {
   color: var(--white);
   padding: 2rem;
@@ -394,6 +475,118 @@ details {
         height: 100%;
         background-color: var(--blue);
       }
+    }
+  }
+}
+
+/* app/assets/stylesheets/application/table_chart.css */
+.table-chart {
+  .table-chart-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0;
+    padding: 1rem;
+    border-bottom: 1px solid var(--divider);
+  }
+  & tr:has(a.table-chart-row-action:hover) {
+    background-color: var(--surface-hover);
+  }
+  & a.table-chart-row-action::before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  & > table {
+    width: 100%;
+    border-spacing: 0;
+    white-space: nowrap;
+    & th {
+      text-align: left;
+      font-weight: 400;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+    }
+    & tr {
+      position: relative;
+    }
+    & td {
+      padding: .5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+      & + & {
+        border-left: 1px solid var(--divider);
+      }
+    }
+  }
+}
+
+/* app/assets/stylesheets/application/query_table.css */
+.query-table {
+  display: grid;
+  --column-count: 10;
+  grid-template-columns: repeat(var(--column-count), auto);
+  grid-template-rows: min-content auto;
+  & .query-table-column {
+    padding: .5rem 1rem;
+    border-bottom: 1px solid var(--divider);
+    white-space: nowrap;
+    & + & {
+      border-left: 1px solid var(--divider);
+    }
+  }
+  & > header {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: -1 / 1;
+    flex-wrap: nowrap;
+    font-weight: var(--font-weight-bold);
+  }
+  .query-table-body {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: -1 / 1;
+  }
+  .query-table-row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: -1 / 1;
+  }
+  & > table {
+    width: 100%;
+    border-spacing: 0;
+    white-space: nowrap;
+    & th {
+      text-align: left;
+      font-weight: 400;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+    }
+    & td {
+      padding: .5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+      & + & {
+        border-left: 1px solid var(--divider);
+      }
+    }
+  }
+}
+
+/* app/assets/stylesheets/mixins/nav_button.css */
+@layer mixin {
+  .tabs .tabs-button,
+  .mixin-nav-button {
+    display: flex;
+    align-items: center;
+    padding: .5rem .75rem;
+    gap: .5rem;
+    border-radius: .5rem;
+    text-decoration: none;
+    font-weight: 400;
+    color: color-mix(in oklab, var(--black) 20%, white);
+    &:is(:hover, :focus-visible) {
+      background-color: var(--surface-hover);
     }
   }
 }

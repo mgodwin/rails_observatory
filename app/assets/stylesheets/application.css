@@ -3,21 +3,27 @@
 @import url('elements/a.css');
 @import url('elements/button.css');
 @import url('elements/details.css');
+@import url('elements/section.css');
 
 /* Layout */
 @import url('layout/app.css');
 @import url('layout/details-side-panel.css');
-@import url('layout/requests-index.css');
+@import url('layout/requests.css');
 
 /* Application styles */
-@import url('application/_scrollable.css');
+@import url('application/global_modifiers.css');
 @import url('application/card.css');
 @import url('application/dropdown.css');
-@import url('application/side-nav.css');
-@import url('application/top-nav.css');
-@import url('application/tab-nav.css');
-@import url('application/side-panel.css');
+@import url('application/side_nav.css');
+@import url('application/top_nav.css');
+@import url('application/tab_nav.css');
+@import url('application/side_panel.css');
 @import url('application/chart.css');
+@import url('application/table_chart.css');
+@import url("application/query_table.css");
+
+/* Mixins */
+@import url('mixins/nav_button.css');
 
 
 /* page styles */

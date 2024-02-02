@@ -11,7 +11,7 @@ module RailsObservatory
       context = ActiveSupport::ExecutionContext.to_h
       payload = {}
       payload[:level] = level
-      payload[:request_id] = context[:controller]&.request&.request_id || context[:job]&.request_id
+      payload[:request_id] = context[:controller]&.request&.request_id
       payload[:job_id] = context[:job]&.job_id
       payload[:message] = message
       payload[:message] ||= block_given? ? block.call : progname

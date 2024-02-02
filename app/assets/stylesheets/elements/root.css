@@ -13,6 +13,7 @@
   --surface-card: color-mix(in oklab, var(--black) 96%, white);
 
   --font-mono: 'Roboto Mono', monospace;
+  --font-weight-bold: 400;
 }
 
 

@@ -3,7 +3,7 @@ PATH
   specs:
     rails_observatory (0.1.0)
       rails (>= 7.1.0)
-      redis-client
+      redis-client (~> 0.19)
       rouge
       zeitwerk
 
@@ -175,7 +175,7 @@ GEM
     rake (13.1.0)
     rdoc (6.6.2)
       psych (>= 4.0.0)
-    redis-client (0.15.0)
+    redis-client (0.19.1)
       connection_pool
     reline (0.4.2)
       io-console (~> 0.5)

@@ -10,55 +10,12 @@
 </style>
 
 <%#= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
-<%= render 'chart', name: 'Performed', series: @perform_count, type: 'bar' %>
+<%= render 'chart', name: 'Performed', series: series_for(name: 'job.count', aggregate_using: :sum), type: 'bar' %>
 
-<div class="card table">
-  <h2>By Queue</h2>
-  <table>
-    <thead>
-    <tr>
-      <th>Queue name</th>
-      <th>Jobs performed</th>
-      <th>Latency</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @by_queue.each do |s| %>
-      <tr>
-        <td><%= s.queue_name %></td>
-        <td><%= s.value %></td>
-        <td><%= 'tbd' %></td>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+<%= render 'table_chart', name: 'By Queue', group_by: :queue_name, metrics: { "job.count": :sum, "job.queue_latency": :last } %>
+<%= render 'table_chart', name: 'By Job', group_by: :job_class, metrics: { "job.count": :sum, latency: :avg, "job.error_count": :sum } %>
 
-<div class="card table">
-  <h2>By Job</h2>
-  <table>
-    <thead>
-    <tr>
-      <th>Job name</th>
-      <th>Runs</th>
-      <th>Errors</th>
-      <th>Avg # Retries</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @by_job.each do |s| %>
-      <tr>
-        <td><%= s.job_class %></td>
-        <td><%= s.value %></td>
-        <td><%= 'tbd' %></td>
-        <td><%= 'tbd' %></td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
-</div>
-
-<div class="card table">
+<section>
   <h2>Recent Jobs</h2>
-  <%= render 'events_table', events: @recent_jobs, fields: [:timestamp, :job_id, :job_class, :duration, ] %>
-</div>
+  <%= render 'events_table', events: @recent_jobs, fields: [:timestamp, :job_id, :job_class, :duration,] %>
+</section>

@@ -1,6 +1,4 @@
 .side-nav {
-  grid-area: side-nav;
-  grid-row: 1 / -1;
   border-right: 1px solid var(--divider);
   padding: 1rem;
   display: flex;
@@ -56,7 +54,7 @@
       font-weight: 400;
       color: color-mix(in oklab, var(--black) 20%, white);
 
-      &:hover {
+      &:is(:hover, :focus-visible) {
         background-color: var(--surface-hover);
       }
     }

@@ -3,21 +3,17 @@ module RailsObservatory
 
     before_action :set_duration
 
+    around_action :set_time_range
+
     def index
+      Job.ensure_index
+      @recent_jobs = Job.all.take(10)
+    end
 
-      @time_range = (duration.seconds.ago..)
-      @recent_jobs = JobsStream.all.take(10)
-      @by_queue = JobTimeSeries.where(name: "count", queue_name: '*').slice(@time_range)
-                               .downsample(1, using: :sum)
-                               .sort_by(&:value)
-
-      @by_job = JobTimeSeries.where(name: "count", job_class: '*').slice(@time_range)
-                             .downsample(1, using: :sum)
-                             .sort_by(&:value)
-
-      @perform_count = JobTimeSeries.where(name: "count")
-                                    .slice(@time_range)
-                                    .downsample(buckets_for_chart, using: :sum)
+    def set_time_range
+      TimeSeries.with_slice(duration.seconds.ago..) do
+        yield
+      end
     end
   end
 end

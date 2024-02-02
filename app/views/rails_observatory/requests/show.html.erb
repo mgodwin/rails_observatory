@@ -1,67 +1,115 @@
 <% content_for :title do %>
-  <span style="font-weight:200"><%= @request.http_method %></span> <%= @request.action.classify %>
+  <span style="font-weight:200"><%= @request.http_method %></span> <%= @request.name.classify %>
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="18">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-</svg>
+    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+  </svg>
   <span class="status-<%= 'success' if @request.status.to_s.start_with?('2') %>"><%= @request.status %> <%= Rack::Utils::HTTP_STATUS_CODES[@request.status] %></span>
-  <br><span style="font-size: 1rem; font-weight: 200;"><%= @request.time %> | <%= @request.duration.round(2) %>ms <%= @request.path %></span>
-<% end %>
-<% content_for :top_nav do %>
-
+  <br>
+  <span style="font-size: 1rem; font-weight: 200;"><%= time_ago_in_words(Time.at(@request.time)) %> ago | <%= @request.duration.round(2) %>ms
+    | <%= @request.path %></span>
 <% end %>
 <% content_for(:hide_duration, 'true') %>
 
-<% content_for(:main_css_class, 'requests') %>
+<% content_for(:main_css_class, 'layout-events-breakdown') %>
 
-<div class="details tabs">
-  <%= render 'chart', type: 'icicle', series: @events, autobound: true %>
-  <nav class="tab-nav">
-    <ul>
-      <li><a href="">Event Details</a></li>
-      <li><a href="">Logs</a></li>
-      <li><a href="">Mail</a></li>
-      <li><a href="">Jobs</a></li>
-      <li><a href="">Request</a></li>
-      <li><a href="">Response</a></li>
-      <li><a href="">Middleware <%= @middleware_events.pluck('self_time').sum.round(2) %>ms</a></li>
-      <li><a href="">Errors</a></li>
-    </ul>
+<%= render 'chart', type: 'icicle', series: @icicle_chart_series, autobound: true %>
+<div class="tabs layout-events-breakdown-details">
+  <nav class="tabs-nav">
+    <label class="tabs-button">
+      Event Details
+      <input type="radio" name="tabs" checked>
+    </label>
+    <label class="tabs-button">
+      Logs
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Mail
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Jobs
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Request
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Response
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Middleware
+      <span style="color: var(--black-secondary)"><%= @middleware_events.pluck('self_time').sum.round(2) %>ms</span>
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Errors
+      <input type="radio" name="tabs">
+    </label>
   </nav>
-  <div class="tab-content event-details" data-controller="event-details" data-action="chart:selected@window->event-details#show">
-    <% @filtered_events.each do |e| %>
-      <div id="<%= e['start_at'] %>" hidden>
-        <div><%= e['name'] %>
-          <span><%= e['duration'].round(2) %>ms</span>
-          <span><%= e['self_time'].to_f.round(2) %>ms</span>
+  <div class="--scrollable">
+    <div class="tab-content event-details" data-controller="event-details" data-action="chart:selected@window->event-details#show">
+      <% @filtered_events.each_with_index do |e, index| %>
+        <div class="event-detail" id="<%= e['start_at'] %>" <%= 'hidden' unless index.zero? %>>
+          <div>
+            <%= e['name'] %>
+            <span><%= e['duration'].round(2) %>ms</span>
+            <span><%= e['self_time'].to_f.round(2) %>ms</span>
+          </div>
+          <dl>
+            <dt>Payload</dt>
+            <% if e['payload'].empty? %>
+              <dd>Nothing in payload</dd>
+            <% else %>
+              <dd>
+                <pre><%= JSON.pretty_generate(e['payload']) %></pre>
+              </dd>
+            <% end %>
+
+          </dl>
+
         </div>
-        <dl>
-          <dt>Payload</dt>
-          <% if e['payload'].empty? %>
-            <dd>Nothing in payload</dd>
-          <% else %>
-            <dd>
-              <pre><%= JSON.pretty_generate(e['payload']) %></pre>
-            </dd>
-          <% end %>
+      <% end %>
+    </div>
+    <div class="tab-content logs">
+      LOGS!
+    </div>
+    <div class="tab-content mail">
+      MAIL
+    </div>
+    <div class="tab-content jobs">
+      jobs
+    </div>
+    <div class="tab-content request">
+      request
+    </div>
+    <div class="tab-content response">
+      response
+    </div>
+    <div class="tab-content middleware">
 
-        </dl>
+      <div class="table-bar-chart">
+        <div>Middleware Stack</div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <% total_time = @middleware_events.pluck('self_time').sum %>
 
+        <% @middleware_events.each do |e| %>
+          <% percent = e['self_time'] / total_time * 100 %>
+          <div><%= e['payload']['middleware'] %></div>
+          <div><%= percent.round(1) %>%</div>
+          <div class="bar">
+            <div style="width: <%= percent.round(1) %>%"></div>
+          </div>
+          <div> <%= e['self_time'].to_f.round(2) %>ms</div>
+        <% end %>
       </div>
-    <% end %>
-  </div>
-  <div class="logs-tab-content">
-
-  </div>
-  <div class="tab-content middleware">
-
-    <div class="table-bar-chart">
-      <div>Middleware Stack</div><div></div><div></div><div></div>
-      <% total_time = @middleware_events.pluck('self_time').sum %>
-
-    <% @middleware_events.each do |e| %>
-        <% percent = e['self_time'] / total_time * 100 %>
-        <div><%= e['payload']['middleware'] %></div><div><%= percent.round(1) %>%</div><div class="bar"><div style="width: <%= percent.round(1) %>%"></div></div><div> <%= e['self_time'].to_f.round(2) %>ms</div>
-    <% end %>
+    </div>
+    <div class="tab-content errors">
+      errors
     </div>
   </div>
 </div>

@@ -1,0 +1,62 @@
+.tabs {
+
+  display: flex;
+  flex-direction: column;
+  .tabs-nav {
+    border-bottom: 1px solid var(--divider);
+    border-top: 1px solid var(--divider);
+    padding-block: .5rem;
+    padding-inline: 1.25rem;
+
+    display: flex;
+    gap: .25rem;
+
+  }
+
+  &:has(:nth-child(1 of .tabs-button) input:checked) { :nth-child(1 of .tab-content) {display: block;} }
+  &:has(:nth-child(2 of .tabs-button) input:checked) { :nth-child(2 of .tab-content) {display: block;} }
+  &:has(:nth-child(3 of .tabs-button) input:checked) { :nth-child(3 of .tab-content) {display: block;} }
+  &:has(:nth-child(4 of .tabs-button) input:checked) { :nth-child(4 of .tab-content) {display: block;} }
+  &:has(:nth-child(5 of .tabs-button) input:checked) { :nth-child(5 of .tab-content) {display: block;} }
+  &:has(:nth-child(6 of .tabs-button) input:checked) { :nth-child(6 of .tab-content) {display: block;} }
+  &:has(:nth-child(7 of .tabs-button) input:checked) { :nth-child(7 of .tab-content) {display: block;} }
+  &:has(:nth-child(8 of .tabs-button) input:checked) { :nth-child(8 of .tab-content) {display: block;} }
+  &:has(:nth-child(9 of .tabs-button) input:checked) { :nth-child(9 of .tab-content) {display: block;} }
+
+  .tabs-button {
+    /* Mixin .mixin-nav-button */
+
+    & input {
+      position: absolute;
+      /*z-index: -100;*/
+      opacity: 0;
+
+    }
+
+    &:has(:focus-visible) {
+      outline: -webkit-focus-ring-color auto 1px;
+    }
+
+    &:has(:checked) {
+      background-color: var(--surface-active);
+    }
+  }
+
+    /*& label:has(:focus) {*/
+    /*  outline: -webkit-focus-ring-color auto 1px;*/
+    /*}*/
+
+  .tab-content {
+    display: none;
+    padding: 1rem 2rem;
+
+    & dd {
+      margin-left: 0;
+    }
+    & dt {
+      font-weight: 400;
+      color: var(--black-secondary);
+      margin-bottom: .75rem;
+    }
+  }
+}

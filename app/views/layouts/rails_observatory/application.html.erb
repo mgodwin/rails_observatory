@@ -12,8 +12,8 @@
     <%= Rouge::Theme.find('github.dark').render %>
   </style>
 </head>
-<body class="layout/app">
-<nav class="side-nav">
+<body class="layout-app">
+<nav class="side-nav layout-app-side-nav">
   <img height="36" src="<%= "#{root_path}assets/logo_with_text.svg" %>" alt="RailsObservatory">
   <ul>
     <li><%= link_to root_path, class: "#{'_active' if request.path == root_path || request.path =~ /requests/}" do %>

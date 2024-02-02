@@ -2,13 +2,6 @@ require 'rouge'
 module RailsObservatory
   module ApplicationHelper
 
-    def buckets_for_chart
-      duration_sec = (time_slice_end - time_slice_start) / 1000
-      # 10 second buckets are the smallest resolution we have
-      buckets_in_time_frame = (duration_sec / 10.0).to_i
-      [120, buckets_in_time_frame].min
-    end
-
     def highlight_source_extract(source_extract)
       source_extract => {code:, line_number:}
       fmt = Rouge::Formatters::HTMLLineTable.new(Rouge::Formatters::HTML.new, start_line: code.keys.first.to_s.to_i)
@@ -21,8 +14,10 @@ module RailsObservatory
       html.to_html
     end
 
-    def series_for(name:, aggregate_using:, time_range: @time_range, downsample: buckets_for_chart,  **opts)
-      RailsObservatory::TimeSeries.where(name:, **opts).slice(time_range).downsample(downsample, using: aggregate_using)
+    def series_for(name:, aggregate_using:, time_range: nil, downsample: 120,  **opts)
+      series = RailsObservatory::TimeSeries.where(name:, **opts).downsample(downsample, using: aggregate_using)
+      series = series.slice(time_range) if time_range
+      series
     end
 
     def time_slice_start

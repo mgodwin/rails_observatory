@@ -1,45 +1,47 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
-<% content_for(:main_css_class, 'layout/requests-index') %>
-<%= render 'chart', title: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg) %>
-<%= render 'chart', title: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum)  %>
+<% content_for(:main_css_class, 'layout-requests_index') %>
+<%= render 'chart', title: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg, action: params[:controller_action]) %>
+<%= render 'chart', title: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>
 <%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
 <%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
 
 <% if params[:controller_action].blank? %>
-  <div class="card table">
+  <section class="layout-requests_index-by_controller">
     <h2>By Controller Action</h2>
-    <table>
-      <thead>
-      <tr>
-        <th>Controller Action</th>
-        <th>Requests</th>
-        <th>Avg Latency</th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @count_by_controller.each do |series| %>
+    <div class="table-chart ">
+      <table>
+        <thead>
         <tr>
-          <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param) %></td>
-          <td><%= series.data.dig(0, 1) %></td>
-          <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
+          <th>Controller Action</th>
+          <th>Requests</th>
+          <th>Avg Latency</th>
         </tr>
-      <% end %>
+        </thead>
+        <tbody>
+        <% @count_by_controller.each do |series| %>
+          <tr>
+            <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param), class: 'table-chart-row-action' %></td>
+            <td><%= series.data.dig(0, 1) %></td>
+            <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
+          </tr>
+        <% end %>
 
-      <!-- More people... -->
-      </tbody>
-    </table>
-  </div>
+        <!-- More people... -->
+        </tbody>
+      </table>
+    </div>
+  </section>
 <% end %>
-
-<div class="card table">
+<section class="layout-requests_index-events">
   <h2>Recent Requests</h2>
 
 
   <%= render 'events_table', events: @events, fields: [
-    :time, :http_method, :action, :duration, :status , :request_id,
+    :time, :http_method, :action, :route_pattern, :duration, :status,
   ], formatters: {
-    request_id: ->(request_id) { link_to request_id, request_path(request_id) },
-    action: ->(ca) { ca.classify }
+    time: ->(time, event) { link_to Time.at(time).to_fs('%H:%M:%S'), request_path(event.request_id) },
   } %>
-</div>
+</section>
+
+

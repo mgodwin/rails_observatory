@@ -1,29 +1,24 @@
-<div class="~scrollable">
-  <table>
-    <thead>
-    <tr>
-      <% fields.each do |f| %>
-        <th><%= f.to_s.humanize(capitalize: true, keep_id_suffix: true) %></th>
-      <% end %>
-
-    </tr>
-    </thead>
-    <tbody>
+<div class="query-table --scrollable" style="--column-count: <%= fields.size %>">
+  <header>
+    <% fields.each do |f| %>
+      <div class="query-table-column"><%= f.to_s.humanize(capitalize: true, keep_id_suffix: true) %></div>
+    <% end %>
+  </header>
+  <div class="query-table-body --scrollable">
     <% events.each do |e| %>
-      <tr>
+      <div class="query-table-row">
         <% fields.each do |f| %>
           <% if (formatter = local_assigns[:formatters]&.fetch(f, nil)) %>
             <% if formatter.arity == 2 %>
-            <td><%= formatter.call(e.respond_to?(f) ? e.send(f) : 'unknownattribute', e) %></td>
-              <% else %>
-            <td><%= formatter.call(e.respond_to?(f) ? e.send(f) : 'unknownattribute') %></td>
+              <div class="query-table-column"><%= formatter.call(e.respond_to?(f) ? e.send(f) : 'unknownattribute', e) %></div>
+            <% else %>
+              <div class="query-table-column"><%= formatter.call(e.respond_to?(f) ? e.send(f) : 'unknownattribute') %></div>
             <% end %>
           <% else %>
-            <td><%= format_event_value(e.respond_to?(f) ? e.send(f) : 'unknownattribute') %></td>
+            <div class="query-table-column"><%= format_event_value(e.respond_to?(f) ? e.send(f) : 'unknownattribute') %></div>
           <% end %>
         <% end %>
-      </tr>
+      </div>
     <% end %>
-    </tbody>
-  </table>
+  </div>
 </div>

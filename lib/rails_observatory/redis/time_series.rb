@@ -8,6 +8,13 @@ module RailsObservatory
 
     attr_reader :labels, :name, :data
 
+    def self.with_slice(time_range)
+      ActiveSupport::IsolatedExecutionState[:observatory_slice] = time_range
+      yield
+    ensure
+      ActiveSupport::IsolatedExecutionState[:observatory_slice] = nil
+    end
+
     def self.where(**conditions)
       QueryBuilder.new(self).where(**conditions)
     end

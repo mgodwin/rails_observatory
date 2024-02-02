@@ -1,0 +1,48 @@
+.table-chart {
+  .table-chart-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0;
+    padding: 1rem;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  & tr:has(a.table-chart-row-action:hover) {
+    background-color: var(--surface-hover);
+  }
+
+  & a.table-chart-row-action::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    right:0;
+    bottom: 0;
+  }
+
+  & > table {
+    width: 100%;
+    border-spacing: 0;
+    white-space: nowrap;
+
+    & th {
+      text-align: left;
+      font-weight: 400;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    & tr {
+      position: relative;
+    }
+
+    & td {
+      padding: .5rem 1rem;
+      border-bottom: 1px solid var(--divider);
+
+      & + & {
+        border-left: 1px solid var(--divider);
+      }
+    }
+  }
+}

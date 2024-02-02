@@ -5,5 +5,6 @@ class CalculateProfitJob < ApplicationJob
     puts "hello!!!"
     logger.info "Step 1: Run Job"
     logger.info "Step 3: Profit"
+    true
   end
 end

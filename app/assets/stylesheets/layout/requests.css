@@ -1,0 +1,37 @@
+@layer layout {
+  .layout-requests_index {
+    display: grid;
+
+    grid-template-areas:
+        'glance glance'
+        'chart chart'
+        /*'chart chart'*/
+        'bycontroller bycontroller'
+        'events events';
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 265px auto auto;
+    gap: 1rem;
+
+    & > .layout-requests_index-glance {
+      grid-area: glance;
+    }
+
+    & > .layout-requests_index-chart {
+      grid-area: chart;
+    }
+
+    & > .layout-requests_index-by_controller {
+      grid-area: bycontroller;
+    }
+
+    & > .layout-requests_index-events {
+      grid-area: events;
+    }
+  }
+
+  .layout-events-breakdown {
+    display: grid;
+    grid-template-rows: auto minmax(50px, 1fr);
+    gap: 1rem;
+  }
+}
