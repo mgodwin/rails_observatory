@@ -31,7 +31,12 @@
 
   .layout-events-breakdown {
     display: grid;
-    grid-template-rows: auto minmax(50px, 1fr);
+    grid-template-rows: min-content auto;
+    grid-template-columns: 1fr;
     gap: 1rem;
+
+    & > .layout-events-breakdown-details {
+      border-top: 1px solid var(--divider);
+    }
   }
 }

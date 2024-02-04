@@ -9,7 +9,6 @@ module RailsObservatory
     end
 
     def call(event)
-      puts "Collecting event #{event.name} #{event.payload}"
       return if ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY].blank?
 
       ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY].each do |key|

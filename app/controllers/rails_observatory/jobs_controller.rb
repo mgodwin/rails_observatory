@@ -6,8 +6,14 @@ module RailsObservatory
     around_action :set_time_range
 
     def index
-      Job.ensure_index
-      @recent_jobs = Job.all.take(10)
+      JobTrace.ensure_index
+      @recent_jobs = JobTrace.all.take(10)
+    end
+
+    def show
+      @job = JobTrace.find(params[:id])
+      @events = @job.events
+
     end
 
     def set_time_range

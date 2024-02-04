@@ -76,8 +76,7 @@ section {
     font-size: 1.5rem;
     font-weight: 400;
     margin: 0;
-    padding: 1rem;
-    padding-block: 2rem;
+    padding: 2rem;
     border-bottom: 1px solid var(--divider);
   }
 }
@@ -140,14 +139,24 @@ section {
   }
   .layout-events-breakdown {
     display: grid;
-    grid-template-rows: auto minmax(50px, 1fr);
+    grid-template-rows: min-content auto;
+    grid-template-columns: 1fr;
     gap: 1rem;
+    & > .layout-events-breakdown-details {
+      border-top: 1px solid var(--divider);
+    }
   }
 }
 
 /* app/assets/stylesheets/application/global_modifiers.css */
 .--scrollable {
   overflow: auto;
+}
+.--sticky {
+  position: sticky;
+  top: 0;
+  background-color: var(--black);
+  z-index: 1;
 }
 
 /* app/assets/stylesheets/application/card.css */
@@ -337,11 +346,11 @@ section {
 
 /* app/assets/stylesheets/application/tab_nav.css */
 .tabs {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: min-content auto;
+  grid-template-columns: minmax(0, 1fr);
   .tabs-nav {
     border-bottom: 1px solid var(--divider);
-    border-top: 1px solid var(--divider);
     padding-block: .5rem;
     padding-inline: 1.25rem;
     display: flex;
@@ -406,7 +415,7 @@ section {
   }
   .tab-content {
     display: none;
-    padding: 1rem 2rem;
+    padding-bottom: 2rem;
     & dd {
       margin-left: 0;
     }
@@ -477,6 +486,10 @@ section {
       }
     }
   }
+}
+.chart {
+  padding: 1rem;
+  overflow: hidden;
 }
 
 /* app/assets/stylesheets/application/table_chart.css */
@@ -573,6 +586,58 @@ section {
   }
 }
 
+/* app/assets/stylesheets/application/tbd.css */
+.simple-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  flex-grow: 1;
+  .simple-list-title {
+    font-weight: var(--font-weight-bold);
+  }
+  & li {
+    padding: 2rem;
+  }
+  & li + li {
+    border-top: 1px solid var(--divider);
+  }
+  & a {
+    display: flex;
+    align-items: center;
+    padding: .5rem .75rem;
+    gap: .5rem;
+    border-radius: .5rem;
+    text-decoration: none;
+    font-weight: 400;
+    color: color-mix(in oklab, var(--black) 20%, white);
+    &:is(:hover, :focus-visible) {
+      background-color: var(--surface-hover);
+    }
+  }
+}
+.event-detail {
+  &:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  max-width: 120ch;
+  .highlight {
+    border: 1px solid var(--divider);
+    .line {
+      padding: 0 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+    }
+  }
+}
+
 /* app/assets/stylesheets/mixins/nav_button.css */
 @layer mixin {
   .tabs .tabs-button,
@@ -638,15 +703,33 @@ section {
 }
 .table-bar-chart {
   display: grid;
-  grid-template-columns: min-content min-content 3rem min-content;
+  grid-template-columns: auto min-content min-content;
   column-gap: 1rem;
-  row-gap: .5rem;
-  .bar {
-    background-color: var(--surface-card);
-    & > * {
-      background-color: var(--blue);
-      height: 100%;
+  .table-bar-row {
+    position: relative;
+    background-color: transparent;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    padding: .5rem;
+    &:hover {
+      background-color: var(--surface-hover);
     }
+  }
+  .table-bar-header {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--divider);
+    font-weight: var(--font-weight-bold);
+    padding: .5rem 0;
+  }
+  .bar {
+    background-color: var(--blue);
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    mix-blend-mode: lighten;
+    z-index: 0;
   }
 }
 

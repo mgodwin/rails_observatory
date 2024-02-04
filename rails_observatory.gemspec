@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Mark Godwin"]
   spec.email       = ["godwin.mark@gmail.com"]
   spec.homepage    = "https://github.com/mgodwin/observatory-rails"
-  spec.summary     = "Metrics Tracking for Rails Apps"
-  spec.description = "Metrics Tracking for Rails Apps"
+  spec.summary     = "Observability for Rails Apps"
+  spec.description = "Observability for Rails Apps"
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the "allowed_push_host"

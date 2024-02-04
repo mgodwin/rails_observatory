@@ -1,14 +1,5 @@
 <% content_for(:title, 'Jobs') %>
 
-<style>
-  @scope {
-    :scope {
-      display: grid;
-      gap: 2rem;
-    }
-  }
-</style>
-
 <%#= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
 <%= render 'chart', name: 'Performed', series: series_for(name: 'job.count', aggregate_using: :sum), type: 'bar' %>
 
@@ -17,5 +8,11 @@
 
 <section>
   <h2>Recent Jobs</h2>
-  <%= render 'events_table', events: @recent_jobs, fields: [:timestamp, :job_id, :job_class, :duration,] %>
+  <%= render 'events_table',
+             events: @recent_jobs,
+             fields: [:time, :job_id, :job_class, :duration],
+             formatters: {
+               time: ->(time, event) { link_to Time.at(time).to_fs('%H:%M:%S'), job_path(event.job_id) },
+             }
+  %>
 </section>

@@ -11,13 +11,13 @@ module RailsObservatory
         TimeSeries.increment("job.retry_count", labels:) if executions > 1
 
         start_at = Time.now
-        start_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        start_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         events, result = EventCollector.instance.collect_events { super }
-        end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         result
       rescue Exception => error
         events = error.instance_variable_get(:@_trace_events)
-        end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         TimeSeries.increment("job.error_count", labels:)
         raise
       ensure
@@ -29,8 +29,9 @@ module RailsObservatory
           duration:,
           queue_adapter: ActiveJob.adapter_name(queue_adapter),
           executions:,
+          job_class: self.class.name,
           queue_name:,
-          events: events.map { EventSerializer.serialize_event(_1) },
+          events: events.map { Serializer.serialize(_1) },
           error: error.present?
         ).save
       end

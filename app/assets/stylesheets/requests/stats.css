@@ -37,15 +37,36 @@
 
 .table-bar-chart {
   display: grid;
-  grid-template-columns: min-content min-content 3rem min-content;
+  grid-template-columns: auto min-content min-content;
   column-gap: 1rem;
-  row-gap: .5rem;
+
+  .table-bar-row {
+    position: relative;
+    background-color: transparent;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    padding: .5rem;
+
+    &:hover {
+      background-color: var(--surface-hover);
+    }
+  }
+
+  .table-bar-header {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--divider);
+    font-weight: var(--font-weight-bold);
+    padding: .5rem 0;
+  }
 
   .bar {
-    background-color: var(--surface-card);
-    & > * {
-      background-color: var(--blue);
-      height: 100%;
-    }
+    background-color: var(--blue);
+    position: absolute;
+    top: 0;
+    left:0;
+    bottom:0;
+    mix-blend-mode: lighten;
+    z-index: 0;
   }
 }

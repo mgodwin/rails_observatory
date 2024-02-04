@@ -10903,13 +10903,14 @@
           const seriesSelfTime = controller.series()[opts.seriesIndex].data.reduce((acc, val) => {
             return acc + val["event_self_time"];
           }, 0);
+          console.log(controller.series()[opts.seriesIndex].name, controller.series()[opts.seriesIndex].data);
           const totalSelfTime = controller.series().reduce((acc, val) => {
             return acc + val.data.reduce((acc2, val2) => {
               return acc2 + val2["event_self_time"];
             }, 0);
           }, 0);
           const percent = seriesSelfTime / totalSelfTime * 100;
-          return `${seriesName} <span class="percent">${percent.toFixed(1)}% <div class="bar"><div  style="width:${percent.toFixed(1)}%"></div></div></span> `;
+          return `${seriesName} <span class="percent">${seriesSelfTime.toFixed(1)}ms <div class="bar"><div  style="width:${percent.toFixed(1)}%"></div></div></span> `;
         },
         itemMargin: {
           horizontal: "14"
@@ -11119,7 +11120,7 @@
         top: 0,
         right: 0,
         bottom: 0,
-        left: 8
+        left: 0
       }
     },
     title: {
@@ -11160,7 +11161,8 @@
     yaxis: {
       decimalsInFloat: 0,
       labels: {
-        // offsetX: -40,
+        offsetX: -10
+        // align: 'left',
       },
       axisTicks: {
         show: false

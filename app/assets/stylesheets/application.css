@@ -21,6 +21,7 @@
 @import url('application/chart.css');
 @import url('application/table_chart.css');
 @import url("application/query_table.css");
+@import url("application/tbd.css");
 
 /* Mixins */
 @import url('mixins/nav_button.css');

@@ -87,6 +87,11 @@ module RailsObservatory
       redis.call("JSON.SET", self.class.key_name(id), "$", JSON.generate(attributes))
     end
 
+    def mail_events
+      events.only('enqueue.action_job', 'deliver.action_mailer')
+            .reject {_1['name'] == 'enqueue.action_job' && _1.dig('payload', 'job', 'class') != 'ActionMailer::MailDeliveryJob' }
+    end
+
     def events
       attr_value = super
       return nil if attr_value.nil?

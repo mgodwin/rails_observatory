@@ -2,8 +2,8 @@ module RailsObservatory
   class RequestsController < ApplicationController
 
     def index
-      # CalculateProfitJob.perform_later
-      # NewUserMailer.greeting.deliver_later
+      CalculateProfitJob.perform_later
+      NewUserMailer.greeting.deliver_later
       @time_range = (duration.seconds.ago..)
 
       # page_through(query, page_size: 25).each_result do |event|
@@ -33,8 +33,8 @@ module RailsObservatory
     def show
       @request = RequestTrace.find(params[:id])
       @middleware_events = @request.events.only('process_middleware.action_dispatch')
-      @filtered_events = @request.events.without('process_middleware.action_dispatch')
-      @icicle_chart_series = @request.events.without('process_middleware.action_dispatch').to_series
+      @events = @request.events
+      @icicle_chart_series = @events.to_series
     end
 
   end

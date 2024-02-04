@@ -1,0 +1,96 @@
+<%= render 'chart', type: 'icicle', series: @events.to_series, autobound: true %>
+
+<div class="tabs layout-events-breakdown-details">
+  <nav class="tabs-nav --sticky">
+    <label class="tabs-button">
+      Event Details
+      <input type="radio" name="tabs" checked>
+    </label>
+    <label class="tabs-button">
+      Logs
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Mail
+      <span style="color: var(--black-secondary)"><%= model.mail_events.size %></span>
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Jobs
+      <input type="radio" name="tabs">
+    </label>
+    <label class="tabs-button">
+      Errors
+      <input type="radio" name="tabs">
+    </label>
+  </nav>
+  <div class="tab-content event-details" data-controller="event-details" data-action="chart:selected@window->event-details#show">
+    <% @events.each_with_index do |e, index| %>
+      <div class="event-detail" id="<%= e['start_at'] %>" <%= 'hidden' unless index.zero? %> style="padding-inline: 2rem;">
+        <div>
+          <h3><%= e['name'] %> (<%= e['self_time'].to_f.round(2) %>ms)</h3>
+          <span style="color: var(--black-secondary)">Event spanned from <%= e['relative_start_at'].round(2) %>ms
+            to <%= e['relative_end_at'].round(2) %>ms
+            with a total duration of <%= e['duration'].round(2) %>ms
+          </span>
+        </div>
+        <% if e['middleware_stack'].present? %>
+          <div class="table-bar-chart">
+            <div class="table-bar-header">Middleware Stack</div>
+            <% total_time = e['self_time'] %>
+
+            <% e['middleware_stack'].each do |middleware_event| %>
+              <div class="table-bar-row">
+                <% percent = middleware_event['self_time'] / total_time * 100 %>
+                <div class="bar" style="width: <%= percent.round(1) %>%"></div>
+                <%= middleware_event['payload']['middleware'] %>
+                <div> <%= middleware_event['self_time'].to_f.round(2) %>ms</div>
+                <div style="color: var(--black-secondary);white-space: nowrap">(<%= percent.round(1) %>% of total)</div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <dl style="">
+            <dt>Payload</dt>
+            <% if e['payload'].empty? %>
+              <dd>Nothing in payload</dd>
+            <% else %>
+              <dd class="highlight">
+                <pre class="--scrollable"><%== Rouge.highlight(e['payload'].to_yaml, 'yaml', Rouge::Formatters::HTMLLinewise.new(Rouge::Formatters::HTML.new, class: 'line')) %></pre>
+                <!--              <pre style="width:100%;overflow: auto;"><%#== Rouge.highlight(JSON.pretty_generate(e['payload']) , 'json', 'html') %></pre>-->
+              </dd>
+            <% end %>
+
+          </dl>
+        <% end %>
+
+      </div>
+    <% end %>
+  </div>
+  <div class="tab-content logs">
+    LOGS!
+  </div>
+  <div class="tab-content mail">
+    MAIL
+  </div>
+  <div class="tab-content jobs">
+    <ul class="simple-list">
+      <% model.events.only('enqueue.active_job').each do |event| %>
+        <li>
+          <div class="simple-list-title"><%= event.dig('payload', 'job', 'class') %></div>
+          <div>
+            Enqueued job (
+            <span><%= event.dig('payload', 'job', 'job_id').slice(0...8) %></span>
+            ) to
+            <span><%= event.dig('payload', 'job', 'queue_name') %></span>
+            queue at
+            <span><%= event['start_at'] %></span>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="tab-content errors">
+    errors
+  </div>
+</div>

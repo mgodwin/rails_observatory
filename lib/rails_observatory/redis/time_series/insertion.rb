@@ -45,6 +45,7 @@ module RailsObservatory
                         end
         TIMING_SCRIPT.call(prefixed_name, value, labels.to_a.flatten.map(&:to_s))
       end
+      alias_method :record_timing, :distribution
 
       def increment(name, labels: {})
 
@@ -57,6 +58,7 @@ module RailsObservatory
                         end
         INCREMENT_CALL.call(prefixed_name, labels.to_a.flatten.map(&:to_s))
       end
+      alias_method :record_occurrence, :increment
     end
   end
 end

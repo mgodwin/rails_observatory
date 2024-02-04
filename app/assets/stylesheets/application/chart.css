@@ -28,3 +28,8 @@
     }
   }
 }
+
+.chart {
+  padding: 1rem;
+  overflow: hidden;
+}

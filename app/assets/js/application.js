@@ -30,7 +30,7 @@ window.Apex = {
       top: 0,
       right: 0,
       bottom: 0,
-      left: 8
+      left: 0
     },
   },
   title: {
@@ -72,7 +72,8 @@ window.Apex = {
   yaxis: {
     decimalsInFloat: 0,
     labels: {
-       // offsetX: -40,
+       offsetX: -10,
+      // align: 'left',
     },
     axisTicks: {
       show: false

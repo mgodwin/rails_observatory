@@ -1,6 +1,6 @@
 RailsObservatory::Engine.routes.draw do
   resources :requests, only: [:index, :show]
-  resources :jobs, only: :index
+  resources :jobs, only: [:index, :show]
   resources :logs, only: :index
   resources :mailers, only: [:index, :show]
   resources :errors, only: [:index, :show]

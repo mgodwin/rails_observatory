@@ -1,10 +1,12 @@
 .tabs {
 
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: min-content auto;
+  grid-template-columns: minmax(0, 1fr);
+
   .tabs-nav {
     border-bottom: 1px solid var(--divider);
-    border-top: 1px solid var(--divider);
+    /*border-top: 1px solid var(--divider);*/
     padding-block: .5rem;
     padding-inline: 1.25rem;
 
@@ -48,7 +50,7 @@
 
   .tab-content {
     display: none;
-    padding: 1rem 2rem;
+    padding-bottom: 2rem;
 
     & dd {
       margin-left: 0;

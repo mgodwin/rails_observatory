@@ -25,19 +25,26 @@ module RailsObservatory
 
       status, headers, body = response
       body = ::Rack::BodyProxy.new(body) do
-        puts "Saving request"
         duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start_at_mono)
+        controller_action = "#{request.params[:controller]}##{request.params[:action]}"
         RequestTrace.new(
           request_id: request.request_id,
           status:,
           http_method: request.method,
-          action: "#{request.params[:controller]}##{request.params[:action]}",
+          route_pattern: request.route_uri_pattern,
+          action: controller_action,
           error: events.any? { _1.payload[:exception] },
+          format: request.format,
           duration:,
           time: start_at.to_f,
           path: request.path,
-          events: events.map { EventSerializer.serialize_event(_1) }
+          events: events.map { Serializer.serialize(_1) },
         ).save
+
+        labels = { action: controller_action, format: request.format, status:, http_method: request.method }
+        TimeSeries.record_occurrence("request.count", labels:)
+        TimeSeries.record_occurrence("request.error_count", labels:) if status >= 500
+        TimeSeries.record_timing("request.latency", duration, labels:)
       end
 
       [status, headers, body]

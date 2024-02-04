@@ -1,19 +1,22 @@
+require_relative './job_serializer'
+require_relative './mail_delivery_job_serializer'
+require_relative './event_serializer'
+require_relative './request_serializer'
+require_relative './headers_serializer'
+require_relative './response_serializer'
+
 module RailsObservatory
-  class EventSerializer
+  class Serializer
 
     PERMITTED_TYPES = [NilClass, String, Integer, Float, TrueClass, FalseClass]
 
+    ADDITIONAL_SERIALIZERS = [JobSerializer, MailDeliveryJobSerializer, EventSerializer, RequestSerializer, HeadersSerializer, ResponseSerializer]
+
     class << self
-      def serialize_event(event)
-        {
-          name: event.name,
-          payload: serialize_payload(event.payload),
-          start_at: event.time,
-          end_at: event.end,
-          duration: event.duration,
-          allocations: event.allocations,
-          failed: event.payload.include?(:exception),
-        }
+
+
+      def serialize(argument)
+        serialize_payload(argument)
       end
 
       def serialize_payload(argument)
@@ -31,9 +34,7 @@ module RailsObservatory
         when Symbol
           argument.to_s
         else
-          "Unable to serialize #{argument.class.name}"
-          # raise "unknown argument type #{argument.class}"
-          # Serializers.serialize(argument)
+          ADDITIONAL_SERIALIZERS.find { argument.is_a?(_1.klass) }&.new&.serialize(argument) || "Unable to serialize #{argument.class.name}"
         end
       end
 

@@ -36,13 +36,24 @@ module RailsObservatory
     end
 
     def to_series
-      grouped_events = to_a.group_by { _1['name'].split('.').last }
+      all_events = to_a
+      min, max = all_events.minmax_by { _1['depth'] }.pluck('depth')
+
+      category_primer = (min..max).map do |depth|
+        {
+          x: depth.to_s,
+          y: nil,
+          event_self_time: 0,
+        }
+      end
+
+      grouped_events = all_events.group_by { _1['name'].split('.').last }.sort_by { _1.first }
       grouped_events.map do |name, events|
         {
           name: name,
-          data: events.map do |ev|
+          data: category_primer + events.map do |ev|
             {
-              x: ev['depth'].to_i.to_s,
+              x: ev['depth'].to_s,
               y: [ev['relative_start_at'], ev['relative_end_at']],
               event_self_time: ev['self_time'],
               event_name: ev['name'].split('.').first,
@@ -59,8 +70,9 @@ module RailsObservatory
 
     def decorate_events
       @events = @events.then(&method(:sort_events))
-                       .then(&method(:decorate_with_depth))
                        .then(&method(:decorate_with_self_time))
+                       .then(&method(:merge_middleware))
+                       .then(&method(:decorate_with_depth))
       @decorated = true
     end
 
@@ -68,23 +80,51 @@ module RailsObservatory
       events.sort_by { _1['start_at'] }
     end
 
+    def merge_middleware(events)
+      middleware_events = events.select { _1['name'] == 'process_middleware.action_dispatch' }
+      return events if middleware_events.empty?
+      merged_middleware = middleware_events.reduce(middleware_events.first.without('self_time')) do |merged, event|
+        merged['self_time'] ||= 0
+        merged['self_time'] += event['self_time']
+        merged['middleware_stack'] ||= []
+        merged['middleware_stack'] << event
+        merged
+      end
+      [merged_middleware] + events.excluding(middleware_events)
+    end
+
     def decorate_with_depth(events)
-      events.each_cons(2) do |a, b|
-        if b['start_at'] > a['start_at'] && b['end_at'] < a['end_at']
-          b['depth'] = a['depth'].to_i + 1
-        else
-          b['depth'] = a['depth']
-        end
+      depth_stack = [] 
+      events.each do |e|
+        event_range = (e['start_at']..e['end_at'])
+        depth_stack.select! { _1.cover?(event_range) }
+        e['depth'] = depth_stack.size
+        depth_stack << event_range
       end
     end
 
     def decorate_with_self_time(events)
       events.each do |ev|
-        ev['self_time'] = ev['duration'] - events.select { _1['depth'] == (ev['depth'].to_i + 1) && _1['end_at'] < ev['end_at'] }.pluck('duration').sum
+        ev_range = (ev['start_at']..ev['end_at'])
+        sub_events = events.excluding(ev).select { ev_range.cover?(_1['start_at'].._1['end_at']) }
+        sub_event_time = non_overlapping_ranges(sub_events).reduce(0) { |sum, range| sum + (range.end - range.begin) }
+        ev['self_time'] = ev['duration'] - sub_event_time
+      end
+    end
+
+    def non_overlapping_ranges(events)
+      events.reduce([]) do |arr, event|
+        event_range = (event['start_at']..event['end_at'])
+        if arr.any? { |r| r.cover?(event_range) }
+          arr
+        else
+          arr << event_range
+        end
       end
     end
 
     def decorate_with_relative_time(events)
+      return events if events.empty?
       first_event = events.first['start_at']
       events.each do |ev|
         ev['relative_start_at'] = ev['start_at'] - first_event

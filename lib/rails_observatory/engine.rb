@@ -1,6 +1,4 @@
 require 'redis-client'
-require_relative './patches/notification_event'
-
 
 module RailsObservatory
   class Engine < ::Rails::Engine
@@ -14,9 +12,10 @@ module RailsObservatory
 
     initializer "rails_observatory.redis" do |app|
       require_relative './redis/logging_middleware'
+      require_relative './redis/redis_client_instrumentation'
       app.config.rails_observatory.redis => pool_size:, **redis_config
       #.merge(middlewares: [LoggingMiddleware])
-      redis_config = RedisClient.config(**redis_config)
+      redis_config = RedisClient.config(**redis_config.merge(middlewares: [RedisClientInstrumentation]))
       $redis = redis_config.new_pool(timeout: 0.5, size: pool_size)
       app.config.rails_observatory.redis = $redis
     end
@@ -32,6 +31,7 @@ module RailsObservatory
     end
 
     initializer "rails_observatory.active_job_instrumentation" do
+      require_relative './models/job_trace'
       ActiveSupport.on_load(:active_job) do |active_job|
         require_relative './railties/active_job_instrumentation'
         active_job.include(Railties::ActiveJobInstrumentation)

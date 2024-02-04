@@ -1,0 +1,8 @@
+<% content_for :title do %>
+  <%= @job.job_class %><br/>
+  <span style="font-size: 1rem; font-weight: 200;"><%= time_ago_in_words(Time.at(@job.time)) %> ago
+    | <%= @job.duration.round(2) %>ms</span>
+<% end %>
+<% content_for(:hide_duration, 'true') %>
+
+<%= render 'trace', model: @job, events: @events %>
