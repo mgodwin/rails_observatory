@@ -20,6 +20,11 @@ module RailsObservatory
       series
     end
 
+    def series_value(name:, aggregate_using:)
+      series = series_for(name:, aggregate_using: aggregate_using, downsample: 1)
+      series.sole.value
+    end
+
     def time_slice_start
       @time_range.begin.to_i * 1000
     end

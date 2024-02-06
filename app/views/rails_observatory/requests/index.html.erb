@@ -1,11 +1,25 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
 <% content_for(:main_css_class, 'layout-requests_index') %>
-<%= render 'chart', title: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg, action: params[:controller_action]) %>
-<%= render 'chart', title: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>
+<div class="layout-requests_index-glance" style="display:flex;justify-content: space-evenly">
+  <%= render 'text_gauge', title: 'Requests', value: series_value(name:"request.count", aggregate_using: :sum) %>
+  <%= render 'text_gauge', title: 'Throughput', value: series_value(name:"request.count", aggregate_using: :sum).fdiv(duration / 60).round(2), unit: 'rpm' %>
+  <text-gauge>
+    <text-gauge-title>Errors</text-gauge-title>
+    <text-gauge-value>0</text-gauge-value>
+  </text-gauge>
+  <text-gauge>
+    <text-gauge-title>P95 Latency</text-gauge-title>
+    <text-gauge-value>0.5 ms</text-gauge-value>
+  </text-gauge>
+</div>
+<div class="layout-requests_index-chart">
+  <%= render 'chart', name: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>
+  <%= render 'chart', name: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg, action: params[:controller_action]) %>
+
 <%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
 <%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
-
+</div>
 <% if params[:controller_action].blank? %>
   <section class="layout-requests_index-by_controller">
     <h2>By Controller Action</h2>

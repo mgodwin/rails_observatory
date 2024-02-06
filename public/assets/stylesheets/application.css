@@ -122,13 +122,16 @@ section {
     display: grid;
     grid-template-areas: "glance glance" "chart chart" "bycontroller bycontroller" "events events";
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 265px auto auto;
-    gap: 1rem;
+    grid-template-rows: min-content min-content auto auto;
+    gap: 2rem;
     & > .layout-requests_index-glance {
       grid-area: glance;
     }
     & > .layout-requests_index-chart {
       grid-area: chart;
+      display: grid;
+      grid-template-columns: subgrid;
+      padding-inline: 2rem;
     }
     & > .layout-requests_index-by_controller {
       grid-area: bycontroller;
@@ -488,7 +491,6 @@ section {
   }
 }
 .chart {
-  padding: 1rem;
   overflow: hidden;
 }
 
@@ -635,6 +637,20 @@ section {
         background-color: var(--surface-hover);
       }
     }
+  }
+}
+text-gauge {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-block: 1rem;
+  padding-inline: 2rem;
+  white-space: nowrap;
+  & text-gauge-title {
+  }
+  & text-gauge-value {
+    font-size: 3rem;
+    font-weight: 400;
   }
 }
 

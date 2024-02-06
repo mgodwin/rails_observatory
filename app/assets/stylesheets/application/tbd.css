@@ -42,7 +42,9 @@
     flex-direction: column;
     gap: 1rem;
   }
+
   max-width: 120ch;
+
   .highlight {
     border: 1px solid var(--divider);
 
@@ -55,5 +57,21 @@
         background-color: var(--surface-hover);
       }
     }
+  }
+}
+
+text-gauge {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-block: 1rem;
+  padding-inline: 2rem;
+  white-space: nowrap;
+
+  & text-gauge-title {}
+
+  & text-gauge-value {
+    font-size: 3rem;
+    font-weight: 400;
   }
 }

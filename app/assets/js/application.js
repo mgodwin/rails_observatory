@@ -34,7 +34,6 @@ window.Apex = {
     },
   },
   title: {
-
     align: 'left',
     offsetY: 20,
     style: {

@@ -12,6 +12,5 @@
 <% content_for(:hide_duration, 'true') %>
 
 <% content_for(:main_css_class, 'layout-events-breakdown') %>
-
-<%= render 'chart', type: 'icicle', series: @icicle_chart_series, autobound: true %>
+<%= render 'trace', model: @request, events: @events %>
 

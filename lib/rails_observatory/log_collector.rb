@@ -1,6 +1,5 @@
-require_relative 'streams/logs_stream'
 module RailsObservatory
-  class EventStreamLogger < ::Logger
+  class LogCollector < ::Logger
 
     def initialize(*args, **kwargs)
       _, *rest = args
