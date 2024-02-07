@@ -4,7 +4,7 @@
   <nav class="tabs-nav --sticky">
     <label class="tabs-button">
       Event Details
-      <input type="radio" name="tabs" checked>
+      <input type="radio" name="tabs">
     </label>
     <label class="tabs-button">
       Logs
@@ -12,8 +12,10 @@
     </label>
     <label class="tabs-button">
       Mail
+      <% if  model.mail_events.size > 0 %>
       <span style="color: var(--black-secondary)"><%= model.mail_events.size %></span>
-      <input type="radio" name="tabs">
+      <% end %>
+      <input type="radio" name="tabs" checked>
     </label>
     <label class="tabs-button">
       Jobs
@@ -68,19 +70,43 @@
     <% end %>
   </div>
   <div class="tab-content logs">
-    LOGS!
+    <log-lines style="display:grid;grid-template-columns: min-content min-content 1fr; gap:1rem;padding-block: 1rem;">
+      <% model.logs.each do |log| %>
+        <log-line style="display: grid; padding-inline: 2rem; grid-template-columns: subgrid;grid-column: 1/-1;">
+          <time style="white-space: nowrap"><%= Time.at(log['time']) %></time>
+          <log-level><%= log['severity'] %></log-level>
+          <log-message><%= log['message'] %></log-message>
+        </log-line>
+      <% end %>
+    </log-lines>
   </div>
   <div class="tab-content mail">
-    MAIL
+    <simple-list class="simple-list">
+      <% if model.mail_events.empty? %>
+        <li>No mail enqueued or delivered</li>
+      <% end %>
+      <% model.mail_events.each do |e| %>
+        <li>
+          Mail Delivery <%= e.dig('payload', 'mailer') %>
+          <div>To: <%= e.dig('payload', 'to') %></div>
+          <div>From: <%= e.dig('payload', 'from') %></div>
+          <div>Subject: <%= e.dig('payload', 'subject') %></div>
+          <a href="/rails/mailers/delivered_mail/preview?message_id=<%= e.dig('payload', 'message_id') %>" target="_blank">View Email</a>
+        </li>
+      <% end %>
+    </simple-list>
   </div>
   <div class="tab-content jobs">
     <ul class="simple-list">
+      <% if model.events.only('enqueue.active_job').to_a.empty? %>
+        <li>No jobs were enqueued</li>
+      <% end %>
       <% model.events.only('enqueue.active_job').each do |event| %>
         <li>
           <div class="simple-list-title"><%= event.dig('payload', 'job', 'class') %></div>
           <div>
             Enqueued job (
-            <span><%= event.dig('payload', 'job', 'job_id').slice(0...8) %></span>
+            <span><%= link_to event.dig('payload', 'job', 'job_id').slice(0...8), job_path(event.dig('payload', 'job', 'job_id')) %></span>
             ) to
             <span><%= event.dig('payload', 'job', 'queue_name') %></span>
             queue at

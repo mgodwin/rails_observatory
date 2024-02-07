@@ -1,6 +1,10 @@
 require_relative './redis_model'
+require_relative './events'
+require_relative './logs'
 module RailsObservatory
   class RequestTrace < RedisModel
+    include Events
+    include Logs
 
     attribute :request_id, :string
     attribute :status, :integer
@@ -16,6 +20,10 @@ module RailsObservatory
 
     alias_attribute :id, :request_id
     alias_attribute :name, :action
+
+    def self.key_prefix
+      "rt"
+    end
 
   end
 end

@@ -1,6 +1,15 @@
 require_relative './redis_model'
+require_relative './events'
+require_relative './logs'
+
 module RailsObservatory
   class JobTrace < RedisModel
+    include Events
+    include Logs
+
+    def self.key_prefix
+      "jt"
+    end
 
     attribute :job_id, :string
     attribute :queue_name, :string

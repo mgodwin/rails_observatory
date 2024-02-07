@@ -1,38 +1,45 @@
 module RailsObservatory
   class LogCollector < ::Logger
 
+    KEY = :observatory_logs
+
     def initialize(*args, **kwargs)
       _, *rest = args
       super(nil, *rest, **kwargs)
     end
 
-    def build_payload(level, message, progname, &block)
-      context = ActiveSupport::ExecutionContext.to_h
-      payload = {}
-      payload[:level] = level
-      payload[:request_id] = context[:controller]&.request&.request_id
-      payload[:job_id] = context[:job]&.job_id
-      payload[:message] = message
-      payload[:message] ||= block_given? ? block.call : progname
-      payload
+    def self.collect_logs
+      logs = []
+      ActiveSupport::IsolatedExecutionState[KEY] = logs
+      yield
+      logs
+    ensure
+      ActiveSupport::IsolatedExecutionState.delete(KEY)
     end
 
     def add(severity, message = nil, progname = nil, &block)
-      if severity >= level
-        LogsStream.add_to_stream(type: "log", payload: build_payload(format_severity(severity), message, progname, &block), duration: 0)
+      if (logs = ActiveSupport::IsolatedExecutionState[KEY])
+        severity ||= UNKNOWN
+        return true if severity < level
+        progname = @progname if progname.nil?
+        if message.nil?
+          if block_given?
+            message = yield
+          else
+            message = progname
+            progname = @progname
+          end
+        end
+        logs << { severity:, message:, progname:, time: Time.now.to_f }
       end
     end
 
     alias log add
 
-    private
-
-    def format_severity(severity)
-      super
-    end
-
     def <<(message)
-      LogsStream.add_to_stream(type: "log", payload: build_payload('unknown', message, &block), duration: 0)
+      if (logs = ActiveSupport::IsolatedExecutionState[KEY])
+        logs << { severity: UNKNOWN, message:, progname: nil, time: Time.now.to_f }
+      end
     end
 
   end

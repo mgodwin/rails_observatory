@@ -12,7 +12,13 @@ module RailsObservatory
 
         start_at = Time.now
         start_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
-        events, result = EventCollector.instance.collect_events { super }
+        result = nil
+        logs = []
+        events = EventCollector.instance.collect_events do
+          logs = LogCollector.collect_logs do
+            result = super
+          end
+        end
         end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         result
       rescue Exception => error
@@ -32,6 +38,7 @@ module RailsObservatory
           job_class: self.class.name,
           queue_name:,
           events: events.map { Serializer.serialize(_1) },
+          logs:,
           error: error.present?
         ).save
       end

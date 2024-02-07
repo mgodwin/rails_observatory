@@ -1,5 +1,6 @@
+require_relative './redis_model'
 module RailsObservatory
-  class Error
+  class Error < RedisModel
 
   end
 end

@@ -30,8 +30,8 @@ module RailsObservatory
       ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY] ||= []
       ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY] << key
       ActiveSupport::IsolatedExecutionState[key] = events
-      result = yield
-      [events, result]
+      yield
+      events
     rescue Exception => e
       e.instance_variable_set(:@_trace_events, events)
       raise

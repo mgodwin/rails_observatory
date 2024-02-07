@@ -6,6 +6,7 @@ module RailsObservatory
     attr_accessor :events
 
     delegate :push, :<<, :size, to: :events
+    delegate :empty?, to: :to_a
 
     def initialize(events)
       @events = events

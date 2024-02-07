@@ -607,13 +607,6 @@ section {
     border-top: 1px solid var(--divider);
   }
   & a {
-    display: flex;
-    align-items: center;
-    padding: .5rem .75rem;
-    gap: .5rem;
-    border-radius: .5rem;
-    text-decoration: none;
-    font-weight: 400;
     color: color-mix(in oklab, var(--black) 20%, white);
     &:is(:hover, :focus-visible) {
       background-color: var(--surface-hover);

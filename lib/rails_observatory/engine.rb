@@ -1,5 +1,6 @@
 require 'redis-client'
 
+require_relative './action_mailer_subscriber'
 module RailsObservatory
   class Engine < ::Rails::Engine
     isolate_namespace RailsObservatory
@@ -39,34 +40,13 @@ module RailsObservatory
     end
 
     initializer "rails_observatory.logger" do |app|
-      # require_relative './event_stream_logger'
-      # Rails.logger.broadcast_to(EventStreamLogger.new)
+      require_relative './log_collector'
+      Rails.logger.broadcast_to(LogCollector.new)
     end
 
 
     initializer "rails_observatory.mailer_instrumentation" do |app|
-      # noisy_subscriber(/deliver.action_mailer/) do |event|
-      #   payload = event.payload.except(:mail)
-      #
-      #   context = ActiveSupport::ExecutionContext.to_h
-      #   payload[:request_id] = context[:controller]&.request&.request_id || context[:job]&.request_id
-      #   payload[:job_id] = context[:job]&.job_id
-      #   payload[:failed] = payload[:exception_object].present?
-      #   payload[:mail] = event.payload[:mail].to_s
-      #
-      #   MailersStream.add_to_stream(type: event.name, payload: payload, duration: event.duration)
-      #   ErrorsStream.add_to_stream(event.payload[:exception_object], request_id: payload[:request_id]) if event.payload[:exception_object]
-      # end
-
-      # noisy_subscriber(/process.action_mailer/) do |event|
-      #   payload = event.payload
-      #   context = ActiveSupport::ExecutionContext.to_h
-      #   payload[:request_id] = context[:controller]&.request&.request_id || context[:job]&.request_id
-      #   payload[:job_id] = context[:job]&.job_id
-      #   payload[:failed] = payload[:exception_object].present?
-      #   MailersStream.add_to_stream(type: event.name, payload: payload, duration: event.duration)
-      #   ErrorsStream.add_to_stream(event.payload[:exception_object], request_id: payload[:request_id]) if event.payload[:exception_object]
-      # end
+      config.action_mailer.preview_paths << "#{config.root}/lib/rails_observatory/mailer_previews"
     end
   end
 end

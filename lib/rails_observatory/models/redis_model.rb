@@ -1,26 +1,31 @@
 require_relative '../serializers/serializer'
 require_relative './event_collection'
 require_relative '../redis/time_series'
+require 'zlib'
 module RailsObservatory
   class RedisModel
     include ActiveModel::Model
     include ActiveModel::Attributes
+    include ActiveModel::Serializers::JSON
 
     class NotFound < StandardError; end
 
     class << self
       attr_accessor :indexed_attributes
+      attr_accessor :compressed_attributes
     end
 
-    def self.attribute(name, *args, indexed: true, **rest)
+    def self.attribute(name, *args, indexed: true, compressed: false, **rest)
       if indexed
         self.indexed_attributes ||= []
         indexed_attributes << name
       end
+      if compressed
+        self.compressed_attributes ||= []
+        compressed_attributes << name.to_s
+      end
       super(name, *args, **rest)
     end
-
-    attribute :events, indexed: false
 
     def self.redis
       Rails.configuration.rails_observatory.redis
@@ -51,6 +56,12 @@ module RailsObservatory
     def self.find(id)
       result = redis.call("JSON.GET", key_name(id), "$") || raise(NotFound, "Could not find #{name} with id #{id}")
       attrs = JSON.parse(result).first
+
+      compressed_attributes.each do |attr|
+        val = redis.call("GET", [key_prefix, attr].join("_")  + ":#{id}")
+        attrs.merge!(attr => JSON.parse(Zlib.gunzip(val)))
+      end
+
       self.new(attrs)
     end
 
@@ -83,19 +94,19 @@ module RailsObservatory
       redis.call("FT._LIST").include?(index_name) || create_redis_index
     end
 
+    def attribute_names_for_serialization
+      attributes.keys - self.class.compressed_attributes
+    end
+
     def save
-      redis.call("JSON.SET", self.class.key_name(id), "$", JSON.generate(attributes))
+      redis.multi do |r|
+        r.call("JSON.SET", self.class.key_name(id), "$", JSON.generate(as_json))
+        self.class.compressed_attributes.each do |attr|
+          compressed_value = Zlib.gzip(JSON.generate(@attributes.fetch_value(attr)), level: Zlib::BEST_COMPRESSION)
+          r.call("SET", [self.class.key_prefix, attr].join("_")  + ":#{id}", compressed_value)
+        end
+      end
     end
 
-    def mail_events
-      events.only('enqueue.action_job', 'deliver.action_mailer')
-            .reject {_1['name'] == 'enqueue.action_job' && _1.dig('payload', 'job', 'class') != 'ActionMailer::MailDeliveryJob' }
-    end
-
-    def events
-      attr_value = super
-      return nil if attr_value.nil?
-      EventCollection.new(attr_value)
-    end
   end
 end
