@@ -43,7 +43,7 @@ module RailsObservatory
         TimeSeries.record_occurrence("error.count", labels: { fingerprint: error.fingerprint })
       end
 
-      return response if request.params[:controller].blank?
+      return response if request.params[:controller].blank? || request.params[:controller] =~ /rails_observatory/
 
       status, headers, body = response
       body = ::Rack::BodyProxy.new(body) do
