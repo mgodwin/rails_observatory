@@ -75,13 +75,13 @@
       <span><%= e.location.classify %></span>
     </div>
     <div class="_message"><%= e.message %></div>
-    <div class="_time"><%= time_ago_in_words(Time.at(e.latest_ts / 1000)) %> ago</div>
+    <div class="_time"><%= time_ago_in_words(Time.at(e.time)) %> ago</div>
 
     <div class="_graph">
       <% if @series_by_fingerprint[e.fingerprint] %>
         <%= render "sparkline", type: "bar", series: @series_by_fingerprint[e.fingerprint] %>
       <% end %>
     </div>
-    <div class="_count"><%= e.count %></div>
+    <div class="_count"><%= @count_by_fingerprint[e.fingerprint] %><%# e.count %></div>
   </div>
 <% end %>

@@ -3,6 +3,7 @@
 require "active_support/notifications"
 require_relative './event_collector'
 require_relative './models/request_trace'
+require_relative './models/error'
 require_relative './serializers/serializer'
 require 'zlib'
 require 'benchmark'
@@ -34,12 +35,19 @@ module RailsObservatory
         response = @app.call(env)
       end
 
+      controller_action = "#{request.params[:controller]}##{request.params[:action]}"
+
+      if (event = events.find { _1.name == 'process_action.action_controller' && _1.payload[:exception_object] })
+        error = Error.new(exception: event.payload[:exception_object], location: controller_action, time: Time.now)
+        error.save
+        TimeSeries.record_occurrence("error.count", labels: { fingerprint: error.fingerprint })
+      end
+
       return response if request.params[:controller].blank?
 
       status, headers, body = response
       body = ::Rack::BodyProxy.new(body) do
         duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start_at_mono)
-        controller_action = "#{request.params[:controller]}##{request.params[:action]}"
         RequestTrace.new(
           request_id: request.request_id,
           status:,

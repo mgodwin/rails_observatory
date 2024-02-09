@@ -4,18 +4,20 @@ module RailsObservatory
     before_action :set_duration
 
     def index
-      @time_range = (24.hours.ago..)
-      @errors = Redis::ErrorSet.new('errors_by_recency').take(25)
-      @series_by_fingerprint = ErrorTimeSeries.where(fingerprint: @errors.map(&:fingerprint))
-                                              .slice(@time_range)
-                                              .downsample(12, using: :sum)
-                                              .index_by(&:fingerprint)
+      Error.ensure_index
+      @errors = Error.all
+      @series_by_fingerprint = TimeSeries.where(name: "error.count", fingerprint: @errors.map(&:fingerprint))
+                                         .downsample(12, using: :sum)
+                                         .index_by { _1.labels[:fingerprint] }
+      @count_by_fingerprint = TimeSeries.where(name: "error.count", fingerprint: @errors.map(&:fingerprint)).group(:fingerprint).sum
     end
 
     def show
       @time_range = (1.hour.ago..)
       @error = Error.find(params[:id])
-      series = ErrorTimeSeries.where(fingerprint: @error.fingerprint).downsample(24, using: :sum)
+      series = TimeSeries.where(name: "error.count", fingerprint: @error.fingerprint)
+                         .downsample(24, using: :sum)
+      @count = TimeSeries.where(name: "error.count", fingerprint: @error.fingerprint).slice(2.years.ago..).downsample(1, using: :sum).first.value
       # puts series.slice(1.day.ago..).to_a.size
       @past_24_hours = series.slice(24.hours.ago..).first
       @past_7_days = series.slice(7.days.ago..).first

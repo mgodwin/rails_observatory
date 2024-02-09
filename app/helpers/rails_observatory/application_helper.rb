@@ -3,11 +3,11 @@ module RailsObservatory
   module ApplicationHelper
 
     def highlight_source_extract(source_extract)
-      source_extract => {code:, line_number:}
+      source_extract.symbolize_keys => {code:, line_number:}
       fmt = Rouge::Formatters::HTMLLineTable.new(Rouge::Formatters::HTML.new, start_line: code.keys.first.to_s.to_i)
       html = Nokogiri::HTML4(Rouge.highlight(code.values.flatten.join(""), 'ruby', fmt))
       html.css("#line-#{line_number}").add_class('hll')
-      line = code[line_number.to_s.to_sym]
+      line = code[line_number.to_s]
       if line.length > 1
         html.css("#line-#{line_number}").attr('data-highlight-start', line[0].length).attr('data-highlight-length', line[1].length)
       end

@@ -38,11 +38,13 @@ module RailsObservatory
         clone
       end
 
+
+
       def sum
         if @group
           @agg_type = :sum
           @samples = 1
-          to_a.index_by { _1.labels[@group] }
+          to_a.index_by { _1.labels[@group] }.transform_values { _1.value }
         else
           raise "Cannot sum without grouping"
         end

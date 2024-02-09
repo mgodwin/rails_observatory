@@ -9,6 +9,7 @@
 @import url('layout/app.css');
 @import url('layout/details-side-panel.css');
 @import url('layout/requests.css');
+@import url('layout/two-column.css');
 
 /* Application styles */
 @import url('application/global_modifiers.css');
