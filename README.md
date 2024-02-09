@@ -100,7 +100,7 @@ differentiating labels in the **key** of the time series.
 
 
 ## Contributing
-Contribution directions go here.
+Since this is a 
 
 ## License
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the LGPL v2 License.

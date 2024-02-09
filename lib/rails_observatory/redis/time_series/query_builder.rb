@@ -86,7 +86,7 @@ module RailsObservatory
         mrange_args.push('FILTER', *ts_filters)
 
         # puts mrange_args.join(" ")
-        res = $redis.call(mrange_args)
+        res = @series_class.redis.call(mrange_args)
         return if res.nil?
 
         res.each do |name, labels, data|
@@ -130,7 +130,7 @@ module RailsObservatory
         raise 'Must specify name' if @conditions[:name].blank?
 
         @conditions[@group] = "*" if @group
-        labels = $redis.call('SMEMBERS', "#{@conditions[:name]}:labels")
+        labels = @series_class.redis.call('SMEMBERS', "#{@conditions[:name]}:labels")
         labels = labels.map { |l| [l.to_sym, nil] }.to_h
         @conditions.reverse_merge!(labels)
         @conditions.map do |k, v|
