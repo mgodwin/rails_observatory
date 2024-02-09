@@ -2,8 +2,11 @@
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
 <% content_for(:main_css_class, 'layout-requests_index') %>
 <div class="layout-requests_index-glance" style="display:flex;justify-content: space-evenly">
-  <%= render 'text_gauge', title: 'Requests', value: series_value(name:"request.count", aggregate_using: :sum) %>
-  <%= render 'text_gauge', title: 'Throughput', value: series_value(name:"request.count", aggregate_using: :sum).fdiv(duration / 60).round(2), unit: 'rpm' %>
+  <% request_count = series_value(name: "request.count", aggregate_using: :sum) %>
+  <% if request_count.to_i > 0 %>
+    <%= render 'text_gauge', title: 'Requests', value: series_value(name: "request.count", aggregate_using: :sum) %>
+    <%= render 'text_gauge', title: 'Throughput', value: series_value(name: "request.count", aggregate_using: :sum).fdiv(duration / 60).round(2), unit: 'rpm' %>
+  <% end %>
 </div>
 <div class="layout-requests_index-chart">
   <%= render 'chart', name: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>

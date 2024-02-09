@@ -28,7 +28,7 @@ module RailsObservatory
       # By instantiating the collector, we ensure that the InstrumentationProxy is used
       EventCollector.instance
 
-      app.middleware.insert_before(ActionDispatch::HostAuthorization, Middleware)
+      app.middleware.unshift(Middleware)
     end
 
     initializer "rails_observatory.active_job_instrumentation" do

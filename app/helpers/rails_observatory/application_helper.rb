@@ -22,7 +22,7 @@ module RailsObservatory
 
     def series_value(name:, aggregate_using:)
       series = series_for(name:, aggregate_using: aggregate_using, downsample: 1)
-      series.sole.value
+      series.first&.value
     end
 
     def time_slice_start

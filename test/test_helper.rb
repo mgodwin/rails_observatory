@@ -15,4 +15,4 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
 end
 
 Rails.configuration.rails_observatory.redis.call("FLUSHALL")
-RailsObservatory::Request.ensure_index
+RailsObservatory::RequestTrace.ensure_index
