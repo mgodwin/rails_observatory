@@ -5,8 +5,8 @@
 Simple observability for your Rails app.
 
 Rails observatory hooks into ActiveSupport::Instrumentation
-with [RedisTimeSeries](https://redis.io/docs/data-types/timeseries/) to provide
-a simple way to track metrics and errors in your Rails app, without third party integrations.
+with [RedisStack](https://redis.io/docs/about/about-stack/) to provide
+a simple way to observe what is happening your Rails app, without third party integrations.
 
 <img src="https://github.com/mgodwin/rails_observatory/blob/main/.github/observatory_trace.png?raw=true">
 
