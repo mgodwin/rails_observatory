@@ -1,7 +1,5 @@
 # Rails Observatory
 
-<img src="https://raw.githubusercontent.com/mgodwin/rails_observatory/main/.github/logo_with_text.svg" height="80">
-
 Simple observability for your Rails app.
 
 Rails observatory hooks into ActiveSupport::Instrumentation
