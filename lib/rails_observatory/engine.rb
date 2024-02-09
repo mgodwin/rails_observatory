@@ -15,10 +15,8 @@ module RailsObservatory
       require_relative './redis/logging_middleware'
       require_relative './redis/redis_client_instrumentation'
       app.config.rails_observatory.redis => pool_size:, **redis_config
-      #.merge(middlewares: [LoggingMiddleware])
       redis_config = RedisClient.config(**redis_config.merge(middlewares: [RedisClientInstrumentation]))
-      $redis = redis_config.new_pool(timeout: 0.5, size: pool_size)
-      app.config.rails_observatory.redis = $redis
+      app.config.rails_observatory.redis = redis_config.new_pool(timeout: 0.5, size: pool_size)
     end
 
     initializer "rails_observatory.middleware" do |app|
@@ -43,7 +41,6 @@ module RailsObservatory
       require_relative './log_collector'
       Rails.logger.broadcast_to(LogCollector.new)
     end
-
 
     initializer "rails_observatory.mailer_instrumentation" do |app|
       config.action_mailer.preview_paths << "#{config.root}/lib/rails_observatory/mailer_previews"

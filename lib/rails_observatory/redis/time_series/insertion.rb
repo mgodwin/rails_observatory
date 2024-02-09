@@ -4,13 +4,22 @@ SCRIPT = File.read(File.join(File.dirname(__FILE__), 'timing_script.lua'))
 INCREMENT_SCRIPT = File.read(File.join(File.dirname(__FILE__), 'increment_script.lua'))
 
 class RedisScript
+
+  def self.redis
+    Rails.configuration.rails_observatory.redis
+  end
+
+  def redis
+    self.class.redis
+  end
+
   def initialize(lua_string)
     @script = lua_string
   end
 
   def call(*args)
     @sha1 ||= load_script
-    $redis.call("EVALSHA", @sha1, 0, *args)
+    redis.call("EVALSHA", @sha1, 0, *args)
   rescue => e
     if e.message =~ /NOSCRIPT/
       @sha1 = load_script
@@ -21,7 +30,7 @@ class RedisScript
   end
 
   def load_script
-    $redis.call('SCRIPT', 'LOAD', @script)
+    redis.call('SCRIPT', 'LOAD', @script)
   end
 
 end

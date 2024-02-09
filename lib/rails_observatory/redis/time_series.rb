@@ -8,6 +8,14 @@ module RailsObservatory
 
     attr_reader :labels, :name, :data
 
+    def self.redis
+      Rails.configuration.rails_observatory.redis
+    end
+
+    def redis
+      self.class.redis
+    end
+
     def self.with_slice(time_range)
       ActiveSupport::IsolatedExecutionState[:observatory_slice] = time_range
       yield

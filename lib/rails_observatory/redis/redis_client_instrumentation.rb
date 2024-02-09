@@ -1,6 +1,5 @@
 module RailsObservatory
   module RedisClientInstrumentation
-
     def call(command, redis_config)
       payload_command = command
       payload_command = [payload_command.first] if payload_command.first == "SCRIPT"
