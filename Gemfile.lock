@@ -5,7 +5,6 @@ PATH
       rails (>= 7.1.0)
       redis-client (~> 0.19)
       rouge
-      zeitwerk
 
 GEM
   remote: https://rubygems.org/

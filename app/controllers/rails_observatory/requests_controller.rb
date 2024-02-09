@@ -2,16 +2,9 @@ module RailsObservatory
   class RequestsController < ApplicationController
 
     def index
-      CalculateProfitJob.perform_later
-      NewUserMailer.greeting.deliver_later
       @time_range = (duration.seconds.ago..)
 
-      # page_through(query, page_size: 25).each_result do |event|
-      #
-      # end
-      if params[:controller_action].present?
-
-      else
+      if params[:controller_action].blank?
         @count_by_controller = TimeSeries.where(name: 'request.count', action: '*')
                                          .slice(@time_range)
                                          .downsample(1, using: :sum)
@@ -24,7 +17,6 @@ module RailsObservatory
                                            .downsample(1, using: :avg)
                                            .index_by { _1.labels[:action] }
       end
-
 
       RequestTrace.ensure_index
       @events = RequestTrace.all

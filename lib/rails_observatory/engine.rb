@@ -9,7 +9,7 @@ module RailsObservatory
     middleware.use(Rack::Static, urls: ["/assets"], root: config.root.join("public"))
 
     config.rails_observatory = ActiveSupport::OrderedOptions.new
-    config.rails_observatory.redis = {}
+    config.rails_observatory.redis = { host: "localhost", port: 6379, db: 0, pool_size: ENV["RAILS_MAX_THREADS"] || 3 }
 
     initializer "rails_observatory.redis" do |app|
       require_relative './redis/logging_middleware'
