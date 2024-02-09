@@ -4,14 +4,6 @@
 <div class="layout-requests_index-glance" style="display:flex;justify-content: space-evenly">
   <%= render 'text_gauge', title: 'Requests', value: series_value(name:"request.count", aggregate_using: :sum) %>
   <%= render 'text_gauge', title: 'Throughput', value: series_value(name:"request.count", aggregate_using: :sum).fdiv(duration / 60).round(2), unit: 'rpm' %>
-  <text-gauge>
-    <text-gauge-title>Errors</text-gauge-title>
-    <text-gauge-value>0</text-gauge-value>
-  </text-gauge>
-  <text-gauge>
-    <text-gauge-title>P95 Latency</text-gauge-title>
-    <text-gauge-value>0.5 ms</text-gauge-value>
-  </text-gauge>
 </div>
 <div class="layout-requests_index-chart">
   <%= render 'chart', name: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>

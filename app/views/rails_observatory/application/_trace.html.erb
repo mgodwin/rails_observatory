@@ -4,7 +4,7 @@
   <nav class="tabs-nav --sticky">
     <label class="tabs-button">
       Event Details
-      <input type="radio" name="tabs">
+      <input type="radio" name="tabs" checked>
     </label>
     <label class="tabs-button">
       Logs
@@ -15,7 +15,7 @@
       <% if  model.mail_events.size > 0 %>
       <span style="color: var(--black-secondary)"><%= model.mail_events.size %></span>
       <% end %>
-      <input type="radio" name="tabs" checked>
+      <input type="radio" name="tabs">
     </label>
     <label class="tabs-button">
       Jobs
@@ -91,7 +91,7 @@
           <div>To: <%= e.dig('payload', 'to') %></div>
           <div>From: <%= e.dig('payload', 'from') %></div>
           <div>Subject: <%= e.dig('payload', 'subject') %></div>
-          <a href="/rails/mailers/delivered_mail/preview?message_id=<%= e.dig('payload', 'message_id') %>" target="_blank">View Email</a>
+          <a href="<%= preview_mail_path(e.dig('payload', 'message_id')) %>" target="_blank">View Email</a>
         </li>
       <% end %>
     </simple-list>

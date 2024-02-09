@@ -1,7 +1,9 @@
 <% content_for(:title, 'Jobs') %>
 
 <%#= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
+<div style="padding: 2rem;">
 <%= render 'chart', name: 'Performed', series: series_for(name: 'job.count', aggregate_using: :sum), type: 'bar' %>
+</div>
 
 <%= render 'table_chart', name: 'By Queue', group_by: :queue_name, metrics: { "job.count": :sum, "job.queue_latency": :last } %>
 <%= render 'table_chart', name: 'By Job', group_by: :job_class, metrics: { "job.count": :sum, latency: :avg, "job.error_count": :sum } %>

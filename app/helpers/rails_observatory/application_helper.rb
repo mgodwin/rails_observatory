@@ -58,6 +58,10 @@ module RailsObservatory
       end
     end
 
+    def preview_mail_path(message_id)
+      "/rails/mailers/delivered_mail/preview?message_id=#{message_id}"
+    end
+
     # {"used_memory"=>"46573752",
     #  "used_memory_human"=>"44.42M",
     #  "used_memory_rss"=>"70778880",

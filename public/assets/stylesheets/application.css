@@ -540,6 +540,15 @@ section {
       font-weight: 400;
       padding: 0.5rem 1rem;
       border-bottom: 1px solid var(--divider);
+      & + & {
+        border-left: 1px solid var(--divider);
+      }
+      &:first-child {
+        padding-left: 2rem;
+      }
+      &:last-child {
+        padding-right: 2rem;
+      }
     }
     & tr {
       position: relative;
@@ -549,6 +558,12 @@ section {
       border-bottom: 1px solid var(--divider);
       & + & {
         border-left: 1px solid var(--divider);
+      }
+      &:first-child {
+        padding-left: 2rem;
+      }
+      &:last-child {
+        padding-right: 2rem;
       }
     }
   }
@@ -566,6 +581,12 @@ section {
     white-space: nowrap;
     & + & {
       border-left: 1px solid var(--divider);
+    }
+    &:first-child {
+      padding-left: 2rem;
+    }
+    &:last-child {
+      padding-right: 2rem;
     }
   }
   & > header {
