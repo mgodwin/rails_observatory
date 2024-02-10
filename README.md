@@ -1,6 +1,6 @@
 # Rails Observatory
 
-Simple observability for your Rails app.
+Observability for your Rails app.
 
 Rails observatory hooks into ActiveSupport::Instrumentation
 with [RedisStack](https://redis.io/docs/about/about-stack/) to provide
