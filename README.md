@@ -38,5 +38,4 @@ Pull requests, issues and more are welcome!
 
 ## License
 
-The gem is available as open source under the terms of the LGPL v2 License.
-If you'd like a commercial license, please contact me mark.godwin@hey.com
+The gem is available as open source under the terms of the MIT License.
