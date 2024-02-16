@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Mark Godwin"]
   spec.email       = ["mark.godwin@hey.com"]
   spec.homepage    = "https://github.com/mgodwin/rails_observatory"
-  spec.summary     = "Observability for Rails Apps"
-  spec.description = "Observability for Rails Apps"
+  spec.summary     = "See what's happening in your Rails App"
+  spec.description = "See what's happening in your Rails App"
   spec.license     = "MIT"
 
   spec.metadata["homepage_uri"] = spec.homepage
