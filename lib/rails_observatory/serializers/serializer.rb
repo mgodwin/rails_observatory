@@ -34,7 +34,7 @@ module RailsObservatory
         when Symbol
           argument.to_s
         else
-          ADDITIONAL_SERIALIZERS.find { argument.is_a?(_1.klass) }&.new&.serialize(argument) || "Unable to serialize #{argument.class.name}"
+          ADDITIONAL_SERIALIZERS.find { argument.is_a?(_1.klass) }&.new&.serialize(argument)&.deep_stringify_keys || "Unable to serialize #{argument.class.name}"
         end
       end
 
@@ -42,7 +42,7 @@ module RailsObservatory
         argument.each_with_object({}) do |(key, value), hash|
           case key
           when String, Symbol
-            hash[key] = serialize_payload(value)
+            hash[key.to_s] = serialize_payload(value)
           end
         end
       end

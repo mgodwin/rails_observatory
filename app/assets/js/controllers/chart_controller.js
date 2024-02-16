@@ -1,7 +1,7 @@
 import {Controller} from "@hotwired/stimulus";
 import Apexcharts from "apexcharts";
 
-const icicleChartOptions = function(controller) {
+const icicleChartOptions = function (controller) {
   return {
     chart: {
       id: controller.element.id,
@@ -9,10 +9,12 @@ const icicleChartOptions = function(controller) {
       type: 'rangeBar',
       height: 300,
       events: {
-        dataPointSelection: function(event, chartContext, config) {
-          controller.dispatch('selected', {detail: {
+        dataPointSelection: function (event, chartContext, config) {
+          controller.dispatch('selected', {
+            detail: {
               ...config.w.config.series[config.seriesIndex].data[config.dataPointIndex]
-            }})
+            }
+          })
         }
       },
     },
@@ -69,8 +71,12 @@ const icicleChartOptions = function(controller) {
         const seriesSelfTime = controller.series()[opts.seriesIndex].data.reduce((acc, val) => {
           return acc + val['event_self_time']
         }, 0)
-        console.log(controller.series()[opts.seriesIndex].name, controller.series()[opts.seriesIndex].data);
-        const totalSelfTime = controller.series().reduce((acc, val) => { return acc + val.data.reduce((acc, val) => { return acc + val['event_self_time'] }, 0) }, 0)
+        // console.log(controller.series()[opts.seriesIndex].name, controller.series()[opts.seriesIndex].data);
+        const totalSelfTime = controller.series().reduce((acc, val) => {
+          return acc + val.data.reduce((acc, val) => {
+            return acc + val['event_self_time']
+          }, 0)
+        }, 0)
         const percent = seriesSelfTime / totalSelfTime * 100
         return `${seriesName} <span class="percent">${seriesSelfTime.toFixed(1)}ms <div class="bar"><div  style="width:${percent.toFixed(1)}%"></div></div></span> `
       },
@@ -97,7 +103,7 @@ const icicleChartOptions = function(controller) {
 
 }
 
-const defaultOptions = function(controller) {
+const defaultOptions = function (controller) {
   return {
     chart: {
       id: controller.element.id,
@@ -126,20 +132,23 @@ const defaultOptions = function(controller) {
         opacityTo: 0
       }
     },
-    theme: {
-      monochrome: {
-        enabled: true,
-        color: '#0c8be8',
-        shadeTo: 'dark',
-        shadeIntensity: 0.65
-      }
-    },
     stroke: {
       width: 2,
       curve: 'straight'
     }
   }
 
+}
+
+function stackedAreaOptions(controller) {
+  return {
+    ...defaultOptions(controller),
+    chart: {
+      ...defaultOptions(controller).chart,
+      type: 'area',
+      stacked: true,
+    },
+  }
 }
 
 export class ChartController extends Controller {
@@ -157,6 +166,8 @@ export class ChartController extends Controller {
     switch (this.typeValue) {
       case 'icicle':
         return icicleChartOptions(this)
+      case 'stackedArea':
+        return stackedAreaOptions(this)
       default:
         return defaultOptions(this)
     }

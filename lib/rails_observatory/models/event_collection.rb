@@ -65,6 +65,13 @@ module RailsObservatory
       end
     end
 
+    def self_time_by_library
+      each_with_object(Hash.new(0)) do |event, hash|
+        library = event['name'].split('.').last
+        hash[library] += event['self_time']
+      end
+    end
+
 
 
     private

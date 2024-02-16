@@ -11,9 +11,8 @@
 <div class="layout-requests_index-chart">
   <%= render 'chart', name: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>
   <%= render 'chart', name: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg, action: params[:controller_action]) %>
-
-<%#= render 'chart', name: "Latency Breakdown", series: @latency_composition, type: 'area' %>
-<%#= render 'chart', name: 'Errors', series: @errors, type: 'bar', palette: 'palette7' %>
+  <%= render 'chart', name: "Latency Breakdown", series: series_for(name: 'request.latency', aggregate_using: :avg, compaction: :avg, action: params[:controller_action], children: true), type: 'stackedArea' %>
+  <%= render 'chart', name: 'Errors', series: series_for(name: 'request.error_count', aggregate_using: :sum, action: params[:controller_action]), type: 'bar' %>
 </div>
 <% if params[:controller_action].blank? %>
   <section class="layout-requests_index-by_controller">

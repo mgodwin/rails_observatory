@@ -14,8 +14,13 @@ module RailsObservatory
       html.to_html
     end
 
-    def series_for(name:, aggregate_using:, time_range: nil, downsample: 120,  **opts)
-      series = RailsObservatory::TimeSeries.where(name:, **opts).downsample(downsample, using: aggregate_using)
+    def series_for(name:, aggregate_using:, time_range: nil, downsample: 60, children: false,  **opts)
+      if children
+        series = TimeSeries.where(parent: name, **opts)
+      else
+        series = TimeSeries.where(name:, **opts)
+      end
+      series = series.downsample(downsample, using: aggregate_using)
       series = series.slice(time_range) if time_range
       series
     end

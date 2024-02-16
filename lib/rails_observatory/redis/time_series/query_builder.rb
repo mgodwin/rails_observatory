@@ -127,10 +127,11 @@ module RailsObservatory
       end
 
       def ts_filters
-        raise 'Must specify name' if @conditions[:name].blank?
+        root_labels = @conditions[:name] || @conditions[:parent]
+        raise 'Must specify name or parent' if @conditions[:name].blank? && @conditions[:parent].blank?
 
         @conditions[@group] = "*" if @group
-        labels = @series_class.redis.call('SMEMBERS', "#{@conditions[:name]}:labels")
+        labels = @series_class.redis.call('SMEMBERS', "#{root_labels}:labels")
         labels = labels.map { |l| [l.to_sym, nil] }.to_h
         @conditions.reverse_merge!(labels)
         @conditions.map do |k, v|

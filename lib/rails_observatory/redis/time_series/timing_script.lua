@@ -9,7 +9,7 @@ local function generate_key_combinations(keys)
       for i = start_idx, n do
         local new_comb = {}
         for _, v in ipairs(curr_comb) do
-            table.insert(new_comb, v)
+          table.insert(new_comb, v)
         end
         table.insert(new_comb, keys[i])
         table.insert(combs, new_comb)
@@ -36,7 +36,7 @@ local metric_name = tostring(ARGV[1])  -- Ensure it's a string
 local value_to_add = tonumber(ARGV[2]) -- Ensure it's a number
 local raw_retention = 10000 -- Hardcoded to 10ms
 local compaction_retention = 31536000000 -- Hardcoded to 1 year in ms (365*24*60*60*1000)
-local compactions = {"avg", "min", "max"}
+local compactions = { "avg", "min", "max" }
 
 -- Assuming base_name is defined somewhere above
 local parent_label = extract_parent_label(metric_name)
@@ -44,11 +44,15 @@ local parent_label = extract_parent_label(metric_name)
 -- Extracting labels
 local labels = {}
 local keys = {}
-for i=3, #ARGV, 2 do
+for i = 3, #ARGV, 2 do
   local key = tostring(ARGV[i])
-  local value = tostring(ARGV[i+1])
+  local value = tostring(ARGV[i + 1])
   labels[key] = value
-  redis.call("SADD", metric_name .. ':labels', key)
+  if parent_label then
+    redis.call("SADD", parent_label .. ':labels', key)
+  else
+    redis.call("SADD", metric_name .. ':labels', key)
+  end
   table.insert(keys, key)
 end
 
@@ -78,9 +82,8 @@ for _, comb_keys in ipairs(key_combinations) do
   for _, compaction in ipairs(compactions) do
     local compaction_key = ts_name .. "_" .. compaction
     if redis.call("EXISTS", compaction_key) == 0 then
-      redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "CHUNK_SIZE", 48, "LABELS","name", metric_name, "compaction", compaction, unpack(label_set))
+      redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "CHUNK_SIZE", 48, "LABELS", "name", metric_name, "compaction", compaction, unpack(label_set))
       redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", compaction, 10000)
-      return redis.call("TS.INFO", compaction_key)
     end
   end
   redis.call("TS.ADD", ts_name, "*", value_to_add)
