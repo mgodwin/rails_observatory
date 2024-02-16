@@ -10850,9 +10850,11 @@
         height: 300,
         events: {
           dataPointSelection: function(event, chartContext, config) {
-            controller.dispatch("selected", { detail: {
-              ...config.w.config.series[config.seriesIndex].data[config.dataPointIndex]
-            } });
+            controller.dispatch("selected", {
+              detail: {
+                ...config.w.config.series[config.seriesIndex].data[config.dataPointIndex]
+              }
+            });
           }
         }
       },
@@ -10903,7 +10905,6 @@
           const seriesSelfTime = controller.series()[opts.seriesIndex].data.reduce((acc, val) => {
             return acc + val["event_self_time"];
           }, 0);
-          console.log(controller.series()[opts.seriesIndex].name, controller.series()[opts.seriesIndex].data);
           const totalSelfTime = controller.series().reduce((acc, val) => {
             return acc + val.data.reduce((acc2, val2) => {
               return acc2 + val2["event_self_time"];
@@ -10962,20 +10963,22 @@
           opacityTo: 0
         }
       },
-      theme: {
-        monochrome: {
-          enabled: true,
-          color: "#0c8be8",
-          shadeTo: "dark",
-          shadeIntensity: 0.65
-        }
-      },
       stroke: {
         width: 2,
         curve: "straight"
       }
     };
   };
+  function stackedAreaOptions(controller) {
+    return {
+      ...defaultOptions(controller),
+      chart: {
+        ...defaultOptions(controller).chart,
+        type: "area",
+        stacked: true
+      }
+    };
+  }
   var ChartController = class extends Controller {
     static targets = ["chart", "data"];
     static values = {
@@ -10989,6 +10992,8 @@
       switch (this.typeValue) {
         case "icicle":
           return icicleChartOptions(this);
+        case "stackedArea":
+          return stackedAreaOptions(this);
         default:
           return defaultOptions(this);
       }
