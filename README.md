@@ -1,8 +1,8 @@
 # Rails Observatory
 
-Observability for your Rails app.
+See what's happening in your Rails app.
 
-Rails observatory hooks into ActiveSupport::Instrumentation
+Rails Observatory hooks into [ActiveSupport::Notifications](https://api.rubyonrails.org/classes/ActiveSupport/Notifications.html)
 with [RedisStack](https://redis.io/docs/about/about-stack/) to provide
 a simple way to observe what is happening your Rails app, without third party integrations.
 
