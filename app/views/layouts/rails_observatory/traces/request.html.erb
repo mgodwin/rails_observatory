@@ -1,0 +1,13 @@
+<% content_for :title do %>
+  <span style="font-weight:200"><%= @request.http_method %></span> <%= @request.name.classify %>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="18">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+  </svg>
+  <span class="status-<%= 'success' if @request.status.to_s.start_with?('2') %>"><%= @request.status %> <%= Rack::Utils::HTTP_STATUS_CODES[@request.status] %></span>
+  <br>
+  <span style="font-size: 1rem; font-weight: 200;"><%= time_ago_in_words(Time.at(@request.time)) %> ago
+    | <%= @request.duration.round(2) %>ms
+    | <%= @request.path %></span>
+<% end %>
+<% content_for(:hide_duration, 'true') %>
+<% content_for(:main_css_class, 'layout-trace') %>

@@ -1,0 +1,48 @@
+.tabs {
+  border-bottom: 1px solid var(--divider);
+  /*border-top: 1px solid var(--divider);*/
+  padding-block: .5rem;
+  padding-inline: 1.25rem;
+
+  display: flex;
+  gap: .25rem;
+
+  .tabs-button {
+    /* Mixin .mixin-nav-button */
+
+    position: relative;
+
+    &:has(:focus-visible) {
+      outline: -webkit-focus-ring-color auto 1px;
+    }
+
+    &.active:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      height: 2px;
+      left: 0;
+      background-color: var(--divider-active);
+      view-transition-name: tab-button;
+    }
+  }
+
+    /*& label:has(:focus) {*/
+    /*  outline: -webkit-focus-ring-color auto 1px;*/
+    /*}*/
+
+  .tab-content {
+    display: none;
+    padding-bottom: 2rem;
+
+    & dd {
+      margin-left: 0;
+    }
+    & dt {
+      font-weight: 400;
+      color: var(--black-secondary);
+      margin-bottom: .75rem;
+    }
+  }
+}

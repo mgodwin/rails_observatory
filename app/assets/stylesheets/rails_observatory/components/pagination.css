@@ -1,0 +1,8 @@
+@scope (.pagination) {
+
+  :scope {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+  }
+}

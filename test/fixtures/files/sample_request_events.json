@@ -1,0 +1,713 @@
+[
+  {
+    "name": "sql.active_record",
+    "payload": {
+      "sql": "SELECT sqlite_version(*)",
+      "name": "SCHEMA",
+      "binds": [],
+      "type_casted_binds": [],
+      "async": false,
+      "connection": "Unable to serialize ActiveRecord::ConnectionAdapters::SQLite3Adapter",
+      "transaction": null,
+      "row_count": 1
+    },
+    "start_at": 2418048.9757709997,
+    "end_at": 2418048.977048,
+    "duration": 1.2769999504089355,
+    "allocations": 641,
+    "failed": false
+  },
+  {
+    "name": "sql.active_record",
+    "payload": {
+      "sql": "SELECT name FROM pragma_table_list WHERE schema \u003c\u003e 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table')",
+      "name": "SCHEMA",
+      "binds": [],
+      "type_casted_binds": [],
+      "async": false,
+      "connection": "Unable to serialize ActiveRecord::ConnectionAdapters::SQLite3Adapter",
+      "transaction": null,
+      "row_count": 1
+    },
+    "start_at": 2418048.9754689997,
+    "end_at": 2418048.977163,
+    "duration": 1.694000244140625,
+    "allocations": 940,
+    "failed": false
+  },
+  {
+    "name": "sql.active_record",
+    "payload": {
+      "sql": "SELECT name FROM pragma_table_list WHERE schema \u003c\u003e 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'ar_internal_metadata' AND type IN ('table')",
+      "name": "SCHEMA",
+      "binds": [],
+      "type_casted_binds": [],
+      "async": false,
+      "connection": "Unable to serialize ActiveRecord::ConnectionAdapters::SQLite3Adapter",
+      "transaction": null,
+      "row_count": 1
+    },
+    "start_at": 2418048.977215,
+    "end_at": 2418048.977236,
+    "duration": 0.020999908447265625,
+    "allocations": 12,
+    "failed": false
+  },
+  {
+    "name": "sql.active_record",
+    "payload": {
+      "sql": "SELECT \"schema_migrations\".\"version\" FROM \"schema_migrations\" ORDER BY \"schema_migrations\".\"version\" ASC",
+      "name": "ActiveRecord::SchemaMigration Load",
+      "binds": [],
+      "type_casted_binds": [],
+      "async": false,
+      "connection": "Unable to serialize ActiveRecord::ConnectionAdapters::SQLite3Adapter",
+      "transaction": null,
+      "row_count": 1
+    },
+    "start_at": 2418048.9850560003,
+    "end_at": 2418048.9850999997,
+    "duration": 0.043999671936035156,
+    "allocations": 30,
+    "failed": false
+  },
+  {
+    "name": "start_processing.action_controller",
+    "payload": {
+      "controller": "RailsObservatory::RequestsController",
+      "action": "index",
+      "request": {
+        "method": "GET",
+        "path": "/observatory/",
+        "format": {
+          "symbol": "html",
+          "synonyms": [
+            "application/xhtml+xml"
+          ],
+          "string": "text/html",
+          "hash": -4545155701266922546
+        },
+        "route_pattern": "/",
+        "headers": {}
+      },
+      "params": {
+        "duration": "1800",
+        "controller": "rails_observatory/requests",
+        "action": "index"
+      },
+      "headers": {},
+      "format": "html",
+      "method": "GET",
+      "path": "/observatory/?duration=1800",
+      "response": {
+        "status": 200
+      },
+      "status": 200,
+      "view_runtime": 36.44199991226196,
+      "db_runtime": 0.0,
+      "queries_count": 0,
+      "cached_queries_count": 0
+    },
+    "start_at": 2418049.121456,
+    "end_at": 2418049.121462,
+    "duration": 0.006000041961669922,
+    "allocations": 0,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "FT._LIST"
+    },
+    "start_at": 2418049.176537,
+    "end_at": 2418049.1772519997,
+    "duration": 0.7149996757507324,
+    "allocations": 21,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.count:labels"
+    },
+    "start_at": 2418049.177367,
+    "end_at": 2418049.1780029996,
+    "duration": 0.6359996795654297,
+    "allocations": 16,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 + WITHLABELS LATEST ALIGN 0 AGGREGATION SUM 1800000 EMPTY FILTER format= http_method= action!= status= name=request.count"
+    },
+    "start_at": 2418049.178035,
+    "end_at": 2418049.180832,
+    "duration": 2.796999931335449,
+    "allocations": 160,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.latency:labels"
+    },
+    "start_at": 2418049.18089,
+    "end_at": 2418049.181281,
+    "duration": 0.39100027084350586,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 + WITHLABELS LATEST ALIGN 0 AGGREGATION AVG 1800003 EMPTY FILTER format= http_method= action!= status= name=request.latency"
+    },
+    "start_at": 2418049.181302,
+    "end_at": 2418049.184348,
+    "duration": 3.0460000038146973,
+    "allocations": 435,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.count:labels"
+    },
+    "start_at": 2418049.609561,
+    "end_at": 2418049.610859,
+    "duration": 1.2980003356933594,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION SUM 1800000 EMPTY FILTER format= http_method= action= status= name=request.count compaction=sum"
+    },
+    "start_at": 2418049.610894,
+    "end_at": 2418049.612518,
+    "duration": 1.624000072479248,
+    "allocations": 40,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.latency:labels"
+    },
+    "start_at": 2418049.612557,
+    "end_at": 2418049.613448,
+    "duration": 0.8909997940063477,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION AVG 1800000 EMPTY FILTER format= http_method= action= status= name=request.latency compaction=avg"
+    },
+    "start_at": 2418049.613487,
+    "end_at": 2418049.615063,
+    "duration": 1.5760002136230469,
+    "allocations": 40,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.latency:labels"
+    },
+    "start_at": 2418049.615099,
+    "end_at": 2418049.615712,
+    "duration": 0.6129999160766602,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION MAX 1800000 EMPTY FILTER format= http_method= action= status= name=request.latency compaction=max"
+    },
+    "start_at": 2418049.615741,
+    "end_at": 2418049.617116,
+    "duration": 1.375,
+    "allocations": 40,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.error_count:labels"
+    },
+    "start_at": 2418049.617155,
+    "end_at": 2418049.617983,
+    "duration": 0.8279995918273926,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION SUM 1800000 EMPTY FILTER format= http_method= action= status= name=request.error_count compaction=sum"
+    },
+    "start_at": 2418049.618022,
+    "end_at": 2418049.6192719997,
+    "duration": 1.25,
+    "allocations": 37,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.count:labels"
+    },
+    "start_at": 2418049.61932,
+    "end_at": 2418049.6200780002,
+    "duration": 0.7579998970031738,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION SUM 30000 EMPTY FILTER format= http_method= action= status= name=request.count compaction=sum"
+    },
+    "start_at": 2418049.620112,
+    "end_at": 2418049.621191,
+    "duration": 1.0789999961853027,
+    "allocations": 40,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.latency:labels"
+    },
+    "start_at": 2418049.621303,
+    "end_at": 2418049.621955,
+    "duration": 0.6519999504089355,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION AVG 30000 EMPTY FILTER format= http_method= action= status= name=request.latency compaction=avg"
+    },
+    "start_at": 2418049.621985,
+    "end_at": 2418049.623158,
+    "duration": 1.1729998588562012,
+    "allocations": 40,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "SMEMBERS request.latency:labels"
+    },
+    "start_at": 2418049.623239,
+    "end_at": 2418049.623879,
+    "duration": 0.6400003433227539,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "TS.MRANGE 1750173257000 1750175057000 WITHLABELS LATEST ALIGN 0 AGGREGATION AVG 30000 EMPTY FILTER format= http_method= action= status= compaction=avg parent=request.latency"
+    },
+    "start_at": 2418049.623898,
+    "end_at": 2418049.624955,
+    "duration": 1.0570001602172852,
+    "allocations": 107,
+    "failed": false
+  },
+  {
+    "name": "render_partial.action_view",
+    "payload": {
+      "identifier": "/rails_observatory/app/views/rails_observatory/application/_chart.html.erb",
+      "layout": null,
+      "locals": {
+        "name": "Errors",
+        "series": {
+          "name": "request.error_count",
+          "agg_method": "sum",
+          "action": null,
+          "duration": "Unable to serialize ActiveSupport::Duration"
+        },
+        "type": "bar"
+      },
+      "cache_hit": null
+    },
+    "start_at": 2418049.6255409997,
+    "end_at": 2418049.6256339997,
+    "duration": 0.09299993515014648,
+    "allocations": 127,
+    "failed": false
+  },
+  {
+    "name": "render_template.action_view",
+    "payload": {
+      "identifier": "/rails_observatory/app/views/rails_observatory/requests/index.html.erb",
+      "layout": "layouts/rails_observatory/application",
+      "locals": {}
+    },
+    "start_at": 2418049.60921,
+    "end_at": 2418049.6258790004,
+    "duration": 16.669000148773193,
+    "allocations": 4600,
+    "failed": false
+  },
+  {
+    "name": "call.redis",
+    "payload": {
+      "command": "info memory"
+    },
+    "start_at": 2418049.6421669996,
+    "end_at": 2418049.643456,
+    "duration": 1.2890000343322754,
+    "allocations": 15,
+    "failed": false
+  },
+  {
+    "name": "render_layout.action_view",
+    "payload": {
+      "identifier": "/rails_observatory/app/views/layouts/rails_observatory/application.html.erb"
+    },
+    "start_at": 2418049.609125,
+    "end_at": 2418049.643578,
+    "duration": 34.45300006866455,
+    "allocations": 31551,
+    "failed": false
+  },
+  {
+    "name": "process_action.action_controller",
+    "payload": {
+      "controller": "RailsObservatory::RequestsController",
+      "action": "index",
+      "request": {
+        "method": "GET",
+        "path": "/observatory/",
+        "format": {
+          "symbol": "html",
+          "synonyms": [
+            "application/xhtml+xml"
+          ],
+          "string": "text/html",
+          "hash": -4545155701266922546
+        },
+        "route_pattern": "/",
+        "headers": {}
+      },
+      "params": {
+        "duration": "1800",
+        "controller": "rails_observatory/requests",
+        "action": "index"
+      },
+      "headers": {},
+      "format": "html",
+      "method": "GET",
+      "path": "/observatory/?duration=1800",
+      "response": {
+        "status": 200
+      },
+      "status": 200,
+      "view_runtime": 36.44199991226196,
+      "db_runtime": 0.0,
+      "queries_count": 0,
+      "cached_queries_count": 0
+    },
+    "start_at": 2418049.1215419997,
+    "end_at": 2418049.643718,
+    "duration": 522.1760001182556,
+    "allocations": 1003413,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::TempfileReaper"
+    },
+    "start_at": 2418048.985957,
+    "end_at": 2418049.643827,
+    "duration": 657.8700003623962,
+    "allocations": 1205240,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::ETag"
+    },
+    "start_at": 2418048.985955,
+    "end_at": 2418049.643861,
+    "duration": 657.9060001373291,
+    "allocations": 1205288,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::ConditionalGet"
+    },
+    "start_at": 2418048.9859510004,
+    "end_at": 2418049.6438639998,
+    "duration": 657.9129996299744,
+    "allocations": 1205299,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::Head"
+    },
+    "start_at": 2418048.985948,
+    "end_at": 2418049.643867,
+    "duration": 657.9190001487732,
+    "allocations": 1205308,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::PermissionsPolicy::Middleware"
+    },
+    "start_at": 2418048.985946,
+    "end_at": 2418049.643876,
+    "duration": 657.9299998283386,
+    "allocations": 1205327,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::ContentSecurityPolicy::Middleware"
+    },
+    "start_at": 2418048.985943,
+    "end_at": 2418049.643882,
+    "duration": 657.9390001296997,
+    "allocations": 1205342,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Flash"
+    },
+    "start_at": 2418048.985941,
+    "end_at": 2418049.643884,
+    "duration": 657.9429998397827,
+    "allocations": 1205348,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Session::CookieStore"
+    },
+    "start_at": 2418048.985924,
+    "end_at": 2418049.644024,
+    "duration": 658.1000003814697,
+    "allocations": 1205537,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Cookies"
+    },
+    "start_at": 2418048.985915,
+    "end_at": 2418049.644072,
+    "duration": 658.1570000648499,
+    "allocations": 1205648,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActiveRecord::Migration::CheckPending"
+    },
+    "start_at": 2418048.9722399996,
+    "end_at": 2418049.6440749997,
+    "duration": 671.835000038147,
+    "allocations": 1214175,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Callbacks"
+    },
+    "start_at": 2418048.9722309997,
+    "end_at": 2418049.644077,
+    "duration": 671.8460001945496,
+    "allocations": 1214188,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Reloader"
+    },
+    "start_at": 2418048.96787,
+    "end_at": 2418049.644079,
+    "duration": 676.2090001106262,
+    "allocations": 1215133,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::ActionableExceptions"
+    },
+    "start_at": 2418048.9678590004,
+    "end_at": 2418049.644081,
+    "duration": 676.2219996452332,
+    "allocations": 1215152,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::DebugExceptions"
+    },
+    "start_at": 2418048.967856,
+    "end_at": 2418049.6440830003,
+    "duration": 676.2270002365112,
+    "allocations": 1215160,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::ShowExceptions"
+    },
+    "start_at": 2418048.9678530004,
+    "end_at": 2418049.644084,
+    "duration": 676.2309999465942,
+    "allocations": 1215167,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rails::Rack::Logger"
+    },
+    "start_at": 2418048.967107,
+    "end_at": 2418049.644087,
+    "duration": 676.9800000190735,
+    "allocations": 1215491,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::RemoteIp"
+    },
+    "start_at": 2418048.967099,
+    "end_at": 2418049.6440879996,
+    "duration": 676.9889998435974,
+    "allocations": 1215508,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::RequestId"
+    },
+    "start_at": 2418048.967066,
+    "end_at": 2418049.644092,
+    "duration": 677.0260000228882,
+    "allocations": 1215541,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::MethodOverride"
+    },
+    "start_at": 2418048.967061,
+    "end_at": 2418049.644093,
+    "duration": 677.0320000648499,
+    "allocations": 1215551,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::Runtime"
+    },
+    "start_at": 2418048.967055,
+    "end_at": 2418049.644098,
+    "duration": 677.0430002212524,
+    "allocations": 1215566,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActiveSupport::Cache::Strategy::LocalCache::Middleware"
+    },
+    "start_at": 2418048.967047,
+    "end_at": 2418049.6440999997,
+    "duration": 677.0529999732971,
+    "allocations": 1215588,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::ServerTiming"
+    },
+    "start_at": 2418048.967034,
+    "end_at": 2418049.644119,
+    "duration": 677.085000038147,
+    "allocations": 1215638,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Executor"
+    },
+    "start_at": 2418048.882907,
+    "end_at": 2418049.6441209996,
+    "duration": 761.21399974823,
+    "allocations": 1251884,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::Static"
+    },
+    "start_at": 2418048.829567,
+    "end_at": 2418049.6441220003,
+    "duration": 814.5550003051758,
+    "allocations": 1264739,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "Rack::Sendfile"
+    },
+    "start_at": 2418048.829554,
+    "end_at": 2418049.644125,
+    "duration": 814.5710000991821,
+    "allocations": 1264747,
+    "failed": false
+  },
+  {
+    "name": "process_middleware.action_dispatch",
+    "payload": {
+      "middleware": "ActionDispatch::HostAuthorization"
+    },
+    "start_at": 2418048.829481,
+    "end_at": 2418049.644126,
+    "duration": 814.6449999809265,
+    "allocations": 1264778,
+    "failed": false
+  }
+]

@@ -1,10 +1,6 @@
 module RailsObservatory
   class JobsController < ApplicationController
 
-    before_action :set_duration
-
-    around_action :set_time_range
-
     def index
       JobTrace.ensure_index
       @recent_jobs = JobTrace.all.take(10)

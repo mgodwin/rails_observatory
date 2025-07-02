@@ -1,6 +1,8 @@
 module RailsObservatory
   class RequestsController < ApplicationController
 
+    before_action :ensure_indexed, only: :index
+
     def index
       @time_range = (duration.seconds.ago..)
 
@@ -17,9 +19,11 @@ module RailsObservatory
                                            .downsample(1, using: :avg)
                                            .index_by { _1.labels[:action] }
       end
+    end
 
-      RequestTrace.ensure_index
-      @events = RequestTrace.all
+    def recent
+      @traces = RequestTrace.all.where(time: 5.seconds.ago..).limit(20)
+      render partial: 'rails_observatory/requests/recent_requests', layout: false
     end
 
     def show
@@ -27,6 +31,12 @@ module RailsObservatory
       @middleware_events = @request.events.only('process_middleware.action_dispatch')
       @events = @request.events
       @icicle_chart_series = @events.to_series
+    end
+
+    private
+
+    def ensure_indexed
+      RequestTrace.ensure_index
     end
 
   end

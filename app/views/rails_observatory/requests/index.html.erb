@@ -1,18 +1,51 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
 <% content_for(:main_css_class, 'layout-requests_index') %>
-<div class="layout-requests_index-glance" style="display:flex;justify-content: space-evenly">
-  <% request_count = series_value(name: "request.count", aggregate_using: :sum) %>
-  <% if request_count.to_i > 0 %>
-    <%= render 'text_gauge', title: 'Requests', value: series_value(name: "request.count", aggregate_using: :sum) %>
-    <%= render 'text_gauge', title: 'Throughput', value: series_value(name: "request.count", aggregate_using: :sum).fdiv(duration / 60).round(2), unit: 'rpm' %>
-  <% end %>
+<div class="summary-panel">
+  <dl>
+    <dt>Requests</dt>
+    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.count_sum') %></dd>
+    <dt>Mean Response Time</dt>
+    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_avg') %>
+      ms
+    </dd>
+    <dt>Max Response Time</dt>
+    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_max') %>
+      ms
+    </dd>
+    <dt>Errors</dt>
+    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1_sum?labels..."><%= metric_value(name: 'request.error_count_sum') %></dd>
+  </dl>
+  <%#= render 'text_gauge', title: 'Requests', series: { name: "request.count", agg_method: :sum, duration: duration } %>
+  <%#= render 'text_gauge', title: 'Errors', series: { name: "request.error_count", agg_method: :sum, duration: duration } %>
+  <%#= render 'text_gauge', title: 'Throughput', value: series_sum(name: "request.count").fdiv(duration / 60).round(2), unit: 'rpm' %>
 </div>
-<div class="layout-requests_index-chart">
-  <%= render 'chart', name: 'Requests', type: 'bar', series: series_for(name: 'request.count', aggregate_using: :sum, action: params[:controller_action]) %>
-  <%= render 'chart', name: 'Latency', type: 'area', series: series_for(name: 'request.latency', aggregate_using: :avg, action: params[:controller_action]) %>
-  <%= render 'chart', name: "Latency Breakdown", series: series_for(name: 'request.latency', aggregate_using: :avg, compaction: :avg, action: params[:controller_action], children: true), type: 'stackedArea' %>
-  <%= render 'chart', name: 'Errors', series: series_for(name: 'request.error_count', aggregate_using: :sum, action: params[:controller_action]), type: 'bar' %>
+<div class="charts">
+  <div class="chart"
+       id="request-count-chart"
+       data-controller="bar-chart"
+       data-bar-chart-initial-data-value="<%= metric_series(name: 'request.count_sum').to_json %>"
+       data-bar-chart-group-value="request-charts"
+       data-bar-chart-name-value="Requests"></div>
+  <div class="chart"
+       id="mean-response-time-chart"
+       data-controller="area-chart"
+       data-area-chart-initial-data-value="<%= metric_series(name: 'request.latency_avg').to_json %>"
+       data-area-chart-group-value="request-charts"
+       data-area-chart-name-value="Mean Response Time"></div>
+  <div class="chart"
+       id="stacked-response-time-chart"
+       data-controller="area-chart"
+       data-area-chart-stacked-value="true"
+       data-area-chart-group-value="request-charts"
+       data-area-chart-initial-data-value="<%= metric_series(name: 'request.latency_avg', children: true).to_json %>"
+       data-area-chart-name-value="Mean Response Time"></div>
+  <div class="chart"
+       id="error-count-chart"
+       data-controller="bar-chart"
+       data-bar-chart-initial-data-value="<%= metric_series(name: 'request.error_count_sum').to_json %>"
+       data-bar-chart-group-value="request-charts"
+       data-bar-chart-name-value="Errors"></div>
 </div>
 <% if params[:controller_action].blank? %>
   <section class="layout-requests_index-by_controller">
@@ -34,22 +67,15 @@
             <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
           </tr>
         <% end %>
-
-        <!-- More people... -->
         </tbody>
       </table>
     </div>
   </section>
 <% end %>
-<section class="layout-requests_index-events">
-  <h2>Recent Requests</h2>
 
-
-  <%= render 'events_table', events: @events, fields: [
-    :time, :http_method, :action, :route_pattern, :duration, :status,
-  ], formatters: {
-    time: ->(time, event) { link_to Time.at(time).to_fs('%H:%M:%S'), request_path(event.request_id) },
-  } %>
+<section class="recent-requests">
+  <h2>Recent Request Traces</h2>
+  <turbo-frame id="recent-traces" src="<%= recent_traces_path('rt') %>" loading="lazy"></turbo-frame>
 </section>
 
 

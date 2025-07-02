@@ -1,4 +1,4 @@
-require_relative './redis_model'
+require_relative '../redis/redis_model'
 require_relative './events'
 require_relative './logs'
 

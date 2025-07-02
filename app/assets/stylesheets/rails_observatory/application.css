@@ -1,0 +1,46 @@
+/* Element override styling */
+@import url('elements/root.css');
+@import url('elements/a.css');
+@import url('elements/button.css');
+@import url('elements/details.css');
+@import url('elements/section.css');
+
+/* Layout */
+@import url('layout/app.css');
+@import url('layout/details-side-panel.css');
+@import url('layout/requests.css');
+@import url('layout/traces.css');
+@import url('layout/two-column.css');
+
+/* Application styles */
+@import url('components/global_modifiers.css');
+@import url('components/card.css');
+@import url('components/dropdown.css');
+@import url('components/side_nav.css');
+@import url('components/top_nav.css');
+@import url('components/tab_nav.css');
+@import url('components/side_panel.css');
+@import url('components/chart.css');
+@import url('components/table_chart.css');
+@import url("components/query_table.css");
+@import url("components/tbd.css");
+@import url("components/text_gauge.css");
+@import url("components/pagination.css");
+@import url('components/summary_panel.css');
+
+/* Mixins */
+@import url('mixins/nav_button.css');
+
+
+/* page styles */
+@import url('errors/show/details.css');
+
+@import url('requests/stats.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&family=Roboto+Mono:wght@200;400&display=swap');
+
+
+main {
+  grid-area: main;
+  overflow: auto;
+}

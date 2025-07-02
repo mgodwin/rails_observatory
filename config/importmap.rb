@@ -1,0 +1,9 @@
+pin "application", to: "rails_observatory/application.js", preload: true
+pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
+pin "@hotwired/stimulus", to: "stimulus.min.js", preload: true
+pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
+pin "@rails/actioncable", to: "actioncable.esm.js", preload: true
+pin "apexcharts", to: "vendor/apexcharts.js", preload: true
+pin "consumer", to: "rails_observatory/consumer.js", preload: true
+pin_all_from RailsObservatory::Engine.root.join("app/javascript/rails_observatory/controllers"), under: "controllers", to: "rails_observatory/controllers"
+pin "lodash.merge", to: "vendor/lodash.merge.js", preload: true

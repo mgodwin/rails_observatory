@@ -1,12 +1,16 @@
 require 'redis-client'
+require "importmap-rails"
+require "turbo-rails"
+require "stimulus-rails"
 
 require_relative './action_mailer_subscriber'
 module RailsObservatory
+
   class Engine < ::Rails::Engine
     isolate_namespace RailsObservatory
 
     # This middleware is specific to the engine and will not be included in the application stack
-    middleware.use(Rack::Static, urls: ["/assets"], root: config.root.join("public"))
+    # middleware.use(Rack::Static, urls: ["/assets"], root: config.root.join("public"))
 
     config.rails_observatory = ActiveSupport::OrderedOptions.new
     config.rails_observatory.redis = { host: "localhost", port: 6379, db: 0, pool_size: ENV["RAILS_MAX_THREADS"] || 3 }
@@ -22,10 +26,12 @@ module RailsObservatory
     initializer "rails_observatory.middleware" do |app|
       require_relative './middleware'
 
-      # Middleware is not instrumented UNLESS there's a subscriber listening.
-      # By instantiating the collector, we ensure that the InstrumentationProxy is used
+      # Application middleware is not instrumented UNLESS there's an ActiveSupport::Notification subscriber listening.
+      # By instantiating the collector, we register a subscriber and ensure that the InstrumentationProxy is used in
+      # our application middleware stack.
       EventCollector.instance
 
+      # Add the RailsObservatory middleware to the top of the application middleware stack
       app.middleware.unshift(Middleware)
     end
 
@@ -44,6 +50,24 @@ module RailsObservatory
 
     initializer "rails_observatory.mailer_instrumentation" do |app|
       config.action_mailer.preview_paths << "#{config.root}/lib/rails_observatory/mailer_previews"
+    end
+
+    initializer "rails_observatory.assets" do |app|
+      app.config.assets.paths << root.join("app/assets/stylesheets")
+      app.config.assets.paths << root.join("app/javascript")
+      app.config.assets.paths << root.join("app/assets/images")
+      app.config.assets.precompile += %w[ rails_observatory_manifest ]
+    end
+
+    initializer "rails_observatory.importmap", after: "importmap" do |app|
+      RailsObservatory.importmap.draw(root.join("config/importmap.rb"))
+      if app.config.importmap.sweep_cache && app.config.reloading_enabled?
+        RailsObservatory.importmap.cache_sweeper(watches: root.join("app/javascript"))
+
+        ActiveSupport.on_load(:action_controller_base) do
+          before_action { RailsObservatory.importmap.cache_sweeper.execute_if_updated }
+        end
+      end
     end
   end
 end

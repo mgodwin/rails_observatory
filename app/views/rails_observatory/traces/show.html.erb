@@ -1,0 +1,119 @@
+<div class="chart"
+     data-controller="icicle-chart"
+     data-icicle-chart-initial-data-value="<%= @events.to_series.to_json %>"></div>
+<turbo-frame id="trace-tabs" data-turbo-action="advance">
+  <nav class="tabs --sticky">
+    <a href="?tab=details" class="tabs-button <%= "active" if params[:tab] == "details" %>">
+      Event Details
+    </a>
+    <a href="?tab=logs" class="tabs-button <%= "active" if params[:tab] == "logs" %>">
+      Logs
+    </a>
+    <a href="?tab=mail" class="tabs-button <%= "active" if params[:tab] == "mail" %>">
+      Mail
+      <% if @trace.mail_events.size > 0 %>
+        <span style="color: var(--black-secondary)"><%= @trace.mail_events.size %></span>
+      <% end %>
+    </a>
+    <label class="tabs-button">
+      Jobs
+    </label>
+    <label class="tabs-button">
+      Errors
+    </label>
+  </nav>
+  <div class="tab-content event-details" data-controller="event-details" data-action="icicle-chart:selected@window->event-details#show">
+    <% @events.each_with_index do |e, index| %>
+      <div class="event-detail" id="<%= e['start_at'] %>" <%= 'hidden' unless index.zero? %> style="padding-inline: 2rem;">
+        <div>
+          <h3><%= e['name'] %> (<%= e['self_time'].to_f.round(2) %>ms)</h3>
+          <span style="color: var(--black-secondary)">Event spanned from <%= (e['relative_start_at']).round(2) %>ms
+            to <%= (e['relative_end_at']).round(2) %>ms
+            with a total duration of <%= e['duration'].round(2) %>ms.  Self time of <%= e['self_time'].to_f.round(2) %>ms
+          </span>
+        </div>
+        <% if e['middleware_stack'].present? %>
+          <div class="table-bar-chart">
+            <div class="table-bar-header">Middleware Stack</div>
+            <% total_time = e['self_time'] %>
+
+            <%# e['middleware_stack'].each do |middleware_event| %>
+<!--              <div class="table-bar-row">-->
+                <%# percent = middleware_event['self_time'] / total_time * 100 %>
+<!--                <div class="bar" style="width: <%#= percent.round(1) %>%"></div>-->
+                <%#= middleware_event['payload']['middleware'] %>
+<!--                <div> <%#= middleware_event['self_time'].to_f.round(2) %>ms</div>-->
+<!--                <div style="color: var(--black-secondary);white-space: nowrap">(<%#= percent.round(1) %>% of total)</div>-->
+<!--              </div>-->
+            <%# end %>
+          </div>
+        <% else %>
+          <dl style="">
+            <dt>Payload</dt>
+            <% if e['payload'].empty? %>
+              <dd>Nothing in payload</dd>
+            <% else %>
+              <dd class="highlight">
+                <pre class="--scrollable"><%== Rouge.highlight(e['payload'].to_yaml, 'yaml', Rouge::Formatters::HTMLLinewise.new(Rouge::Formatters::HTML.new, class: 'line')) %></pre>
+                <!--              <pre style="width:100%;overflow: auto;"><%#== Rouge.highlight(JSON.pretty_generate(e['payload']) , 'json', 'html') %></pre>-->
+              </dd>
+            <% end %>
+
+          </dl>
+        <% end %>
+
+      </div>
+    <% end %>
+  </div>
+  <div class="tab-content logs">
+    <log-lines style="display:grid;grid-template-columns: min-content min-content 1fr; gap:.5rem;padding-block: 1rem;font-family:var(--font-mono)">
+      <% @trace.logs.each do |log| %>
+        <log-line style="display: grid; padding-inline: 2rem; grid-template-columns: subgrid;grid-column: 1/-1;">
+          <time style="white-space: nowrap"><%= Time.at(log['time']) %></time>
+          <log-level><%= log['severity'] %></log-level>
+          <log-message><%= log['message'] %></log-message>
+        </log-line>
+      <% end %>
+    </log-lines>
+  </div>
+  <div class="tab-content mail">
+    <simple-list class="simple-list">
+      <% if @trace.mail_events.empty? %>
+        <li>No mail enqueued or delivered</li>
+      <% end %>
+      <% @trace.mail_events.each do |e| %>
+        <li>
+          Mail Delivery <%= e.dig('payload', 'mailer') %>
+          <div>To: <%= e.dig('payload', 'to') %></div>
+          <div>From: <%= e.dig('payload', 'from') %></div>
+          <div>Subject: <%= e.dig('payload', 'subject') %></div>
+          <a href="<%= preview_mail_path(e.dig('payload', 'message_id')) %>" target="_blank">View Email</a>
+        </li>
+      <% end %>
+    </simple-list>
+  </div>
+  <div class="tab-content jobs">
+    <ul class="simple-list">
+      <% if @trace.events.only('enqueue.active_job').to_a.empty? %>
+        <li>No jobs were enqueued</li>
+      <% end %>
+      <% @trace.events.only('enqueue.active_job').each do |event| %>
+        <li>
+          <div class="simple-list-title"><%= event.dig('payload', 'job', 'class') %></div>
+          <div>
+            Enqueued job (
+            <span><%= link_to event.dig('payload', 'job', 'job_id').slice(0...8), job_path(event.dig('payload', 'job', 'job_id')) %></span>
+            ) to
+            <span><%= event.dig('payload', 'job', 'queue_name') %></span>
+            queue at
+            <span><%= event['start_at'] %></span>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="tab-content errors">
+    errors
+  </div>
+</turbo-frame>
+

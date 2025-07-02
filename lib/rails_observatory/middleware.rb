@@ -43,12 +43,13 @@ module RailsObservatory
         TimeSeries.record_occurrence("error.count", labels: { fingerprint: error.fingerprint })
       end
 
-      return response if request.params[:controller].blank? || request.params[:controller] =~ /rails_observatory/
+      return response if request.params[:controller].blank? # || request.params[:controller] =~ /rails_observatory/
 
       status, headers, body = response
       body = ::Rack::BodyProxy.new(body) do
         duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start_at_mono)
         serialized_events = events.map { Serializer.serialize(_1) }
+        # if request trace should not be retained,
         RequestTrace.new(
           request_id: request.request_id,
           status:,
@@ -68,6 +69,7 @@ module RailsObservatory
         TimeSeries.record_occurrence("request.error_count", labels:) if status >= 500
         TimeSeries.record_timing("request.latency", duration, labels:)
         EventCollection.new(serialized_events).self_time_by_library.each do |library, self_time|
+          puts "Recording self time for library: #{library} with self_time: #{self_time}"
           TimeSeries.record_timing("request.latency/#{library}", self_time, labels: { action: controller_action })
         end
       rescue => e

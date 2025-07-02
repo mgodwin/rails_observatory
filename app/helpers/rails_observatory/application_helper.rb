@@ -3,7 +3,7 @@ module RailsObservatory
   module ApplicationHelper
 
     def highlight_source_extract(source_extract)
-      source_extract.symbolize_keys => {code:, line_number:}
+      source_extract.symbolize_keys => { code:, line_number: }
       fmt = Rouge::Formatters::HTMLLineTable.new(Rouge::Formatters::HTML.new, start_line: code.keys.first.to_s.to_i)
       html = Nokogiri::HTML4(Rouge.highlight(code.values.flatten.join(""), 'ruby', fmt))
       html.css("#line-#{line_number}").add_class('hll')
@@ -14,7 +14,7 @@ module RailsObservatory
       html.to_html
     end
 
-    def series_for(name:, aggregate_using:, time_range: nil, downsample: 60, children: false,  **opts)
+    def series_for(name:, aggregate_using:, time_range: nil, downsample: 60, children: false, **opts)
       if children
         series = TimeSeries.where(parent: name, **opts)
       else
@@ -25,9 +25,29 @@ module RailsObservatory
       series
     end
 
-    def series_value(name:, aggregate_using:)
-      series = series_for(name:, aggregate_using: aggregate_using, downsample: 1)
-      series.first&.value
+    def series_sum(name:)
+      TimeSeries.where(name:).sum
+    end
+
+    # Pass a metric name like "requests.count_sum" or "requests.latency_avg"
+    def metric_series(name:, **opts)
+      compaction = name.split('_').last
+      query_name = name.gsub(/_(sum|avg|min|max)$/, '')
+      conditions = { name: query_name, compaction: }.merge(**opts.without(:children))
+      if opts[:children] == true
+        conditions.delete(:name)
+        conditions[:parent] = query_name
+      end
+      TimeSeries
+        .where(**conditions)
+        .downsample(60, using: compaction.to_sym)
+        .to_a
+        .map { |s| { name: s.name.split("/").last, data: s.filled_data } }
+    end
+
+    def metric_value(name:, **labels)
+      compaction_name = name.split('_').last
+      TimeSeries.where(name: name.gsub(/_(sum|avg|min|max)$/, ''), **labels.merge(compaction: compaction_name)).downsample(1, using: compaction_name.to_sym).to_a.first&.value
     end
 
     def time_slice_start
@@ -45,6 +65,11 @@ module RailsObservatory
       else
         value
       end
+    end
+
+    def duration_label(duration)
+      unit, value = duration.parts.sort_by { |unit,  _ | ActiveSupport::Duration::PARTS.index(unit) }.first
+      "#{value.round}#{unit[0]}"
     end
 
     def pretty_backtrace_location(backtrace_line)

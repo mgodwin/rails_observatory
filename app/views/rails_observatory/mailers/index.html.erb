@@ -2,7 +2,7 @@
 <section>
   <h2>Email Delivered</h2>
 
-  <%= render 'events_table', events: @deliveries, fields: [
+  <%= render 'query_table', events: @deliveries, fields: [
     :time, :to, :from, :subject, :view], formatters: {
     time: ->(time, event) { Time.at(time).to_fs('%H:%M:%S') },
     view: ->(view, event) { link_to 'View', preview_mail_path(event.message_id) }

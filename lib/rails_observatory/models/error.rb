@@ -1,4 +1,4 @@
-require_relative './redis_model'
+require_relative '../redis/redis_model'
 require 'digest'
 module RailsObservatory
   class Error < RedisModel

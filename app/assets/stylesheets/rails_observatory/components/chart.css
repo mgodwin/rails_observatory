@@ -1,0 +1,39 @@
+@layer components {
+  [data-chart-type-value="icicle"] {
+    .apexcharts-legend-series {
+      display: flex;
+      gap: .25rem;
+      align-items: center;
+    }
+
+    .apexcharts-legend-text {
+      display: flex;
+      flex-grow: 1;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      padding-block: .25rem;
+
+      .percent {
+        display: flex;
+        gap: .5rem;
+      }
+
+      .bar {
+        width: 2rem;
+        height: 14px;
+        background-color: var(--surface-card);
+
+        & > div {
+          height: 100%;
+          background-color: var(--blue);
+        }
+      }
+    }
+  }
+
+  .chart {
+    overflow: hidden;
+    min-height: 250px;
+  }
+}

@@ -10,6 +10,9 @@
     | <%= @request.path %></span>
 <% end %>
 <% content_for(:hide_duration, 'true') %>
+<% content_for(:head) do %>
+  <meta name="view-transition" content="same-origin">
+<% end %>
 
 <% content_for(:main_css_class, 'layout-events-breakdown') %>
 <%= render 'trace', model: @request, events: @events %>

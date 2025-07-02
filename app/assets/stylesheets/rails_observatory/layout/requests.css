@@ -1,0 +1,46 @@
+@layer layout {
+  .layout-requests_index {
+    display: grid;
+
+    grid-template-areas:
+        'summary summary'
+        'chart chart'
+        /*'chart chart'*/
+        'bycontroller bycontroller'
+        'events events';
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: min-content min-content auto auto;
+    gap: 2rem;
+
+    & > .summary-panel {
+      grid-area: summary;
+      margin: 2rem 2rem 0;
+    }
+
+    & > .charts {
+      grid-area: chart;
+      display: grid;
+      grid-template-columns: subgrid;
+      padding-inline: 2rem;
+    }
+
+    & > .layout-requests_index-by_controller {
+      grid-area: bycontroller;
+    }
+
+    & > section.recent-requests {
+      grid-area: events;
+    }
+  }
+
+  .layout-trace {
+    display: grid;
+    grid-template-rows: min-content auto;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+
+    & > .layout-events-breakdown-details {
+      border-top: 1px solid var(--divider);
+    }
+  }
+}

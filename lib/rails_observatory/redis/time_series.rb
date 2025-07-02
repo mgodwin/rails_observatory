@@ -1,20 +1,13 @@
 require_relative 'time_series/insertion'
 require_relative 'time_series/query_builder'
+require_relative './connection'
 
 module RailsObservatory
   class TimeSeries
-
     extend Insertion
+    include Connection
 
     attr_reader :labels, :name, :data
-
-    def self.redis
-      Rails.configuration.rails_observatory.redis
-    end
-
-    def redis
-      self.class.redis
-    end
 
     def self.with_slice(time_range)
       ActiveSupport::IsolatedExecutionState[:observatory_slice] = time_range
@@ -24,7 +17,7 @@ module RailsObservatory
     end
 
     def self.where(**conditions)
-      QueryBuilder.new(self).where(**conditions)
+      QueryBuilder.new.where(**conditions)
     end
 
     def initialize(name:, labels: {}, data:, time_range:, agg_duration:)
@@ -48,26 +41,24 @@ module RailsObservatory
     end
 
     def end_time
-      @time_range.end.nil? ? Time.now : @time_range.end
+      @time_range.end
     end
 
     def filled_data
-      if @time_range.end.nil?
-        Enumerator
-          .produce(to_ms(start_time)) { |t| t + @agg_duration }
-          .take_while { |t| t < to_ms(end_time) }
-          .map do |t|
-          match = data.find { |ts, _| ts == t }
-          if match
-            timestamp, val = match
-            [timestamp, val.to_f]
-          else
-            [t, 0]
-          end
-        end
-      else
-        data.map do |ts, value|
-          [ts, value.to_i || 0]
+      # Align to epoch
+      start_bucket = start_time_ms - (start_time_ms % @agg_duration)
+      # puts "Filling data from #{start_time_ms} to #{end_time_ms} with agg_duration #{@agg_duration}"
+      # puts "Start bucket: #{start_bucket}"
+      Enumerator
+        .produce(start_bucket) { |t| t + @agg_duration }
+        .take_while { |t| t < end_time_ms }
+        .map do |t|
+        match = data.find { |ts, _| ts == t }
+        if match
+          timestamp, val = match
+          [timestamp, val.to_f]
+        else
+          [t, 0]
         end
       end
     end
@@ -77,7 +68,7 @@ module RailsObservatory
     end
 
     def value
-      data.dig(0, 1).to_i
+      @value ||= data.reduce(0) { |sum, (_, value)| sum + value.to_i }
     end
 
     def to_ms(duration)

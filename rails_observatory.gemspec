@@ -18,8 +18,13 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib,public}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   end
 
-  spec.add_development_dependency "faker"
-  spec.add_dependency "rails", ">= 7.1.0"
+  spec.add_dependency "rails", ">= 8.0.0"
   spec.add_dependency 'redis-client', "~> 0.19"
+  spec.add_dependency "importmap-rails", ">= 1.2.1"
+  spec.add_dependency "turbo-rails"
+  spec.add_dependency "stimulus-rails"
   spec.add_dependency 'rouge'
+
+  spec.add_development_dependency "faker"
+  spec.add_development_dependency "propshaft"
 end

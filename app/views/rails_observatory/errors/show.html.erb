@@ -158,7 +158,7 @@
   </div>
 
   <div class="card">
-    <h2>Trace</h2>
+    <h2>Backtrace</h2>
     <% @error.trace.slice_when { _1["is_application_trace"] != _2["is_application_trace"] }.each do |trace_chunk| %>
       <% if !trace_chunk.first["is_application_trace"] %>
         <details class="framework-trace-chunk">

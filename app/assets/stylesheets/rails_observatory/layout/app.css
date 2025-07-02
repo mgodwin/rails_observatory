@@ -1,0 +1,27 @@
+@layer layout {
+  .layout-app {
+    display: grid;
+    grid-template-areas:  'side-nav top-nav'
+                          'side-nav main';
+    grid-template-columns: 16rem 1fr;
+    grid-template-rows: auto 1fr;
+    margin: 0;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: calc(48px + 32px) 1fr;
+    }
+
+    & > .side-nav {
+      grid-area: side-nav;
+    }
+
+    & > .top-nav {
+      grid-area: top-nav;
+    }
+
+    & > main {
+      grid-area: main;
+      overflow: auto;
+    }
+  }
+}

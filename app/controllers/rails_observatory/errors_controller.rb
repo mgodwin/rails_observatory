@@ -1,8 +1,6 @@
 module RailsObservatory
   class ErrorsController < ApplicationController
 
-    before_action :set_duration
-
     def index
       Error.ensure_index
       @errors = Error.all

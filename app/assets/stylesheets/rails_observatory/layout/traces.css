@@ -1,0 +1,12 @@
+@layer layout {
+  .layout-trace {
+    display: grid;
+    grid-template-rows: min-content auto;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+
+    & > .layout-events-breakdown-details {
+      border-top: 1px solid var(--divider);
+    }
+  }
+}

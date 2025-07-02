@@ -1,0 +1,22 @@
+@layer components {
+  @scope (.text-gauge) {
+
+    :scope {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      padding-block: 1rem;
+      padding-inline: 2rem;
+      white-space: nowrap;
+      background-color: var(--surface-card);
+    }
+
+    .title {
+    }
+
+    .value {
+      font-size: 3rem;
+      font-weight: 400;
+    }
+  }
+}

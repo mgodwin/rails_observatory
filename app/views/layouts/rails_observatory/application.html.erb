@@ -4,45 +4,48 @@
   <title>Rails Observatory</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-  <link rel="preload" href="<%= "#{root_path}assets/stylesheets/application.css" %>" as="style">
-  <link rel="stylesheet" href="<%= "#{root_path}assets/stylesheets/application.css" %>">
-  <script type="text/javascript" src="<%= "#{root_path}assets/js/application.js" %>"></script>
-
+  <meta name="turbo-cache-control" content="no-cache">
+  <meta name="turbo-root" content="<%= root_path %>">
+  <%= action_cable_meta_tag %>
+  <%= stylesheet_link_tag "rails_observatory/application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags "application", importmap: RailsObservatory.importmap %>
   <style>
     <%= Rouge::Theme.find('github.dark').render %>
   </style>
+  <% if content_for :head %>
+    <% yield :head %>
+  <% end %>
 </head>
 <body class="layout-app">
-<nav class="side-nav layout-app-side-nav">
-  <img height="36" src="<%= "#{root_path}assets/logo_with_text.svg" %>" alt="RailsObservatory">
+<nav class="side-nav">
+  <%= image_tag "rails_observatory/logo_with_text.svg", height: 36, class: 'logo-with-text' %>
   <ul>
-    <li><%= link_to root_path, class: "#{'_active' if request.path == root_path || request.path =~ /requests/}" do %>
+    <li><%= link_to root_path, class: "#{'active' if request.path == root_path || request.path =~ /requests/}", title: 'Requests' do %>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
         </svg>
-        Requests
+        <span>Requests</span>
       <% end %></li>
-    <li><%= link_to jobs_path, class: "#{'_active' if request.path =~ /jobs/}" do %>
+    <li><%= link_to jobs_path, class: "#{'active' if request.path =~ /jobs/}", title: 'Jobs' do %>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
         </svg>
-        Jobs
+        <span>Jobs</span>
       <% end %></li>
-    <li><%= link_to mailers_path, class: "#{'_active' if request.path =~ /mailers/}" do %>
+    <li><%= link_to mailers_path, class: "#{'active' if request.path =~ /mailers/}", title: 'Mailers' do %>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
         </svg>
-
-        Mailers
+        <span>Mailers</span>
       <% end %></li>
-    <li><%= link_to errors_path, class: "#{'_active' if request.path =~ /errors/}" do %>
+    <li><%= link_to errors_path, class: "#{'active' if request.path =~ /errors/}", title: 'Errors' do %>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 12.75c1.148 0 2.278.08 3.383.237 1.037.146 1.866.966 1.866 2.013 0 3.728-2.35 6.75-5.25 6.75S6.75 18.728 6.75 15c0-1.046.83-1.867 1.866-2.013A24.204 24.204 0 0112 12.75zm0 0c2.883 0 5.647.508 8.207 1.44a23.91 23.91 0 01-1.152 6.06M12 12.75c-2.883 0-5.647.508-8.208 1.44.125 2.104.52 4.136 1.153 6.06M12 12.75a2.25 2.25 0 002.248-2.354M12 12.75a2.25 2.25 0 01-2.248-2.354M12 8.25c.995 0 1.971-.08 2.922-.236.403-.066.74-.358.795-.762a3.778 3.778 0 00-.399-2.25M12 8.25c-.995 0-1.97-.08-2.922-.236-.402-.066-.74-.358-.795-.762a3.734 3.734 0 01.4-2.253M12 8.25a2.25 2.25 0 00-2.248 2.146M12 8.25a2.25 2.25 0 012.248 2.146M8.683 5a6.032 6.032 0 01-1.155-1.002c.07-.63.27-1.222.574-1.747m.581 2.749A3.75 3.75 0 0115.318 5m0 0c.427-.283.815-.62 1.155-.999a4.471 4.471 0 00-.575-1.752M4.921 6a24.048 24.048 0 00-.392 3.314c1.668.546 3.416.914 5.223 1.082M19.08 6c.205 1.08.337 2.187.392 3.314a23.882 23.882 0 01-5.223 1.082" />
         </svg>
-        Errors
+        <span>Errors</span>
       <% end %></li>
   </ul>
-  <div class="_redis-stats">
+  <div class="redis-stats">
     <strong>Redis</strong> <%= redis_mem_info['used_memory_human'] %> /
     <%= redis_mem_info['used_memory_rss_human'] %>
   </div>
@@ -64,7 +67,11 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Past <%= duration.inspect %></span>
+        <% if relative_time_slice? %>
+          <span>Past <%= duration.inspect %></span>
+        <% else %>
+          <span><%= duration_label(duration) %> <%= time_start.strftime("%b %-d, %Y %H:%M") %> - <%= time_end.strftime("%b %-d, %Y %H:%M") %></span>
+        <% end %>
         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" height="20">
           <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
         </svg>
@@ -81,7 +88,7 @@
             </a>
           </li>
         <% end %>
-
+        <li><a>Custom Time Range</a></li>
       </ul>
     </div>
   <% end %>

@@ -1,0 +1,54 @@
+.simple-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  flex-grow: 1;
+
+  .simple-list-title {
+    font-weight: var(--font-weight-bold);
+  }
+
+  & li {
+    padding: 2rem;
+  }
+
+  & li + li {
+    border-top: 1px solid var(--divider);
+  }
+
+  & a {
+    color: color-mix(in oklab, var(--black) 20%, white);
+
+    &:is(:hover, :focus-visible) {
+      background-color: var(--surface-hover);
+    }
+  }
+}
+
+.event-detail {
+
+  &:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  max-width: 120ch;
+
+  .highlight {
+    border: 1px solid var(--divider);
+
+    .line {
+      padding: 0 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+    }
+  }
+}

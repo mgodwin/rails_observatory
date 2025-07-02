@@ -1,5 +1,3 @@
-@import "https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&family=Roboto+Mono:wght@200;400&display=swap";
-
 /* app/assets/stylesheets/elements/root.css */
 :root {
   --red: #ba181b;
@@ -89,6 +87,9 @@ section {
     grid-template-columns: 16rem 1fr;
     grid-template-rows: auto 1fr;
     margin: 0;
+    @media (max-width: 1024px) {
+      grid-template-columns: calc(48px + 32px) 1fr;
+    }
     & > .layout-app-side-nav {
       grid-area: side-nav;
     }
@@ -136,7 +137,7 @@ section {
     & > .layout-requests_index-by_controller {
       grid-area: bycontroller;
     }
-    & > .layout-requests_index-events {
+    & > section.recent-requests {
       grid-area: events;
     }
   }
@@ -278,37 +279,50 @@ section {
 }
 
 /* app/assets/stylesheets/application/side_nav.css */
-.side-nav {
-  border-right: 1px solid var(--divider);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: stretch;
-  background: rgb(0, 144, 255);
-  background:
-    radial-gradient(
-      ellipse 100% 4rem at top,
-      rgba(0, 144, 255, 0.4) 0%,
-      rgba(22, 26, 29, 1) 100%);
-  ._active {
+@scope (.side-nav) {
+  :scope {
+    border-right: 1px solid var(--divider);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    background: rgb(0, 144, 255);
+    background:
+      radial-gradient(
+        ellipse 100% 4rem at top,
+        rgba(0, 144, 255, 0.4) 0%,
+        rgba(22, 26, 29, 1) 100%);
+  }
+  .active {
     background-color: var(--surface-active);
     color: var(--white);
     &:hover {
       background-color: var(--surface-active);
     }
   }
-  ._redis-stats {
+  .redis-stats {
     align-self: center;
     color: var(--black-secondary);
     font-size: .85rem;
   }
-  & > img {
+  .logo-with-text,
+  .logo {
     align-self: start;
     padding-inline: .75rem;
     transition: all 500ms ease-in-out;
     &:hover {
       filter: drop-shadow(0px 0px 1px rgba(255, 255, 255, .8));
+    }
+  }
+  @media (max-width: 1024px) {
+    .logo-with-text {
+      display: none;
+    }
+  }
+  @media (min-width: 1025px) {
+    .logo {
+      display: none;
     }
   }
   & > ul {
@@ -330,6 +344,11 @@ section {
       color: color-mix(in oklab, var(--black) 20%, white);
       &:is(:hover, :focus-visible) {
         background-color: var(--surface-hover);
+      }
+      & span {
+        @media (max-width: 1024px) {
+          display: none;
+        }
       }
     }
   }
@@ -570,15 +589,46 @@ section {
 }
 
 /* app/assets/stylesheets/application/query_table.css */
-.query-table {
-  display: grid;
-  --column-count: 10;
-  grid-template-columns: repeat(var(--column-count), auto);
-  grid-template-rows: min-content auto;
-  & .query-table-column {
+@scope (.query-table) {
+  :scope {
+    display: grid;
+    --column-count: 10;
+    grid-template-columns: repeat(var(--column-count), auto);
+    grid-template-rows: auto min-content auto auto;
+    position: relative;
+  }
+  ._resize-handle {
+    position: absolute;
+    width: 4px;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    grid-row: 1 / 3;
+    transform: translateX(50%);
+    cursor: col-resize;
+    z-index: 5;
+  }
+  ._resize-handle::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: scaleX(0);
+    transition: all 250ms ease-out;
+    background-color: dodgerblue;
+  }
+  ._resize-handle:hover::before {
+    background-color: dodgerblue;
+    transform-origin: center center;
+    transform: scaleX(1);
+  }
+  ._column {
     padding: .5rem 1rem;
     border-bottom: 1px solid var(--divider);
     white-space: nowrap;
+    overflow: hidden;
     & + & {
       border-left: 1px solid var(--divider);
     }
@@ -589,40 +639,26 @@ section {
       padding-right: 2rem;
     }
   }
-  & > header {
+  ._header {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: -1 / 1;
     flex-wrap: nowrap;
     font-weight: var(--font-weight-bold);
   }
-  .query-table-body {
+  ._body {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: -1 / 1;
   }
-  .query-table-row {
+  ._row {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: -1 / 1;
   }
-  & > table {
-    width: 100%;
-    border-spacing: 0;
-    white-space: nowrap;
-    & th {
-      text-align: left;
-      font-weight: 400;
-      padding: 0.5rem 1rem;
-      border-bottom: 1px solid var(--divider);
-    }
-    & td {
-      padding: .5rem 1rem;
-      border-bottom: 1px solid var(--divider);
-      & + & {
-        border-left: 1px solid var(--divider);
-      }
-    }
+  .pagination {
+    margin-block: .5rem;
+    grid-column: -1 / 1;
   }
 }
 
@@ -670,18 +706,31 @@ section {
     }
   }
 }
-text-gauge {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding-block: 1rem;
-  padding-inline: 2rem;
-  white-space: nowrap;
-  & text-gauge-title {
+
+/* app/assets/stylesheets/application/text_gauge.css */
+@scope (.text-gauge) {
+  :scope {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-block: 1rem;
+    padding-inline: 2rem;
+    white-space: nowrap;
   }
-  & text-gauge-value {
+  .title {
+  }
+  .value {
     font-size: 3rem;
     font-weight: 400;
+  }
+}
+
+/* app/assets/stylesheets/application/pagination.css */
+@scope (.pagination) {
+  :scope {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
   }
 }
 

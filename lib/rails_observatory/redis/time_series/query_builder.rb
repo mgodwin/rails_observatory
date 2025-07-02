@@ -1,10 +1,11 @@
+require_relative '../connection'
 module RailsObservatory
   class TimeSeries
     class QueryBuilder
+      include Connection
       include Enumerable
 
-      def initialize(series_class)
-        @series_class = series_class
+      def initialize
         @conditions = {}
         @samples = nil
         @range_set = false
@@ -38,22 +39,20 @@ module RailsObservatory
         clone
       end
 
-
-
       def sum
+        @agg_type = :sum
+        @samples = 1
         if @group
-          @agg_type = :sum
-          @samples = 1
           to_a.index_by { _1.labels[@group] }.transform_values { _1.value }
         else
-          raise "Cannot sum without grouping"
+          to_a.first.value
         end
       end
 
       def avg
+        @agg_type = :avg
+        @samples = 1
         if @group
-          @agg_type = :avg
-          @samples = 1
           to_a.index_by { _1.labels[@group] }
         else
           raise "Cannot avg without grouping"
@@ -74,23 +73,19 @@ module RailsObservatory
         @range = ActiveSupport::IsolatedExecutionState[:observatory_slice] || (nil..) unless @range_set
         agg_duration = build_agg_duration
         mrange_args = ['TS.MRANGE', from_ts, to_ts, 'WITHLABELS']
-        mrange_args.push('LATEST') if @range.end.nil?
-        if @agg_type && @samples
-          if @range.end.present?
-            mrange_args.push("ALIGN", 'end')
-          elsif @range.begin.present?
-            mrange_args.push("ALIGN", 'start')
-          end
+        mrange_args.push('LATEST')
+        if @agg_type
+          mrange_args.push("ALIGN", '0') #
           mrange_args.push("AGGREGATION", @agg_type.to_s.upcase, agg_duration, "EMPTY")
         end
         mrange_args.push('FILTER', *ts_filters)
 
-        # puts mrange_args.join(" ")
-        res = @series_class.redis.call(mrange_args)
+        puts mrange_args.join(" ")
+        res = redis.call(mrange_args)
         return if res.nil?
 
         res.each do |name, labels, data|
-          yield @series_class.new(
+          yield TimeSeries.new(
             name:,
             labels: Hash[*labels.flatten],
             data:,
@@ -106,6 +101,7 @@ module RailsObservatory
         end_time = @range.end || Time.now
         start_time = @range.begin || 12.months.ago.to_time
         available_datapoints = ((end_time - start_time) / 10.0).to_i
+        puts "available_datapoints #{available_datapoints}"
         datapoints = [@samples, available_datapoints].min
         ((end_time - start_time) * 1000 / datapoints).to_i
       end
@@ -131,7 +127,7 @@ module RailsObservatory
         raise 'Must specify name or parent' if @conditions[:name].blank? && @conditions[:parent].blank?
 
         @conditions[@group] = "*" if @group
-        labels = @series_class.redis.call('SMEMBERS', "#{root_labels}:labels")
+        labels = redis.call('SMEMBERS', "#{root_labels}:labels")
         labels = labels.map { |l| [l.to_sym, nil] }.to_h
         @conditions.reverse_merge!(labels)
         @conditions.map do |k, v|
