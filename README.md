@@ -4,7 +4,7 @@ See what's happening in your Rails app.
 
 Rails Observatory hooks into [ActiveSupport::Notifications](https://api.rubyonrails.org/classes/ActiveSupport/Notifications.html)
 with [RedisStack](https://redis.io/docs/about/about-stack/) to provide
-a simple way to observe what is happening your Rails app, without third party integrations.
+a simple way to observe what is happening your Rails app, without costly SaaS products.
 
 <img src="https://github.com/mgodwin/rails_observatory/blob/main/.github/observatory_trace.png?raw=true">
 
