@@ -11,10 +11,14 @@ module RailsObservatory
     end
 
     def events
-      return @events if @_sorted
-      @_sorted = true
-      @events.sort_by! { _1['start_at'] }
+      return @events if @processed
+      process_events
       @events
+    end
+
+    def find(start_at)
+      needle = start_at.to_f
+      to_a.find { _1['start_at'] == needle }
     end
 
     def without(*names)
@@ -46,10 +50,6 @@ module RailsObservatory
     end
 
     def each
-      process_events
-      # iterating_set = iterating_set.chunk_while { _1['name'] == _2['name'] }.flat_map(&method(:merge_events)) if @flatten_middleware
-      # iterating_set = iterating_set.reject { _1['name'].in?(@without) } if @without
-      # iterating_set = iterating_set.select { _1['name'].in?(@only) } if @only
       events.each { yield _1 }
     end
 
@@ -97,21 +97,35 @@ module RailsObservatory
 
     def merge_middleware_events!
       middleware_events = events.select { _1['name'] == 'process_middleware.action_dispatch' }
+
+      midddleware_depth = middleware_events.map { _1['depth'] }.max
       merged_middleware = {
         'name' => 'process_middleware.action_dispatch',
-        'start_at' => middleware_events.first['start_at'],
-        'end_at' => middleware_events.first['end_at'],
+        'start_at' => middleware_events.map { _1['start_at'] }.min,
+        'end_at' => middleware_events.map { _1['end_at'] }.max,
+        'relative_start_at' => middleware_events.map { _1['relative_start_at'] }.min,
+        'relative_end_at' => middleware_events.map { _1['relative_end_at'] }.max,
         'duration' => middleware_events.first['duration'],
+        'depth' => 0,
+        'self_time' => middleware_events.sum { _1['self_time'] },
         'middleware_stack' => middleware_events
       }
-      self.events = [merged_middleware, *events.excluding(middleware_events)]
+
+      other_events = events.excluding(middleware_events)
+      other_events.each do |event|
+        next if event['depth'] <= midddleware_depth
+        event['depth'] -= midddleware_depth
+        event['depth'] = 1 if event['depth'] <= 1
+      end
+
+      self.events = [merged_middleware, *other_events]
     end
 
     # Self time is the time spent in an event excluding time spent in child events.
     def process_events
-      return if @processed or events.empty?
+      return if @processed or @events.empty?
       timeline = []
-      events.each do |ev|
+      @events.each do |ev|
         timeline << { time: ev['start_at'], type: :start, event: ev }
         timeline << { time: ev['end_at'], type: :end, event: ev }
       end
@@ -141,7 +155,7 @@ module RailsObservatory
         previous_time = entry[:time]
       end
 
-      events.sort_by! { _1['start_at'] }
+      @events.sort_by! { _1['start_at'] }
       @processed = true
     end
 

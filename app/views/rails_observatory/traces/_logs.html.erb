@@ -1,0 +1,11 @@
+<div class="tab-content">
+  <div class="logs --scrollable">
+    <% @trace.logs.each do |log| %>
+      <div style="display: grid; padding-inline: 2rem; grid-template-columns: subgrid;grid-column: 1/-1; white-space: nowrap">
+        <time style="white-space: nowrap; display: none"><%= Time.at(log['time']) %></time>
+        <div style="display:none;"><%= log['severity'] %></div>
+        <div><%= log['message'] %></div>
+      </div>
+    <% end %>
+  </div>
+</div>

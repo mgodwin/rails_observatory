@@ -1,6 +1,6 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
-<% content_for(:main_css_class, 'layout-requests_index') %>
+<main class="layout-requests_index">
 <div class="summary-panel">
   <dl>
     <dt>Requests</dt>
@@ -77,5 +77,5 @@
   <h2>Recent Request Traces</h2>
   <turbo-frame id="recent-traces" src="<%= recent_traces_path('rt') %>" loading="lazy"></turbo-frame>
 </section>
-
+</main>
 

@@ -69,7 +69,6 @@ module RailsObservatory
         TimeSeries.record_occurrence("request.error_count", labels:) if status >= 500
         TimeSeries.record_timing("request.latency", duration, labels:)
         EventCollection.new(serialized_events).self_time_by_library.each do |library, self_time|
-          puts "Recording self time for library: #{library} with self_time: #{self_time}"
           TimeSeries.record_timing("request.latency/#{library}", self_time, labels: { action: controller_action })
         end
       rescue => e

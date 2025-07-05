@@ -15,4 +15,9 @@ addEventListener("turbo:before-frame-render", (event) => {
   }
 });
 
+addEventListener("turbo:fetch-request-error", (event) => {
+  console.log("Turbo fetch request error:", event.detail.request, event.detail.error);
+  window.location.reload()
+})
+
 export { application }

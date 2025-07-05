@@ -1,0 +1,10 @@
+@scope (.logs) {
+
+  :scope {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: .2rem;
+    padding-block: 1rem;
+    font-family: var(--font-mono)
+  }
+}

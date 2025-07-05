@@ -9,26 +9,6 @@ window.Apex = {
     },
   },
   // colors: ["#7209b7"],
-  grid: {
-    borderColor: 'var(--divider)',
-    strokeDashArray: 4,
-    xaxis: {
-      lines: {
-        show: true
-      }
-    },
-    yaxis: {
-      lines: {
-        show: true
-      }
-    },
-    padding: {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    },
-  },
   title: {
     align: 'left',
     offsetY: 20,

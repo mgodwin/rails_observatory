@@ -1,0 +1,20 @@
+<div class="tab-content jobs">
+  <ul class="simple-list">
+    <% if @trace.events.only('enqueue.active_job').to_a.empty? %>
+      <li>No jobs were enqueued</li>
+    <% end %>
+    <% @trace.events.only('enqueue.active_job').each do |event| %>
+      <li>
+        <div class="simple-list-title"><%= event.dig('payload', 'job', 'class') %></div>
+        <div>
+          Enqueued job (
+          <span><%= link_to event.dig('payload', 'job', 'job_id').slice(0...8), job_path(event.dig('payload', 'job', 'job_id')) %></span>
+          ) to
+          <span><%= event.dig('payload', 'job', 'queue_name') %></span>
+          queue at
+          <span><%= event['start_at'] %></span>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

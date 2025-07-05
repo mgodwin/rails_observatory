@@ -27,6 +27,8 @@
 @import url("components/text_gauge.css");
 @import url("components/pagination.css");
 @import url('components/summary_panel.css');
+@import url('components/logs.css');
+@import url('components/resize_handle.css');
 
 /* Mixins */
 @import url('mixins/nav_button.css');

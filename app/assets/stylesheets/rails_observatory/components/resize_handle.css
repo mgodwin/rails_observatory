@@ -1,0 +1,16 @@
+@scope (.resize-handle) {
+
+  :scope {
+    position: relative;
+    height: 8px;
+    width: 80px;
+    border-radius: 9999px 9999px;
+    cursor: ns-resize;
+    background-color: var(--divider-active);
+    transition: all 220ms ease-in-out;
+
+    &:hover {
+      background-color: dodgerblue;
+    }
+  }
+}

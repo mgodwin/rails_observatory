@@ -1,12 +1,23 @@
 @layer layout {
   .layout-trace {
     display: grid;
-    grid-template-rows: min-content auto;
+    grid-template-rows: min-content min-content 1fr;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.25rem;
+    height: 100%;
 
-    & > .layout-events-breakdown-details {
-      border-top: 1px solid var(--divider);
+    & > .layout-area_chart {
+      overflow: auto;
+    }
+
+    & > .layout-area_resize {
+      place-content: center;
+      display: flex;
+    }
+
+    & > .layout-area_trace-details {
+      overflow: auto;
+      min-height: 200px;
     }
   }
 }

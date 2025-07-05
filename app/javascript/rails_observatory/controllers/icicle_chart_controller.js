@@ -2,19 +2,29 @@ import ApplicationChartController from 'controllers/application_chart_controller
 import merge from 'lodash.merge'
 
 export default class extends ApplicationChartController {
+
+  static values = {
+    ...ApplicationChartController.values,
+    selectionFrameId: String,
+  }
+
   chartOptions () {
     return merge(super.chartOptions(), {
       chart: {
         type: 'rangeBar',
+        toolbar: {
+          show: true,
+          tools: {
+            pan: false,
+            download: false,
+          }
+        },
         height: 300,
         events: {
           dataPointSelection: (event, chartContext, config) => {
-            console.log('dataPointSelection', event, chartContext, config)
-            this.dispatch('selected', {
-              detail: {
-                ...config.w.config.series[config.seriesIndex].data[config.dataPointIndex]
-              }
-            })
+            const dataPoint = this.initialDataValue[config.seriesIndex].data[config.dataPointIndex]
+
+            Turbo.visit(`?event=${dataPoint.start_at}`, {frame: this.selectionFrameIdValue})
           }
         },
       },
@@ -58,7 +68,7 @@ export default class extends ApplicationChartController {
       legend: {
         position: 'right',
         showForSingleSeries: true,
-        formatter: (seriesName, opts)=> {
+        formatter: (seriesName, opts) => {
 
           const seriesSelfTime = this.initialDataValue[opts.seriesIndex].data.reduce((acc, val) => {
             return acc + val['event_self_time']
@@ -79,8 +89,8 @@ export default class extends ApplicationChartController {
       dataLabels: {
         enabled: true,
         formatter: (value, { seriesIndex, dataPointIndex, w }) => {
-          if (value === null || value === undefined) return '';
-          const dataPoint = this.initialDataValue[seriesIndex].data[dataPointIndex];
+          if (value === null || value === undefined) return ''
+          const dataPoint = this.initialDataValue[seriesIndex].data[dataPointIndex]
           return `${dataPoint.event_name} (${(value[1] - value[0]).toFixed(2)}ms)`
         },
         offsetX: 4,
@@ -92,6 +102,14 @@ export default class extends ApplicationChartController {
       stroke: {
         width: 2,
         curve: 'straight'
+      },
+      states: {
+        active: {
+          allowMultipleDataPointsSelection: false,
+          filter: {
+            type: 'lighten',
+          }
+        }
       }
     })
   }

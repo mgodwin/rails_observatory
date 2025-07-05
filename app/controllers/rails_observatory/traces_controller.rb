@@ -9,6 +9,7 @@ module RailsObservatory
     def show
       @trace = trace_class.find(params[:id])
       @events = @trace.events.flatten_middleware
+      @event = params[:event] ? @events.find(params[:event]) : @events.first
     end
 
     private

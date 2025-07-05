@@ -31,18 +31,35 @@
     /*& label:has(:focus) {*/
     /*  outline: -webkit-focus-ring-color auto 1px;*/
     /*}*/
+}
 
-  .tab-content {
-    display: none;
-    padding-bottom: 2rem;
+.tab-content {
+  padding-bottom: 2rem;
+  display: grid;
 
-    & dd {
-      margin-left: 0;
-    }
-    & dt {
-      font-weight: 400;
-      color: var(--black-secondary);
-      margin-bottom: .75rem;
-    }
+  & dd {
+    margin-left: 0;
   }
+  & dt {
+    font-weight: 400;
+    color: var(--black-secondary);
+    margin-bottom: .75rem;
+  }
+}
+
+.table-bar-row {
+  view-transition-class: bar;
+}
+
+::view-transition-old(.bar):only-child {
+  animation: 0;
+  opacity:0;
+}
+
+::view-transition-new(.bar):only-child {
+  animation: 0;
+}
+
+::view-transition-group(root) {
+  animation: 0;
 }

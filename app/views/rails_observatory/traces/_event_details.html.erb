@@ -1,0 +1,43 @@
+<div class="tab-content" style="view-transition-name: none">
+  <div class="event-detail" id="<%= @event['start_at'] %>" style="padding-inline: 2rem;">
+    <div>
+      <h3><%= @event['name'] %> (self: <%= @event['self_time'].to_f.round(2) %>ms)</h3>
+      <span style="color: var(--black-secondary)">Event spanned from <%= (@event['relative_start_at']).round(2) %>ms
+        to <%= (@event['relative_end_at']).round(2) %>ms
+        with a total duration of <%= @event['duration'].round(2) %>ms. Self time
+        of <%= @event['self_time'].to_f.round(2) %>ms
+      </span>
+    </div>
+    <% if @event['middleware_stack'].present? %>
+      <div class="table-bar-chart">
+        <div class="table-bar-header">Middleware Stack <a href="?sort=slowest">Slowest</a></div>
+        <% total_time = @event['self_time'] %>
+        <% stack = params[:sort].present? ? @event['middleware_stack'].sort_by { |e| -e['self_time'] } : @event['middleware_stack'] %>
+
+        <% stack.each do |middleware_event| %>
+          <div class="table-bar-row" style="view-transition-name: bar-<%= middleware_event['payload']['middleware'].underscore.gsub('/', '__') %>">
+            <% percent = middleware_event['self_time'] / total_time * 100 %>
+            <div class="bar" style="width: <%= percent.round(1) %>%"></div>
+            <%= middleware_event['payload']['middleware'] %>
+            <div> <%= middleware_event['self_time'].to_f.round(2) %>ms</div>
+            <div style="color: var(--black-secondary);white-space: nowrap">(<%= percent.round(1) %>% of total)</div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <dl style="">
+        <dt>Payload</dt>
+        <% if @event['payload'].empty? %>
+          <dd>Nothing in payload</dd>
+        <% else %>
+          <dd class="highlight">
+            <pre class="--scrollable"><%== Rouge.highlight(@event['payload'].to_yaml, 'yaml', Rouge::Formatters::HTMLLinewise.new(Rouge::Formatters::HTML.new, class: 'line')) %></pre>
+            <!--              <pre style="width:100%;overflow: auto;"><%#== Rouge.highlight(JSON.pretty_generate(@event['payload']) , 'json', 'html') %></pre>-->
+          </dd>
+        <% end %>
+
+      </dl>
+    <% end %>
+
+  </div>
+</div>
