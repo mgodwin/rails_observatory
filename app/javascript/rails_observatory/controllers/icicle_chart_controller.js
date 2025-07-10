@@ -24,7 +24,7 @@ export default class extends ApplicationChartController {
           dataPointSelection: (event, chartContext, config) => {
             const dataPoint = this.initialDataValue[config.seriesIndex].data[config.dataPointIndex]
 
-            Turbo.visit(`?event=${dataPoint.start_at}`, {frame: this.selectionFrameIdValue})
+            Turbo.visit(`?event=${dataPoint.start_at}&tab=details`, {frame: this.selectionFrameIdValue})
           }
         },
       },

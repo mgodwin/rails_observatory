@@ -2,6 +2,7 @@ module RailsObservatory
   class RequestsController < ApplicationController
 
     before_action :ensure_indexed, only: :index
+    layout 'rails_observatory/application_time_slice'
 
     def index
       @time_range = (duration.seconds.ago..)

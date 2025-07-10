@@ -1,5 +1,7 @@
 require_relative './events'
 require_relative './logs'
+require_relative '../serializers/serializer'
+
 module RailsObservatory
   class RequestTrace < RedisModel
     include Events
@@ -20,8 +22,38 @@ module RailsObservatory
     alias_attribute :id, :request_id
     alias_attribute :name, :action
 
+    after_save :record_metrics
+
     def self.key_prefix
       "rt"
+    end
+
+    def self.create_from_request(request, start_at, duration, status, events:, logs:)
+      serialized_events = events.map { |event| Serializer.serialize(event) }
+      controller_action = "#{request.params[:controller]}##{request.params[:action]}"
+      new(
+        request_id: request.request_id,
+        status:,
+        http_method: request.method,
+        route_pattern: request.route_uri_pattern,
+        action: controller_action,
+        error: events.any? { _1.payload[:exception] },
+        format: request.format,
+        duration:,
+        time: start_at.to_f,
+        path: request.path,
+        events: serialized_events,
+        logs:
+      )
+    end
+
+    private
+
+    def record_metrics
+      labels = { action:, format:, status:, http_method: }
+      TimeSeries.record_occurrence("request.count", at: time, labels:)
+      TimeSeries.record_occurrence("request.error_count", at: time, labels:) if status >= 500
+      TimeSeries.record_timing("request.latency", duration, at: time, labels:)
     end
 
   end

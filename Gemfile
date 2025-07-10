@@ -4,6 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Specify your gem's dependencies in observatory.gemspec.
 gemspec
 
+gem "stackprof"
 gem "puma"
 
 gem "sqlite3"

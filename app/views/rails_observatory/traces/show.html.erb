@@ -10,24 +10,14 @@
   </div>
   <turbo-frame id="trace-tabs" data-turbo-action="advance" class="layout-area_trace-details">
     <nav class="tabs --sticky">
-      <a href="?tab=details" class="tabs-button <%= "active" if params[:tab] == "details" || params[:tab].blank? %>">
-        Event Details
-      </a>
-      <a href="?tab=logs" class="tabs-button <%= "active" if params[:tab] == "logs" %>">
-        Logs
-      </a>
-      <a href="?tab=mail" class="tabs-button <%= "active" if params[:tab] == "mail" %>">
-        Mail
-        <% if @trace.mail_events.size > 0 %>
-          <span style="color: var(--black-secondary)"><%= @trace.mail_events.size %></span>
-        <% end %>
-      </a>
-      <label class="tabs-button">
-        Jobs
-      </label>
-      <label class="tabs-button">
-        Errors
-      </label>
+      <%= link_to 'Event Details', filter_params.merge({ tab: 'details' }), class: ['tabs-button', { active: current_tab == 'details' }] %>
+      <%= link_to 'Logs', filter_params.merge({ tab: 'logs' }), class: ['tabs-button', { active: current_tab == 'logs' }] %>
+      <%= link_to 'Mail', filter_params.merge({ tab: 'mail' }), class: ['tabs-button', { active: current_tab == 'mail' }] %>
+      <%= link_to 'Jobs', filter_params.merge({ tab: 'jobs' }), class: ['tabs-button', { active: current_tab == 'jobs' }] %>
+      <%= link_to 'Errors', filter_params.merge({ tab: 'errors' }), class: ['tabs-button', { active: current_tab == 'errors' }] %>
+        <%# if @trace.mail_events.size > 0 %>
+<!--          <span style="color: var(--black-secondary)"><%#= @trace.mail_events.size %></span>-->
+        <%# end %>
     </nav>
     <%= render 'event_details' if params[:tab] == 'details' || params[:tab].blank? %>
     <%= render 'logs' if params[:tab] == 'logs' %>

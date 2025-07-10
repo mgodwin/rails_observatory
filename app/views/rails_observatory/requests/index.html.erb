@@ -16,9 +16,6 @@
     <dt>Errors</dt>
     <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1_sum?labels..."><%= metric_value(name: 'request.error_count_sum') %></dd>
   </dl>
-  <%#= render 'text_gauge', title: 'Requests', series: { name: "request.count", agg_method: :sum, duration: duration } %>
-  <%#= render 'text_gauge', title: 'Errors', series: { name: "request.error_count", agg_method: :sum, duration: duration } %>
-  <%#= render 'text_gauge', title: 'Throughput', value: series_sum(name: "request.count").fdiv(duration / 60).round(2), unit: 'rpm' %>
 </div>
 <div class="charts">
   <div class="chart"
@@ -75,7 +72,7 @@
 
 <section class="recent-requests">
   <h2>Recent Request Traces</h2>
-  <turbo-frame id="recent-traces" src="<%= recent_traces_path('rt') %>" loading="lazy"></turbo-frame>
+  <turbo-frame id="recent-traces" src="<%= recent_traces_by_type_path('rt') %>" loading="lazy"></turbo-frame>
 </section>
 </main>
 

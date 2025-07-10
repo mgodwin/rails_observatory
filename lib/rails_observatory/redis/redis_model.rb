@@ -7,6 +7,9 @@ require 'zlib'
 # RedisModel is a base class for models that interact with Redis.
 # It provides methods for serialization, indexing, and compression of attributes.
 # It uses ActiveModel to provide a consistent interface for models.
+
+# Internally it uses Redis Full Text Search (FT) for indexing and querying.
+# It can also compress attributes to save space in Redis.
 module RailsObservatory
   class RedisModel
     include ActiveModel::Model
@@ -19,6 +22,8 @@ module RailsObservatory
       attr_accessor :indexed_attributes
       attr_accessor :compressed_attributes
     end
+
+    define_model_callbacks :save
 
     def self.attribute(name, *args, indexed: true, compressed: false, **rest)
       if indexed
@@ -62,7 +67,7 @@ module RailsObservatory
       attrs = JSON.parse(result).first
 
       compressed_attributes.each do |attr|
-        val = redis.call("GET", [key_prefix, attr].join("_")  + ":#{id}")
+        val = redis.call("GET", [key_prefix, attr].join("_") + ":#{id}")
         attrs.merge!(attr => JSON.parse(Zlib.gunzip(val)))
       end
 
@@ -103,13 +108,15 @@ module RailsObservatory
     end
 
     def save
-      redis.multi do |r|
-        r.call("JSON.SET", self.class.key_name(id), "$", JSON.generate(as_json))
-        self.class.compressed_attributes.each do |attr|
-          compressed_value = Zlib.gzip(JSON.generate(@attributes.fetch_value(attr)), level: Zlib::BEST_COMPRESSION)
-          r.call("SET", [self.class.key_prefix, attr].join("_")  + ":#{id}", compressed_value)
+      run_callbacks :save do
+        redis.multi do |r|
+          r.call("JSON.SET", self.class.key_name(id), "$", JSON.generate(as_json))
+          self.class.compressed_attributes.each do |attr|
+            compressed_value = Zlib.gzip(JSON.generate(@attributes.fetch_value(attr)), level: Zlib::BEST_COMPRESSION)
+            r.call("SET", [self.class.key_prefix, attr].join("_") + ":#{id}", compressed_value)
+          end
+          r.call("EXPIRE", self.class.key_name(id), 1.day.to_i)
         end
-        r.call("EXPIRE", self.class.key_name(id), 1.day.to_i)
       end
     end
 

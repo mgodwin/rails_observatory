@@ -17,7 +17,7 @@ module RailsObservatory
 
     def collect_events_and_logs
       logs = []
-      events = EventCollector.instance.collect_events do
+      events = EventCollector.collect_events do
         logs = LogCollector.collect_logs do
           yield
         end
@@ -35,41 +35,38 @@ module RailsObservatory
         response = @app.call(env)
       end
 
-      controller_action = "#{request.params[:controller]}##{request.params[:action]}"
 
-      if (event = events.find { _1.name == 'process_action.action_controller' && _1.payload[:exception_object] })
-        error = Error.new(exception: event.payload[:exception_object], location: controller_action, time: Time.now)
-        error.save
-        TimeSeries.record_occurrence("error.count", labels: { fingerprint: error.fingerprint })
-      end
+
+      # if (event = events.find { _1.name == 'process_action.action_controller' && _1.payload[:exception_object] })
+      #   error = Error.new(exception: event.payload[:exception_object], location: controller_action, time: Time.now)
+      #   error.save
+      #   TimeSeries.record_occurrence("error.count", labels: { fingerprint: error.fingerprint })
+      # end
 
       return response if request.params[:controller].blank? # || request.params[:controller] =~ /rails_observatory/
 
       status, headers, body = response
+
+      # Using Rack::BodyProxy to ensure timing is recorded after the response is fully processed
       body = ::Rack::BodyProxy.new(body) do
+
+        # TimeSeries.record_occurrence("request.count", labels:)
+        # TimeSeries.record_occurrence("request.error_count", labels:) if status >= 500
+
+        # serialized_events = events.map { Serializer.serialize(_1) }
+        # EventCollection.new(serialized_events).self_time_by_library.each do |library, self_time|
+        #   TimeSeries.record_timing("request.latency/#{library}", self_time, labels: { action: controller_action })
+        # end
         duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start_at_mono)
-        serialized_events = events.map { Serializer.serialize(_1) }
-        # if request trace should not be retained,
-        RequestTrace.new(
-          request_id: request.request_id,
-          status:,
-          http_method: request.method,
-          route_pattern: request.route_uri_pattern,
-          action: controller_action,
-          error: events.any? { _1.payload[:exception] },
-          format: request.format,
-          duration:,
-          time: start_at.to_f,
-          path: request.path,
-          events: serialized_events,
-          logs:
-        ).save
-        labels = { action: controller_action, format: request.format, status:, http_method: request.method }
-        TimeSeries.record_occurrence("request.count", labels:)
-        TimeSeries.record_occurrence("request.error_count", labels:) if status >= 500
-        TimeSeries.record_timing("request.latency", duration, labels:)
-        EventCollection.new(serialized_events).self_time_by_library.each do |library, self_time|
-          TimeSeries.record_timing("request.latency/#{library}", self_time, labels: { action: controller_action })
+
+        RailsObservatory.worker_pool.post do
+          # if request trace should not be retained,
+          trace = RequestTrace.create_from_request(request, start_at, duration, status, events:, logs: )
+          puts "Saving request trace for #{trace.request_id} (#{trace.path})"
+          trace.save
+        rescue => e
+          puts "Error saving request trace: #{e.message}"
+          puts e.backtrace.join("\n")
         end
       rescue => e
         puts e

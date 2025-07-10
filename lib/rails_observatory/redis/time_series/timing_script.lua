@@ -31,9 +31,16 @@ local function extract_parent_label(base_name)
   end
 end
 
+-- Arguments:
+-- ARGV[1]: metric_name (string)
+-- ARGV[2]: value_to_add (number)
+-- ARGV[3]: timestamp (number) - Unix time (integer, in milliseconds)
+-- ARGV[3], ARGV[4], ...: key-value pairs for labels (even indices are keys, odd indices are values)
+
 -- Main script begins here
-local metric_name = tostring(ARGV[1])  -- Ensure it's a string
-local value_to_add = tonumber(ARGV[2]) -- Ensure it's a number
+local metric_name = tostring(ARGV[1])
+local value_to_add = tonumber(ARGV[2])
+local timestamp = tonumber(ARGV[3])
 local raw_retention = 10000 -- Hardcoded to 10ms
 local compaction_retention = 31536000000 -- Hardcoded to 1 year in ms (365*24*60*60*1000)
 local compactions = { "avg", "min", "max" }
@@ -44,7 +51,7 @@ local parent_label = extract_parent_label(metric_name)
 -- Extracting labels
 local labels = {}
 local keys = {}
-for i = 3, #ARGV, 2 do
+for i = 4, #ARGV, 2 do
   local key = tostring(ARGV[i])
   local value = tostring(ARGV[i + 1])
   labels[key] = value
@@ -68,10 +75,20 @@ for _, comb_keys in ipairs(key_combinations) do
     table.insert(label_set, parent_label)
   end
 
+  -- for each combination of keys, create a time series name and add labels
   for _, key in ipairs(comb_keys) do
     ts_name = ts_name .. ":" .. labels[key]
     table.insert(label_set, key)
     table.insert(label_set, labels[key])
+  end
+
+  -- dig prefix indicates tdigest
+  local tdigest_name = "dig-" .. ts_name
+
+  if redis.call("EXISTS", tdigest_name) == 0 then
+    -- The default configuration for TDIGEST.CREATE is sufficient for our use case, compression of 100
+    -- https://redis.io/docs/latest/commands/tdigest.create/
+    redis.call("TDIGEST.CREATE", tdigest_name )
   end
 
   if redis.call("EXISTS", ts_name) == 0 then
@@ -86,7 +103,8 @@ for _, comb_keys in ipairs(key_combinations) do
       redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", compaction, 10000)
     end
   end
-  redis.call("TS.ADD", ts_name, "*", value_to_add)
+  redis.call("TS.ADD", ts_name, timestamp, value_to_add)
+  redis.call("TDIGEST.ADD", tdigest_name, value_to_add)
 end
 
 return "OK"

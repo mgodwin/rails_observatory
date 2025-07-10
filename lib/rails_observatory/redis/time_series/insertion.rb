@@ -43,8 +43,7 @@ module RailsObservatory
   class TimeSeries
     module Insertion
 
-      # TODO: These need to take in a timestamp
-      def distribution(name, value, labels: {})
+      def distribution(name, value, at: Time.now, labels: {})
         prefixed_name = begin
                           if defined?(self::PREFIX)
                             [self::PREFIX, name].join('.')
@@ -52,11 +51,12 @@ module RailsObservatory
                             name
                           end
                         end
-        TIMING_SCRIPT.call(prefixed_name, value, labels.to_a.flatten.map(&:to_s))
+        timestamp = (at.to_f * 1000).to_i
+        TIMING_SCRIPT.call(prefixed_name, value, timestamp, labels.to_a.flatten.map(&:to_s))
       end
       alias_method :record_timing, :distribution
 
-      def increment(name, labels: {})
+      def increment(name, at: Time.now, labels: {})
 
         prefixed_name = begin
                           if defined?(self::PREFIX)
@@ -65,7 +65,8 @@ module RailsObservatory
                             name
                           end
                         end
-        INCREMENT_CALL.call(prefixed_name, labels.to_a.flatten.map(&:to_s))
+        timestamp = (at.to_f * 1000).to_i
+        INCREMENT_CALL.call(prefixed_name, timestamp, labels.to_a.flatten.map(&:to_s))
       end
       alias_method :record_occurrence, :increment
     end

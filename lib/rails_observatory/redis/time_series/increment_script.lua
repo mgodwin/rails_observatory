@@ -22,8 +22,14 @@ local function generate_key_combinations(keys)
   return combs
 end
 
+-- Arguments:
+-- ARGV[1]: metric_name (string)
+-- ARGV[2]: timestamp (number) - Unix time (integer, in milliseconds)
+-- ARGV[3], ARGV[4], ...: key-value pairs for labels (even indices are keys, odd indices are values)
+
 -- Main script begins here
-local metric_name = tostring(ARGV[1])  -- Ensure it's a string
+local metric_name = tostring(ARGV[1])
+local timestamp = tonumber(ARGV[2])
 local raw_retention = 10000 -- Hardcoded to 10ms
 local compaction_retention = 31536000000 -- Hardcoded to 1 year in ms (365*24*60*60*1000)
 
@@ -31,7 +37,7 @@ local compaction_retention = 31536000000 -- Hardcoded to 1 year in ms (365*24*60
 ---@type table
 local labels = {}
 local keys = {}
-for i = 2, #ARGV, 2 do
+for i = 3, #ARGV, 2 do
   local key = tostring(ARGV[i])
   local value = tostring(ARGV[i + 1])
   labels[key] = value
@@ -61,7 +67,7 @@ for _, comb_keys in ipairs(key_combinations) do
     redis.call("TS.CREATE", compaction_key, "RETENTION", compaction_retention, "CHUNK_SIZE", 48, "LABELS", "name", metric_name, "compaction", "sum", unpack(label_set))
     redis.call("TS.CREATERULE", ts_name, compaction_key, "AGGREGATION", "sum", 10000)
   end
-  redis.call("TS.ADD", ts_name, "*", 1, 'ON_DUPLICATE', 'SUM')
+  redis.call("TS.ADD", ts_name, timestamp, 1, 'ON_DUPLICATE', 'SUM')
 end
 
 return "OK"

@@ -4,6 +4,9 @@ require "turbo-rails"
 require "stimulus-rails"
 
 require_relative './action_mailer_subscriber'
+
+
+
 module RailsObservatory
 
   class Engine < ::Rails::Engine
@@ -15,6 +18,11 @@ module RailsObservatory
     config.rails_observatory = ActiveSupport::OrderedOptions.new
     config.rails_observatory.redis = { host: "localhost", port: 6379, db: 0, pool_size: ENV["RAILS_MAX_THREADS"] || 3 }
 
+    initializer 'rails_observatory.inflections' do
+      ActiveSupport::Inflector.inflections do |inflect|
+        inflect.irregular "trace_by_type", "traces_by_type"
+      end
+    end
     initializer "rails_observatory.redis" do |app|
       require_relative './redis/logging_middleware'
       require_relative './redis/redis_client_instrumentation'
@@ -29,10 +37,33 @@ module RailsObservatory
       # Application middleware is not instrumented UNLESS there's an ActiveSupport::Notification subscriber listening.
       # By instantiating the collector, we register a subscriber and ensure that the InstrumentationProxy is used in
       # our application middleware stack.
-      EventCollector.instance
+      EventCollector.start
+
+      # puts app.middleware.inspect
 
       # Add the RailsObservatory middleware to the top of the application middleware stack
       app.middleware.unshift(Middleware)
+
+      ## This patch exists to reduce the call stack depth when instrumenting middleware calls.
+      module PatchInstrumentationProxy
+        def call(env)
+          result = nil
+          handle = ActiveSupport::Notifications.instrumenter.build_handle(ActionDispatch::MiddlewareStack::InstrumentationProxy::EVENT_NAME, @payload)
+          handle.start
+          begin
+            result = @middleware.call(env)
+          rescue Exception => e
+            @payload[:exception] = [e.class.name, e.message]
+            @payload[:exception_object] = e
+            raise e
+          ensure
+            handle.finish
+          end
+          result
+        end
+      end
+
+      ActionDispatch::MiddlewareStack::InstrumentationProxy.prepend(PatchInstrumentationProxy)
     end
 
     initializer "rails_observatory.active_job_instrumentation" do
@@ -41,6 +72,10 @@ module RailsObservatory
         require_relative './railties/active_job_instrumentation'
         active_job.include(Railties::ActiveJobInstrumentation)
       end
+    end
+
+    initializer "rails_observatory.worker_pool" do |app|
+
     end
 
     initializer "rails_observatory.logger" do |app|

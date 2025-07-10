@@ -1,7 +1,7 @@
 RailsObservatory::Engine.routes.draw do
   resources :requests, only: [:index, :show]
 
-  resources :traces, only: [:index, :show], path: 'traces/:type' do
+  resources :traces, only: [:index, :show], path: 'traces/:type', as: :traces_by_type do
     get 'recent', on: :collection
   end
 

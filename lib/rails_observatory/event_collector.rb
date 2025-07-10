@@ -1,43 +1,41 @@
 module RailsObservatory
   class EventCollector
-    include Singleton
 
-    COLLECTOR_LIST_KEY = :ro_collector
-
-    def initialize
-      @subscriber ||= ActiveSupport::Notifications.subscribe(/\A[^!]/, self)
+    def self.capturing_events?
+      ActiveSupport::IsolatedExecutionState[:rails_observatory_capture_events] == true
     end
 
-    def call(event)
-      return if ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY].blank?
+    def self.current_events
+      ActiveSupport::IsolatedExecutionState[:rails_observatory_events]
+    end
 
-      ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY].each do |key|
-        if (events = ActiveSupport::IsolatedExecutionState[key])
-          events << event
-        end
+    def self.start
+      @subscriber ||= ActiveSupport::Notifications.subscribe(/\A[^!]/) do |event|
+        current_events << event if capturing_events?
       end
-
     end
 
-    def generate_collector_key
-      "collector:#{Object.new.object_id}"
+    def self.stop
+      if @subscriber
+        ActiveSupport::Notifications.unsubscribe(@subscriber)
+        @subscriber = nil
+      end
     end
 
 
-    def collect_events
+    def self.collect_events
+      raise "EventCollector must be started before collecting events" unless @subscriber
       events = []
-      key = generate_collector_key
-      ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY] ||= []
-      ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY] << key
-      ActiveSupport::IsolatedExecutionState[key] = events
+      ActiveSupport::IsolatedExecutionState[:rails_observatory_capture_events] = true
+      ActiveSupport::IsolatedExecutionState[:rails_observatory_events] = events
       yield
       events
     rescue Exception => e
       e.instance_variable_set(:@_trace_events, events)
       raise
     ensure
-      ActiveSupport::IsolatedExecutionState[COLLECTOR_LIST_KEY].delete(key)
-      ActiveSupport::IsolatedExecutionState.delete(key)
+      ActiveSupport::IsolatedExecutionState.delete(:rails_observatory_capture_events)
+      ActiveSupport::IsolatedExecutionState.delete(:rails_observatory_events)
     end
   end
 end
