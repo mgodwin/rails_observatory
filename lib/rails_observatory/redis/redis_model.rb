@@ -5,11 +5,26 @@ require_relative './redis_model/query_builder'
 require 'zlib'
 
 # RedisModel is a base class for models that interact with Redis.
-# It provides methods for serialization, indexing, and compression of attributes.
-# It uses ActiveModel to provide a consistent interface for models.
-
 # Internally it uses Redis Full Text Search (FT) for indexing and querying.
 # It can also compress attributes to save space in Redis.
+#
+# Records are stored as JSON keys in Redis with a specific key prefix which is later
+# used to create an index for searching.
+# Example:
+#   a key prefix of `rt` will result in keys like `rt:12347`
+#
+# Using RedisModel.create_redis_index you can index all saved models using Redis Full Text Search.
+# This command takes a key prefix to know which keys to index.
+#
+# Once an index is created, you can find and search for records using an ActiveRecord inspired
+# query interface.
+#
+# ## Compressed Attributes
+# This class also supports compression of attributes using zlib.
+# Compressed attributes are stored in Redis as separate keys with a specific format.
+# e.g. a compressed attribute `data` for a record with id `12347` will be stored as `rt_data:12347`
+# Compressed attributes are not included in the JSON representation of the model, and are not searchable.
+# They can be used after loading the model like a normal attribute and will be automatically decompressed when accessed.
 module RailsObservatory
   class RedisModel
     include ActiveModel::Model
