@@ -5,7 +5,7 @@ module RailsObservatory
     before_action :update_session_time
     around_action :set_time_range
     def set_time_range
-      TimeSeries.with_slice(time_slice) do
+      RedisTimeSeries.with_slice(time_slice) do
         yield
       end
     end

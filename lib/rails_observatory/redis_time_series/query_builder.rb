@@ -1,8 +1,7 @@
-require_relative '../connection'
 module RailsObservatory
-  class TimeSeries
+  class RedisTimeSeries
     class QueryBuilder
-      include Connection
+      include RedisConnection
       include Enumerable
 
       def initialize
@@ -85,7 +84,7 @@ module RailsObservatory
         return if res.nil?
 
         res.each do |name, labels, data|
-          yield TimeSeries.new(
+          yield RedisTimeSeries.new(
             name:,
             labels: Hash[*labels.flatten],
             data:,
@@ -101,7 +100,6 @@ module RailsObservatory
         end_time = @range.end || Time.now
         start_time = @range.begin || 12.months.ago.to_time
         available_datapoints = ((end_time - start_time) / 10.0).to_i
-        puts "available_datapoints #{available_datapoints}"
         datapoints = [@samples, available_datapoints].min
         ((end_time - start_time) * 1000 / datapoints).to_i
       end

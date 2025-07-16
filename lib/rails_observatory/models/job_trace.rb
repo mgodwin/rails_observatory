@@ -1,7 +1,3 @@
-require_relative '../redis/redis_model'
-require_relative './events'
-require_relative './logs'
-
 module RailsObservatory
   class JobTrace < RedisModel
     include Events

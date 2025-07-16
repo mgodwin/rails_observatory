@@ -1,8 +1,7 @@
-require_relative '../connection'
 module RailsObservatory
   class RedisModel
     class QueryBuilder
-      include Connection
+      include RedisConnection
       include Enumerable
 
       def initialize(model_class)

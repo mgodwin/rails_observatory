@@ -1,15 +1,10 @@
 # frozen_string_literal: true
 
-require "active_support/notifications"
-require_relative './event_collector'
-require_relative './models/request_trace'
-require_relative './models/error'
-require_relative './serializers/serializer'
+# require "active_support/notifications"
 require 'zlib'
-require 'benchmark'
 
 module RailsObservatory
-  class Middleware
+  class RequestMiddleware
 
     def initialize(app)
       @app = app
@@ -60,10 +55,7 @@ module RailsObservatory
         duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start_at_mono)
 
         RailsObservatory.worker_pool.post do
-          # if request trace should not be retained,
-          trace = RequestTrace.create_from_request(request, start_at, duration, status, events:, logs: )
-          puts "Saving request trace for #{trace.request_id} (#{trace.path})"
-          trace.save
+          RequestTrace.create_from_request(request, start_at, duration, status, events:, logs: ).save
         rescue => e
           puts "Error saving request trace: #{e.message}"
           puts e.backtrace.join("\n")

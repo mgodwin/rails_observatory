@@ -5,9 +5,9 @@ module RailsObservatory
 
     def index
 
-      series = TimeSeries.where(**labels)
-                         .slice(duration.seconds.ago..)
-                         .downsample(samples, using: agg_method)
+      series = RedisTimeSeries.where(**labels)
+                              .slice(duration.seconds.ago..)
+                              .downsample(samples, using: agg_method)
 
       render json: series.map { |s| { name: s.name.split("/").last, data: s.filled_data } }, status: :ok
     end

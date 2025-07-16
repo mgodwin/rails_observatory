@@ -82,8 +82,9 @@ for _, comb_keys in ipairs(key_combinations) do
     table.insert(label_set, labels[key])
   end
 
-  -- dig prefix indicates tdigest
-  local tdigest_name = "dig-" .. ts_name
+  -- di prefix indicates tdigest
+  local tdigest_name = "di-" .. metric_name .. '?' .. table.concat(label_set, ',')
+  redis.call("SADD", "tdigests", tdigest_name)
 
   if redis.call("EXISTS", tdigest_name) == 0 then
     -- The default configuration for TDIGEST.CREATE is sufficient for our use case, compression of 100
@@ -105,6 +106,7 @@ for _, comb_keys in ipairs(key_combinations) do
   end
   redis.call("TS.ADD", ts_name, timestamp, value_to_add)
   redis.call("TDIGEST.ADD", tdigest_name, value_to_add)
+  redis.call("EXPIRE", tdigest_name, 60) -- Set a TTL for the tdigest to ensure we clear up old tdigests that are not used
 end
 
 return "OK"

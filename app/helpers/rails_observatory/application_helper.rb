@@ -16,9 +16,9 @@ module RailsObservatory
 
     def series_for(name:, aggregate_using:, time_range: nil, downsample: 60, children: false, **opts)
       if children
-        series = TimeSeries.where(parent: name, **opts)
+        series = RedisTimeSeries.where(parent: name, **opts)
       else
-        series = TimeSeries.where(name:, **opts)
+        series = RedisTimeSeries.where(name:, **opts)
       end
       series = series.downsample(downsample, using: aggregate_using)
       series = series.slice(time_range) if time_range
@@ -26,28 +26,35 @@ module RailsObservatory
     end
 
     def series_sum(name:)
-      TimeSeries.where(name:).sum
+      RedisTimeSeries.where(name:).sum
     end
 
-    # Pass a metric name like "requests.count_sum" or "requests.latency_avg"
-    def metric_series(name:, **opts)
-      compaction = name.split('_').last
-      query_name = name.gsub(/_(sum|avg|min|max)$/, '')
-      conditions = { name: query_name, compaction: }.merge(**opts.without(:children))
-      if opts[:children] == true
+    # Pass a metric name like "requests.count|sum->60@avg" or "requests.latency|avg->60@avg"
+    # The format is "<metric_name>|<compaction>-><downsample>@<aggregate_function>"
+    # You can optionally specify child metrics by using a `/*` in the metric name.
+    # # Example: "requests.latency/*|sum->60@avg"
+    #    - would return requests.latency/action_dispatch and requests.latency/active_record, etc.
+    # Additionally you can pass a compaction of `all` to get all compactions for the metric.
+    # # Example: "requests.latency|all->60@avg"
+    #   - returns request.latency|max, request.latency|min, request.latency|avg, request.latency|p95, etc.
+    def metric_series(name)
+      /\A(?<metric_name>.+?)\|(?<compaction>[^->]+)->(?<buckets>\d+)@(?<rollup_fn>.+)\z/ =~ name
+      conditions = { compaction:, name: metric_name }
+      if metric_name =~ /\/\*\z/
+        conditions[:parent] = metric_name.gsub(/\/\*\z/, '')
         conditions.delete(:name)
-        conditions[:parent] = query_name
       end
-      TimeSeries
+      conditions.delete(:compaction) if compaction == 'all'
+      RedisTimeSeries
         .where(**conditions)
-        .downsample(60, using: compaction.to_sym)
+        .downsample(buckets.to_i, using: rollup_fn.to_sym)
         .to_a
         .map { |s| { name: s.name.split("/").last, data: s.filled_data } }
     end
 
     def metric_value(name:, **labels)
       compaction_name = name.split('_').last
-      TimeSeries.where(name: name.gsub(/_(sum|avg|min|max)$/, ''), **labels.merge(compaction: compaction_name)).downsample(1, using: compaction_name.to_sym).to_a.first&.value
+      RedisTimeSeries.where(name: name.gsub(/_(sum|avg|min|max)$/, ''), **labels.merge(compaction: compaction_name)).downsample(1, using: compaction_name.to_sym).to_a.first&.value
     end
 
     def time_slice_start

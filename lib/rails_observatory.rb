@@ -1,5 +1,13 @@
-require 'rails_observatory/engine'
-require 'rails_observatory/server'
+require 'importmap-rails'
+require "zeitwerk"
+
+loader = Zeitwerk::Loader.for_gem
+loader.push_dir("#{__dir__}/rails_observatory/models", namespace: RailsObservatory)
+loader.push_dir("#{__dir__}/rails_observatory/mailer_previews")
+loader.push_dir("#{__dir__}/rails_observatory/serializers", namespace: RailsObservatory)
+loader.setup
+loader.eager_load
+
 module RailsObservatory
   mattr_accessor :importmap, default: Importmap::Map.new
 
@@ -14,11 +22,11 @@ module RailsObservatory
 
 
   module_function def record_occurrence(...)
-    TimeSeries.record_occurrence(...)
+    RedisTimeSeries.record_occurrence(...)
   end
 
   module_function def record_timing(...)
-    TimeSeries.record_timing(...)
+    RedisTimeSeries.record_timing(...)
   end
 
 end

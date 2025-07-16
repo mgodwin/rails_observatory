@@ -1,5 +1,5 @@
 module RailsObservatory
-  module Connection
+  module RedisConnection
     extend ActiveSupport::Concern
 
     class_methods do

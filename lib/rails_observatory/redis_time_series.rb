@@ -1,11 +1,7 @@
-require_relative 'time_series/insertion'
-require_relative 'time_series/query_builder'
-require_relative './connection'
-
 module RailsObservatory
-  class TimeSeries
+  class RedisTimeSeries
     extend Insertion
-    include Connection
+    include RedisConnection
 
     attr_reader :labels, :name, :data
 

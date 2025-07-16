@@ -3,10 +3,6 @@ require "importmap-rails"
 require "turbo-rails"
 require "stimulus-rails"
 
-require_relative './action_mailer_subscriber'
-
-
-
 module RailsObservatory
 
   class Engine < ::Rails::Engine
@@ -23,17 +19,14 @@ module RailsObservatory
         inflect.irregular "trace_by_type", "traces_by_type"
       end
     end
+
     initializer "rails_observatory.redis" do |app|
-      require_relative './redis/logging_middleware'
-      require_relative './redis/redis_client_instrumentation'
       app.config.rails_observatory.redis => pool_size:, **redis_config
       redis_config = RedisClient.config(**redis_config.merge(middlewares: [RedisClientInstrumentation]))
       app.config.rails_observatory.redis = redis_config.new_pool(timeout: 0.5, size: pool_size)
     end
 
     initializer "rails_observatory.middleware" do |app|
-      require_relative './middleware'
-
       # Application middleware is not instrumented UNLESS there's an ActiveSupport::Notification subscriber listening.
       # By instantiating the collector, we register a subscriber and ensure that the InstrumentationProxy is used in
       # our application middleware stack.
@@ -42,7 +35,7 @@ module RailsObservatory
       # puts app.middleware.inspect
 
       # Add the RailsObservatory middleware to the top of the application middleware stack
-      app.middleware.unshift(Middleware)
+      app.middleware.unshift(RequestMiddleware)
 
       ## This patch exists to reduce the call stack depth when instrumenting middleware calls.
       module PatchInstrumentationProxy
@@ -67,9 +60,7 @@ module RailsObservatory
     end
 
     initializer "rails_observatory.active_job_instrumentation" do
-      require_relative './models/job_trace'
       ActiveSupport.on_load(:active_job) do |active_job|
-        require_relative './railties/active_job_instrumentation'
         active_job.include(Railties::ActiveJobInstrumentation)
       end
     end
@@ -79,7 +70,6 @@ module RailsObservatory
     end
 
     initializer "rails_observatory.logger" do |app|
-      require_relative './log_collector'
       Rails.logger.broadcast_to(LogCollector.new)
     end
 

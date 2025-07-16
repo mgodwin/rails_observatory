@@ -24,7 +24,7 @@ module RailsObservatory
     end
 
     def latest_data
-      series = TimeSeries.where(**labels).slice(duration.seconds.ago..).downsample(40, using: agg_method.to_sym)
+      series = RedisTimeSeries.where(**labels).slice(duration.seconds.ago..).downsample(40, using: agg_method.to_sym)
       series.map { |s| { name: s.name.split("/").last, data: s.filled_data } }
     end
 

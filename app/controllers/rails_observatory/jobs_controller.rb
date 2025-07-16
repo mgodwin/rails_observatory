@@ -13,7 +13,7 @@ module RailsObservatory
     end
 
     def set_time_range
-      TimeSeries.with_slice(duration.seconds.ago..) do
+      RedisTimeSeries.with_slice(duration.seconds.ago..) do
         yield
       end
     end

@@ -1,5 +1,5 @@
 <% content_for(:title, 'Jobs') %>
-
+<main>
 <%#= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
 <div style="padding: 2rem;">
 <%= render 'chart', name: 'Performed', series: { name: 'job.count', aggregate_using: :sum }, type: 'bar' %>
@@ -18,3 +18,4 @@
              }
   %>
 </section>
+</main>

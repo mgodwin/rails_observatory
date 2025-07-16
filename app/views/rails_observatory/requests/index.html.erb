@@ -21,13 +21,13 @@
   <div class="chart"
        id="request-count-chart"
        data-controller="bar-chart"
-       data-bar-chart-initial-data-value="<%= metric_series(name: 'request.count_sum').to_json %>"
+       data-bar-chart-initial-data-value="<%= metric_series('request.count|sum->60@sum').to_json %>"
        data-bar-chart-group-value="request-charts"
        data-bar-chart-name-value="Requests"></div>
   <div class="chart"
        id="mean-response-time-chart"
        data-controller="area-chart"
-       data-area-chart-initial-data-value="<%= metric_series(name: 'request.latency_avg').to_json %>"
+       data-area-chart-initial-data-value="<%= metric_series('request.latency|all->60@avg').to_json %>"
        data-area-chart-group-value="request-charts"
        data-area-chart-name-value="Mean Response Time"></div>
   <div class="chart"
@@ -35,12 +35,12 @@
        data-controller="area-chart"
        data-area-chart-stacked-value="true"
        data-area-chart-group-value="request-charts"
-       data-area-chart-initial-data-value="<%= metric_series(name: 'request.latency_avg', children: true).to_json %>"
-       data-area-chart-name-value="Mean Response Time"></div>
+       data-area-chart-initial-data-value="<%= metric_series('request.latency/*|avg->60@avg').to_json %>"
+       data-area-chart-name-value="Mean Response Time By Namespace"></div>
   <div class="chart"
        id="error-count-chart"
        data-controller="bar-chart"
-       data-bar-chart-initial-data-value="<%= metric_series(name: 'request.error_count_sum').to_json %>"
+       data-bar-chart-initial-data-value="<%= metric_series('request.error_count|sum->60@sum').to_json %>"
        data-bar-chart-group-value="request-charts"
        data-bar-chart-name-value="Errors"></div>
 </div>

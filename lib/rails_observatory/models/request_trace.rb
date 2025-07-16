@@ -1,7 +1,3 @@
-require_relative './events'
-require_relative './logs'
-require_relative '../serializers/serializer'
-
 module RailsObservatory
   class RequestTrace < RedisModel
     include Events
@@ -51,9 +47,9 @@ module RailsObservatory
 
     def record_metrics
       labels = { action:, format:, status:, http_method: }
-      TimeSeries.record_occurrence("request.count", at: time, labels:)
-      TimeSeries.record_occurrence("request.error_count", at: time, labels:) if status >= 500
-      TimeSeries.record_timing("request.latency", duration, at: time, labels:)
+      RedisTimeSeries.record_occurrence("request.count", at: time, labels:)
+      RedisTimeSeries.record_occurrence("request.error_count", at: time, labels:) if status >= 500
+      RedisTimeSeries.record_timing("request.latency", duration, at: time, labels:)
     end
 
   end

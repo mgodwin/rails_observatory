@@ -1,4 +1,4 @@
-<% hashes = metrics.map { |name, agg| RailsObservatory::TimeSeries.where(name:).group(group_by).send(agg) } %>
+<% hashes = metrics.map { |name, agg| RailsObservatory::RedisTimeSeries.where(name:).group(group_by).send(agg) } %>
 
 <section>
   <h2><%= name %></h2>

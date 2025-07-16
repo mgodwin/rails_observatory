@@ -1,5 +1,3 @@
-require_relative '../redis/redis_model'
-
 module RailsObservatory
   class MailDelivery < RedisModel
     attribute :message_id, :string

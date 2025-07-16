@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+echo $@
+docker compose cp lib/rails_observatory/redis_scripts/$1 redis-dev:.
+docker compose exec redis-dev redis-cli --ldb --eval $@

@@ -1,10 +1,3 @@
-require_relative './job_serializer'
-require_relative './mail_delivery_job_serializer'
-require_relative './event_serializer'
-require_relative './request_serializer'
-require_relative './headers_serializer'
-require_relative './response_serializer'
-
 module RailsObservatory
   class Serializer
 

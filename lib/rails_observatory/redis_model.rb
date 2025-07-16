@@ -1,7 +1,3 @@
-require_relative '../serializers/serializer'
-require_relative '../event_collection'
-require_relative './time_series'
-require_relative './redis_model/query_builder'
 require 'zlib'
 
 # RedisModel is a base class for models that interact with Redis.
