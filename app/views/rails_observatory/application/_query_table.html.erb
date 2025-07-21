@@ -1,5 +1,5 @@
 <div class="query-table"
-     data-controller="query-table data-frame"
+     data-controller="query-table"
      style="--column-count: <%= fields.size %>"
      <%= tag.attributes(local_assigns[:attributes]) if local_assigns[:attributes] %>>
   <% fields.each.with_index(1) do |f, i| %>
@@ -31,8 +31,8 @@
     <% end %>
   </div>
   <div class="pagination">
-    <button class="secondary" data-href="?page=1" data-action="click->data-frame#navigate">1</button>
-    <button class="secondary" data-href="?page=2" data-action="click->data-frame#navigate">2</button>
+    <button class="secondary" data-href="?page=1">1</button>
+    <button class="secondary" data-href="?page=2">2</button>
     <button class="secondary" data-href="">3</button>
     <button class="secondary" data-href="">4</button>
   </div>

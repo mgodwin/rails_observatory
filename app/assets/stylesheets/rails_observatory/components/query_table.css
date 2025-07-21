@@ -81,4 +81,8 @@
     grid-column: -1 / 1;
   }
 
+  ._column[data-column-name="status"] {
+
+  }
+
 }

@@ -1,9 +1,19 @@
 section {
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    margin: 0;
-    padding: 2rem;
+  header {
     border-bottom: 1px solid var(--divider);
+    padding: 2rem;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    &:has(h2 + *) h2 {
+      padding-bottom: 1rem;
+    }
   }
 }

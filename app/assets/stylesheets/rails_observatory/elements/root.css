@@ -16,6 +16,10 @@
   --font-weight-bold: 400;
 
   --rounded: 0.5rem 0.5rem;
+
+  --success: #38a238;
+  --error: var(--red);
+  --warning: #ffae42;
 }
 
 

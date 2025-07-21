@@ -1,0 +1,17 @@
+.status-badge {
+  color: var(--white);
+  padding: .25rem .5rem;
+  border-radius: .5rem;
+
+  &.error {
+    background-color: var(--error);
+  }
+
+  &.success {
+    background-color: var(--success);
+  }
+
+  &.warning {
+    background-color: var(--warning);
+  }
+}

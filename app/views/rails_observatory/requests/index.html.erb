@@ -1,78 +1,83 @@
 <% content_for(:title, params[:controller_action].presence || 'Requests') %>
 <% content_for(:subtitle, 'Requests') if params[:controller_action] %>
 <main class="layout-requests_index">
-<div class="summary-panel">
-  <dl>
-    <dt>Requests</dt>
-    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.count_sum') %></dd>
-    <dt>Mean Response Time</dt>
-    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_avg') %>
-      ms
-    </dd>
-    <dt>Max Response Time</dt>
-    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_max') %>
-      ms
-    </dd>
-    <dt>Errors</dt>
-    <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1_sum?labels..."><%= metric_value(name: 'request.error_count_sum') %></dd>
-  </dl>
-</div>
-<div class="charts">
-  <div class="chart"
-       id="request-count-chart"
-       data-controller="bar-chart"
-       data-bar-chart-initial-data-value="<%= metric_series('request.count|sum->60@sum').to_json %>"
-       data-bar-chart-group-value="request-charts"
-       data-bar-chart-name-value="Requests"></div>
-  <div class="chart"
-       id="mean-response-time-chart"
-       data-controller="area-chart"
-       data-area-chart-initial-data-value="<%= metric_series('request.latency|all->60@avg').to_json %>"
-       data-area-chart-group-value="request-charts"
-       data-area-chart-name-value="Mean Response Time"></div>
-  <div class="chart"
-       id="stacked-response-time-chart"
-       data-controller="area-chart"
-       data-area-chart-stacked-value="true"
-       data-area-chart-group-value="request-charts"
-       data-area-chart-initial-data-value="<%= metric_series('request.latency/*|avg->60@avg').to_json %>"
-       data-area-chart-name-value="Mean Response Time By Namespace"></div>
-  <div class="chart"
-       id="error-count-chart"
-       data-controller="bar-chart"
-       data-bar-chart-initial-data-value="<%= metric_series('request.error_count|sum->60@sum').to_json %>"
-       data-bar-chart-group-value="request-charts"
-       data-bar-chart-name-value="Errors"></div>
-</div>
-<% if params[:controller_action].blank? %>
-  <section class="layout-requests_index-by_controller">
-    <h2>By Controller Action</h2>
-    <div class="table-chart ">
-      <table>
-        <thead>
-        <tr>
-          <th>Controller Action</th>
-          <th>Requests</th>
-          <th>Avg Latency</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% @count_by_controller.each do |series| %>
+  <div class="summary-panel">
+    <dl>
+      <dt>Requests</dt>
+      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.count_sum') %></dd>
+      <dt>Mean Response Time</dt>
+      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_avg') %>
+        ms
+      </dd>
+      <dt>Max Response Time</dt>
+      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_max') %>
+        ms
+      </dd>
+      <dt>Errors</dt>
+      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1_sum?labels..."><%= metric_value(name: 'request.error_count_sum') %></dd>
+    </dl>
+  </div>
+  <div class="charts">
+    <div class="chart"
+         id="request-count-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('request.count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="request-charts"
+         data-bar-chart-name-value="Requests"></div>
+    <div class="chart"
+         id="mean-response-time-chart"
+         data-controller="area-chart"
+         data-area-chart-initial-data-value="<%= metric_series('request.latency|all->60@avg').to_json %>"
+         data-area-chart-group-value="request-charts"
+         data-area-chart-name-value="Mean Response Time"></div>
+    <div class="chart"
+         id="stacked-response-time-chart"
+         data-controller="area-chart"
+         data-area-chart-stacked-value="true"
+         data-area-chart-group-value="request-charts"
+         data-area-chart-initial-data-value="<%= metric_series('request.latency/*|avg->60@avg').to_json %>"
+         data-area-chart-name-value="Mean Response Time By Namespace"></div>
+    <div class="chart"
+         id="error-count-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('request.error_count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="request-charts"
+         data-bar-chart-name-value="Errors"></div>
+  </div>
+  <% if params[:controller_action].blank? %>
+    <section class="layout-requests_index-by_controller">
+      <h2>By Controller Action</h2>
+      <div class="table-chart ">
+        <table>
+          <thead>
           <tr>
-            <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param), class: 'table-chart-row-action' %></td>
-            <td><%= series.data.dig(0, 1) %></td>
-            <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
+            <th>Controller Action</th>
+            <th>Requests</th>
+            <th>Avg Latency</th>
           </tr>
-        <% end %>
-        </tbody>
-      </table>
-    </div>
-  </section>
-<% end %>
+          </thead>
+          <tbody>
+          <% @count_by_controller.each do |series| %>
+            <tr>
+              <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param), class: 'table-chart-row-action' %></td>
+              <td><%= series.data.dig(0, 1) %></td>
+              <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
 
-<section class="recent-requests">
-  <h2>Recent Request Traces</h2>
-  <turbo-frame id="recent-traces" src="<%= recent_traces_by_type_path('rt') %>" loading="lazy"></turbo-frame>
-</section>
+  <section class="recent-requests">
+    <header>
+      <h2>Recent Request Traces</h2>
+      <div class="search-bar">
+        <input type="search" placeholder="Search..." />
+      </div>
+    </header>
+    <turbo-frame id="recent-traces" src="<%= recent_traces_by_type_path('rt') %>" loading="lazy"></turbo-frame>
+  </section>
 </main>
 
