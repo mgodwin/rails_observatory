@@ -26,5 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rouge'
 
   spec.add_development_dependency "faker"
-  spec.add_development_dependency "propshaft"
+  spec.add_development_dependency 'propshaft'
+  spec.add_development_dependency 'standard', "~> 1.0", ">= 1.1.0"
 end

@@ -50,6 +50,11 @@ module RailsObservatory
       RedisTimeSeries.record_occurrence("request.count", at: time, labels:)
       RedisTimeSeries.record_occurrence("request.error_count", at: time, labels:) if status >= 500
       RedisTimeSeries.record_timing("request.latency", duration, at: time, labels:)
+
+      # Record per-library latency breakdown for namespace chart
+      events.self_time_by_library.each do |library, self_time|
+        RedisTimeSeries.record_timing("request.latency", self_time, at: time, labels: { action:, namespace: library })
+      end
     end
 
   end
