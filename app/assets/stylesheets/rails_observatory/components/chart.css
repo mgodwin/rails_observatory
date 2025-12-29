@@ -2,7 +2,7 @@
   [data-chart-type-value="icicle"] {
     .apexcharts-legend-series {
       display: flex;
-      gap: .25rem;
+      gap: var(--gap-sm);
       align-items: center;
     }
 
@@ -11,16 +11,16 @@
       flex-grow: 1;
       align-items: center;
       justify-content: space-between;
-      gap: 2rem;
-      padding-block: .25rem;
+      gap: var(--sp-6);
+      padding-block: var(--sp-1);
 
       .percent {
         display: flex;
-        gap: .5rem;
+        gap: var(--gap-md);
       }
 
       .bar {
-        width: 2rem;
+        width: var(--sp-6);
         height: 14px;
         background-color: var(--surface-card);
 

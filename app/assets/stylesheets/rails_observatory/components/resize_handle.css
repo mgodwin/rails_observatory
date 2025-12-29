@@ -7,10 +7,10 @@
     border-radius: 9999px 9999px;
     cursor: ns-resize;
     background-color: var(--divider-active);
-    transition: all 220ms ease-in-out;
+    transition: all var(--transition-standard);
 
     &:hover {
-      background-color: dodgerblue;
+      background-color: var(--accent);
     }
   }
 }

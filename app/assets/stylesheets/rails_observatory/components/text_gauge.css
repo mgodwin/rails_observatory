@@ -5,8 +5,8 @@
       display: flex;
       align-items: center;
       flex-direction: column;
-      padding-block: 1rem;
-      padding-inline: 2rem;
+      padding-block: var(--sp-4);
+      padding-inline: var(--sp-6);
       white-space: nowrap;
       background-color: var(--surface-card);
     }
@@ -15,8 +15,8 @@
     }
 
     .value {
-      font-size: 3rem;
-      font-weight: 400;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
     }
   }
 }

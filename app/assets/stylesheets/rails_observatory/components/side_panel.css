@@ -1,17 +1,17 @@
 .side-panel {
   color: var(--white);
-  padding: 2rem;
+  padding: var(--padding-lg);
 
   ._occurrence_count {
-    font-size: 1.5rem;
-    font-weight: 400;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
   }
 
   & dl {
     margin: 0;
 
     & dt {
-      font-weight: 400;
+      font-weight: var(--font-weight-bold);
       margin: 0;
       color: var(--black-secondary);
       font-size: 1.15rem;
@@ -19,7 +19,7 @@
 
     & dd {
       margin: 0;
-      padding-block: .5rem;
+      padding-block: var(--sp-2);
 
       &[title] {
         text-decoration: underline;

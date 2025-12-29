@@ -1,11 +1,11 @@
 .tabs {
-  border-bottom: 1px solid var(--divider);
+  border-bottom: var(--border-divider);
   /*border-top: 1px solid var(--divider);*/
   padding-block: .5rem;
   padding-inline: 1.25rem;
 
   display: flex;
-  gap: .25rem;
+  gap: var(--gap-sm);
 
   .tabs-button {
     /* Mixin .mixin-nav-button */
@@ -41,7 +41,7 @@
     margin-left: 0;
   }
   & dt {
-    font-weight: 400;
+    font-weight: var(--font-weight-bold);
     color: var(--black-secondary);
     margin-bottom: .75rem;
   }

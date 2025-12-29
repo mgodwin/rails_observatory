@@ -4,11 +4,10 @@
 
   input[type="search"] {
     flex-grow: 1;
-    padding: 8px;
-    font-size: 1rem;
+    padding: var(--sp-2);
+    font-size: var(--font-size-md);
     color: var(--white);
-
-    border: 1px solid var(--divider);
+    border: var(--border-divider);
     border-radius: 4px;
     background-color: var(--surface-card);
   }

@@ -1,7 +1,7 @@
 @layer components {
   @scope (.summary-panel) {
     :scope {
-      border: 1px solid var(--divider);
+      border: var(--border-divider);
       border-radius: var(--rounded);
     }
 
@@ -10,8 +10,8 @@
       grid-template-rows: auto auto;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       grid-auto-flow: column;
-      column-gap: 2rem;
-      padding: 0.5rem 2rem;
+      column-gap: var(--sp-6);
+      padding: var(--sp-2) var(--sp-6);
     }
     dt {
       /*font-weight: 600;*/
@@ -20,9 +20,9 @@
 
     dd {
       margin: 0;
-      margin-top: 0.5rem;
+      margin-top: var(--gap-md);
       padding: 0;
-      font-weight: 400;
+      font-weight: var(--font-weight-bold);
     }
   }
 }

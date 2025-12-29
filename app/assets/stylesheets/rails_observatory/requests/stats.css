@@ -1,7 +1,7 @@
 .table-bar-chart {
   display: grid;
   grid-template-columns: auto min-content min-content;
-  column-gap: 1rem;
+  column-gap: var(--gap-lg);
 
   .table-bar-row {
     position: relative;
@@ -9,7 +9,7 @@
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-    padding: .5rem;
+    padding: var(--sp-2);
 
     &:hover {
       background-color: var(--surface-hover);
@@ -18,9 +18,9 @@
 
   .table-bar-header {
     grid-column: 1 / -1;
-    border-bottom: 1px solid var(--divider);
+    border-bottom: var(--border-divider);
     font-weight: var(--font-weight-bold);
-    padding: .5rem 0;
+    padding: var(--sp-2) 0;
   }
 
   .bar {

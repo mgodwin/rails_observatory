@@ -7,15 +7,55 @@
   --white: #eee;
   --divider: color-mix(in oklab, var(--black) 88%, white);
   --divider-active: color-mix(in oklab, var(--black) 75%, white);
-  --surface-active: color-mix(in oklab, var(--black) 92%, white);
+
+  /* Surface colors (lower % = more white = higher elevation in dark mode) */
+  --surface-muted: color-mix(in oklab, var(--black) 97%, white);
   --surface-hover: color-mix(in oklab, var(--black) 96%, white);
+  --surface-card: color-mix(in oklab, var(--black) 94%, white);
+  --surface-active: color-mix(in oklab, var(--black) 92%, white);
   --surface-dropdown: color-mix(in oklab, var(--black) 88%, white);
-  --surface-card: color-mix(in oklab, var(--black) 96%, white);
+  --surface-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Accent color for interactive highlights */
+  --accent: dodgerblue;
+  --accent-muted: color-mix(in oklab, var(--accent) 50%, var(--black));
 
   --font-mono: 'Roboto Mono', monospace;
   --font-weight-bold: 400;
+  --font-weight-light: 200;
+  --font-size-xs: 0.85rem;
+  --font-size-sm: 0.9rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.5rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 3rem;
 
-  --rounded: 0.5rem 0.5rem;
+  /* Spacing scale */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+
+  --rounded: var(--sp-2) var(--sp-2);
+  --radius-sm: var(--sp-2);
+
+  --gap-sm: var(--sp-1);
+  --gap-md: var(--sp-2);
+  --gap-lg: var(--sp-4);
+  --gap-xl: var(--sp-6);
+  --padding-button: var(--sp-2) var(--sp-3);
+  --padding-cell: var(--sp-2) var(--sp-4);
+  --padding-lg: var(--sp-6);
+
+  --border-divider: 1px solid var(--divider);
+
+  --transition-quick: 0.2s ease-in-out;
+  --transition-standard: 250ms ease-out;
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   --success: #38a238;
   --error: var(--red);
@@ -25,7 +65,7 @@
 
 html, body {
   font-family: 'Fira Sans', sans-serif;
-  font-weight: 200;
+  font-weight: var(--font-weight-light);
   color: var(--white);
   height: 100%;
   background-color: var(--black);

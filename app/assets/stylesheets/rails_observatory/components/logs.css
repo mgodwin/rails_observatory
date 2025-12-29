@@ -3,8 +3,8 @@
   :scope {
     display: grid;
     grid-template-columns: auto auto 1fr;
-    gap: .2rem;
-    padding-block: 1rem;
+    gap: var(--sp-1);
+    padding-block: var(--sp-4);
     font-family: var(--font-mono)
   }
 }

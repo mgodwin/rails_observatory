@@ -10,18 +10,18 @@
         'events events';
     grid-template-columns: 1fr 1fr;
     grid-template-rows: min-content min-content auto auto;
-    gap: 2rem;
+    gap: var(--gap-xl);
 
     & > .summary-panel {
       grid-area: summary;
-      margin: 2rem 2rem 0;
+      margin: var(--sp-6) var(--sp-6) 0;
     }
 
     & > .charts {
       grid-area: chart;
       display: grid;
       grid-template-columns: subgrid;
-      padding-inline: 2rem;
+      padding-inline: var(--sp-6);
     }
 
     & > .layout-requests_index-by_controller {

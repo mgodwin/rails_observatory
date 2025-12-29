@@ -1,10 +1,10 @@
 .table-chart {
   .table-chart-title {
-    font-size: 1.5rem;
-    font-weight: 400;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     margin: 0;
-    padding: 1rem;
-    border-bottom: 1px solid var(--divider);
+    padding: var(--sp-4);
+    border-bottom: var(--border-divider);
   }
 
   & tr:has(a.table-chart-row-action:hover) {
@@ -27,18 +27,18 @@
 
     & th {
       text-align: left;
-      font-weight: 400;
-      padding: 0.5rem 1rem;
-      border-bottom: 1px solid var(--divider);
+      font-weight: var(--font-weight-bold);
+      padding: var(--padding-cell);
+      border-bottom: var(--border-divider);
       & + & {
-        border-left: 1px solid var(--divider);
+        border-left: var(--border-divider);
       }
       &:first-child {
-        padding-left: 2rem;
+        padding-left: var(--sp-6);
       }
 
       &:last-child {
-        padding-right: 2rem;
+        padding-right: var(--sp-6);
       }
     }
 
@@ -47,19 +47,19 @@
     }
 
     & td {
-      padding: .5rem 1rem;
-      border-bottom: 1px solid var(--divider);
+      padding: var(--padding-cell);
+      border-bottom: var(--border-divider);
 
       & + & {
-        border-left: 1px solid var(--divider);
+        border-left: var(--border-divider);
       }
 
       &:first-child {
-        padding-left: 2rem;
+        padding-left: var(--sp-6);
       }
 
       &:last-child {
-        padding-right: 2rem;
+        padding-right: var(--sp-6);
       }
     }
   }

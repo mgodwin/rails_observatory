@@ -3,7 +3,7 @@
     display: grid;
     grid-template-rows: min-content min-content 1fr;
     grid-template-columns: 1fr;
-    gap: 0.25rem;
+    gap: var(--sp-1);
     height: 100%;
 
     & > .layout-area_chart {

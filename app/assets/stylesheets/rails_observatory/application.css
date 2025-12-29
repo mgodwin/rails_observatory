@@ -31,6 +31,7 @@
 @import url('components/resize_handle.css');
 @import url('components/search_bar.css');
 @import url('components/status_badge.css');
+@import url('components/filters.css');
 
 /* Mixins */
 @import url('mixins/nav_button.css');

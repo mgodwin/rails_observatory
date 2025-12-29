@@ -1,0 +1,47 @@
+@scope(.filters) {
+
+  :scope {
+    display: flex;
+    gap: var(--gap-lg);
+  }
+
+  .filter {
+    position: relative;
+
+    button {
+      font-size: var(--font-size-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--gap-md);
+      padding: var(--sp-1) var(--sp-2);
+      border-radius: var(--radius-sm);
+      border: var(--border-divider);
+      background-color: transparent;
+      color: var(--white);
+      font-weight: lighter;
+
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+
+      svg {
+        color: var(--white);
+        width: var(--font-size-sm);
+      }
+    }
+
+    & [popover] {
+      margin: 0;
+      position-area: block-end span-inline-end;
+      border: var(--border-divider);
+      background-color: var(--surface-card);
+      color: var(--white);
+      margin-top: var(--gap-sm);
+      border-radius: var(--radius-sm);
+    }
+
+    ._chevron-down {
+      width: var(--sp-3);
+    }
+  }
+}

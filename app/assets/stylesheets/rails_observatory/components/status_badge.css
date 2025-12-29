@@ -1,7 +1,7 @@
 .status-badge {
   color: var(--white);
-  padding: .25rem .5rem;
-  border-radius: .5rem;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
 
   &.error {
     background-color: var(--error);
