@@ -11,6 +11,7 @@
 @import url('layout/requests.css');
 @import url('layout/traces.css');
 @import url('layout/two-column.css');
+@import url('layout/usage.css');
 
 /* Application styles */
 @import url('components/global_modifiers.css');

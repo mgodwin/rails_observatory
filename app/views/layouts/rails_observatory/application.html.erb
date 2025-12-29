@@ -47,8 +47,8 @@
       <% end %></li>
   </ul>
   <div class="redis-stats">
-    <strong>Redis</strong> <%= redis_mem_info['used_memory_human'] %> /
-    <%= redis_mem_info['used_memory_rss_human'] %>
+    <strong>Redis</strong> <%= redis_mem_info['used_memory_human'] %> / <%= max_memory_display %>
+    <%= link_to "(usage)", usage_path %>
   </div>
 </nav>
 <nav class="top-nav">

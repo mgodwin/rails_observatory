@@ -1,0 +1,73 @@
+<% content_for(:title, 'Redis Usage') %>
+
+<main class="layout-usage">
+  <section class="usage-overview">
+    <div class="summary-panel">
+      <dl>
+        <dt>Used Memory</dt>
+        <dd><%= number_to_human_size(@usage_stats.total_used_bytes) %></dd>
+        <dt>Max Memory</dt>
+        <dd><%= @usage_stats.max_memory_bytes ? number_to_human_size(@usage_stats.max_memory_bytes) : 'Unbounded' %></dd>
+        <dt>Remaining</dt>
+        <dd><%= @usage_stats.remaining_capacity ? number_to_human_size(@usage_stats.remaining_capacity) : 'N/A' %></dd>
+        <dt>Total Keys</dt>
+        <dd><%= number_with_delimiter(@usage_stats.total_keys) %></dd>
+      </dl>
+    </div>
+
+    <% if @usage_stats.capacity_percentage %>
+      <div class="capacity-bar">
+        <div class="capacity-bar-fill" style="width: <%= @usage_stats.capacity_percentage %>%"></div>
+        <span class="capacity-bar-label"><%= @usage_stats.capacity_percentage %>% used</span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="usage-breakdown">
+    <h2>Storage by Category</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Memory</th>
+            <th>Keys</th>
+            <th>Avg Size</th>
+            <th>% of Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @usage_stats.category_stats.each do |category, stats| %>
+            <tr>
+              <td>
+                <%= category.to_s.titleize %><%= stats[:sampled] ? ' *' : '' %>
+              </td>
+              <td><%= number_to_human_size(stats[:bytes]) %></td>
+              <td><%= number_with_delimiter(stats[:key_count]) %></td>
+              <td><%= stats[:key_count] > 0 ? number_to_human_size(stats[:bytes] / stats[:key_count]) : 'N/A' %></td>
+              <td>
+                <% pct = @usage_stats.total_used_bytes > 0 ? (stats[:bytes].to_f / @usage_stats.total_used_bytes * 100).round(1) : 0 %>
+                <%= pct %>%
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <p class="usage-footnote">* Estimated via sampling</p>
+    </div>
+  </section>
+
+  <section class="usage-details">
+    <h2>Additional Info</h2>
+    <div class="summary-panel">
+      <dl>
+        <dt>Memory RSS</dt>
+        <dd><%= @usage_stats.memory_info['used_memory_rss_human'] %></dd>
+        <dt>Fragmentation Ratio</dt>
+        <dd><%= @usage_stats.memory_info['mem_fragmentation_ratio'] %></dd>
+        <dt>Max Memory Policy</dt>
+        <dd><%= @usage_stats.memory_info['maxmemory_policy'] %></dd>
+      </dl>
+    </div>
+  </section>
+</main>

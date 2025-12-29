@@ -133,5 +133,28 @@ module RailsObservatory
     def redis_mem_info
       @info ||= Rails.configuration.rails_observatory.redis.call('info', 'memory').split("\r\n").slice(1..).map { _1.split(":") }.to_h
     end
+
+    def max_memory_display
+      info = redis_mem_info
+      maxmemory = info['maxmemory'].to_i
+
+      if maxmemory > 0
+        info['maxmemory_human']
+      elsif rails_max_memory = rails_observatory_max_memory
+        number_to_human_size(rails_max_memory)
+      else
+        info['used_memory_rss_human']
+      end
+    end
+
+    private
+
+    def rails_observatory_max_memory
+      config = Rails.configuration.rails_observatory
+      config_max = config.respond_to?(:max_memory) ? config.max_memory : nil
+      return config_max if config_max
+
+      ENV['RAILS_OBSERVATORY_MAX_MEMORY']&.to_i&.then { |v| v > 0 ? v : nil }
+    end
   end
 end

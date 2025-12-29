@@ -14,5 +14,6 @@ RailsObservatory::Engine.routes.draw do
   resources :errors, only: [:index, :show]
   resources :time_series, only: [:index]
   resources :updates, only: [:index]
+  get 'usage', to: 'usage#index', as: :usage
   root to: "requests#index"
 end
