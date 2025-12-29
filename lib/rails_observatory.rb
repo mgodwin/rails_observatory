@@ -12,12 +12,16 @@ module RailsObservatory
   mattr_accessor :importmap, default: Importmap::Map.new
 
   module_function def worker_pool
-    @server ||= Concurrent::ThreadPoolExecutor.new(
-      name: "RailsObservatory",
-      min_threads: 1,
-      max_threads: 4,
-      max_queue: 0,
+    @server ||= if Rails.env.test?
+      Concurrent::ImmediateExecutor.new
+    else
+      Concurrent::ThreadPoolExecutor.new(
+        name: "RailsObservatory",
+        min_threads: 1,
+        max_threads: 4,
+        max_queue: 0,
       )
+    end
   end
 
 
