@@ -5,6 +5,10 @@ RailsObservatory::Engine.routes.draw do
     get 'recent', on: :collection
   end
 
+  resources :metrics, only: :index do
+    get 'autocomplete', on: :collection
+  end
+
   resources :jobs, only: [:index, :show]
   resources :mailers, only: [:index, :show]
   resources :errors, only: [:index, :show]
