@@ -1,0 +1,261 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+require_relative '../test/dummy/config/application'
+require 'benchmark'
+
+puts "Booting Rails..."
+Rails.application.initialize!
+
+puts "Starting benchmark..."
+
+POOL_SIZE = 8
+ITERATIONS = 100_000
+SINGLE_ITERATIONS = 1_000
+
+def with_pool(&block)
+  pool = Concurrent::FixedThreadPool.new(POOL_SIZE)
+  ITERATIONS.times do
+    pool.post(&block)
+  end
+  pool.shutdown
+  pool.wait_for_termination(300)  # Increased timeout
+end
+
+def single_thread(iterations = SINGLE_ITERATIONS, &block)
+  iterations.times(&block)
+end
+
+LABELS = { test: 'label', another: 'test', hi: 'mom', hello: 'dad' }
+MANY_LABELS = {
+  test: 'label',
+  another: 'test',
+  hi: 'mom',
+  hello: 'dad',
+  foo: 'bar',
+  baz: 'qux',
+  quux: 'corge',
+  grault: 'garply',
+  waldo: 'fred',
+  plugh: 'xyzzy',
+  thud: 'mumble',
+  alpha: 'beta',
+  gamma: 'delta',
+  epsilon: 'zeta',
+  eta: 'theta',
+}
+
+RailsObservatory.record_occurrence("test_metric", labels: LABELS) # Warm up
+RailsObservatory.record_timing("timing_metric", 100, labels: LABELS) # Warm up
+
+puts "\n=== Profiling individual method calls ==="
+
+# Profile the distribution method step by step
+def profile_distribution_steps
+  redis = RailsObservatory::RedisTimeSeries.redis
+  name = "profile_timing"
+  value = 100
+  labels = LABELS.dup
+
+  # Pre-compute values that would be computed in the method
+  prefixed_name = name
+  timestamp_ms = (Time.now.to_f * 1000).to_i
+  labels_flat = labels.sort.flatten.map(&:to_s)
+  digest = Digest::SHA1.hexdigest(labels_flat.join).slice(0, 20)
+  ts_name = "#{prefixed_name}:#{digest}"
+
+  puts "Profiling steps for distribution/record_timing:"
+
+  # Step 1: Time.now and label processing
+  start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  100.times do
+    prefixed_name = name
+    timestamp_ms = (Time.now.to_f * 1000).to_i
+    labels_flat = labels.sort.flatten.map(&:to_s)
+    digest = Digest::SHA1.hexdigest(labels_flat.join).slice(0, 20)
+    ts_name = "#{prefixed_name}:#{digest}"
+  end
+  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+  puts "  Label processing + digest: #{(elapsed / 100 * 1000).round(4)}ms"
+
+  # Step 2: EXISTS check
+  start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  100.times { redis.call("EXISTS", ts_name) }
+  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+  puts "  EXISTS check: #{(elapsed / 100 * 1000).round(4)}ms"
+
+  # Step 3: TS.ADD
+  start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  100.times { redis.call("TS.ADD", ts_name, timestamp_ms, value, "ON_DUPLICATE", "LAST") }
+  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+  puts "  TS.ADD: #{(elapsed / 100 * 1000).round(4)}ms"
+
+  # Full method call
+  start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  100.times { RailsObservatory.record_timing("profile_timing", value, labels: labels) }
+  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+  puts "  Full record_timing call: #{(elapsed / 100 * 1000).round(4)}ms"
+end
+
+profile_distribution_steps
+
+puts "\n=== Single-threaded benchmark (#{SINGLE_ITERATIONS} iterations) ==="
+puts "Measures per-call latency without thread pool overhead\n\n"
+
+Benchmark.bm(25) do |x|
+  x.report("increment no labels") do
+    single_thread { RailsObservatory.record_occurrence("test_metric") }
+  end
+  x.report("increment 4 labels") do
+    single_thread { RailsObservatory.record_occurrence("test_metric", labels: LABELS) }
+  end
+  x.report("timing no labels") do
+    single_thread { RailsObservatory.record_timing("timing_metric", rand(1..1000)) }
+  end
+  x.report("timing 4 labels") do
+    single_thread { RailsObservatory.record_timing("timing_metric", rand(1..1000), labels: LABELS) }
+  end
+end
+
+# Calculate per-call latency
+puts "\n=== Per-call latency analysis ==="
+%w[increment timing].each do |method|
+  send_method = method == "increment" ? :record_occurrence : :record_timing
+  args = method == "timing" ? [rand(1..1000)] : []
+
+  start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  100.times { RailsObservatory.send(send_method, "latency_test_#{method}", *args, labels: LABELS) }
+  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+  puts "#{method}: #{(elapsed / 100 * 1000).round(3)}ms per call"
+end
+
+puts "\n=== Multi-threaded benchmark (#{ITERATIONS} iterations, #{POOL_SIZE} threads) ==="
+puts "This may take a while...\n\n"
+
+Benchmark.bm(25) do |x|
+  x.report("increment 4 labels") do
+    with_pool do
+      RailsObservatory.record_occurrence("test_metric", labels: LABELS)
+    end
+  end
+  x.report("timing 4 labels") do
+    with_pool do
+      RailsObservatory.record_timing("timing_metric", rand(1..1000), labels: LABELS)
+    end
+  end
+end
+
+puts "\nThroughput:"
+puts "  increment: #{(ITERATIONS / 10.0).round(0)} ops/sec (estimated)"
+puts "  timing: #{(ITERATIONS / 10.0).round(0)} ops/sec (estimated)"
+
+# Compare with raw TS.ADD (no EXISTS check)
+puts "\n=== Comparing hot path optimizations ==="
+redis = RailsObservatory::RedisTimeSeries.redis
+ts_name = "benchmark_raw_add:test123"
+redis.call("TS.CREATE", ts_name, "RETENTION", 10_000) rescue nil
+
+# Current implementation: EXISTS + TS.ADD
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+1000.times do
+  redis.call("EXISTS", ts_name)
+  redis.call("TS.ADD", ts_name, (Time.now.to_f * 1000).to_i, rand(100), "ON_DUPLICATE", "LAST")
+end
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "EXISTS + TS.ADD (current):      #{(elapsed / 1000 * 1000).round(4)}ms per call"
+
+# Optimized: just TS.ADD
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+1000.times do
+  redis.call("TS.ADD", ts_name, (Time.now.to_f * 1000).to_i, rand(100), "ON_DUPLICATE", "LAST")
+end
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "TS.ADD only (optimized):        #{(elapsed / 1000 * 1000).round(4)}ms per call"
+
+# Pipelined version
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+1000.times do |i|
+  redis.pipelined do |p|
+    p.call("TS.ADD", ts_name, (Time.now.to_f * 1000).to_i, rand(100), "ON_DUPLICATE", "LAST")
+  end
+end
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "Pipelined TS.ADD:               #{(elapsed / 1000 * 1000).round(4)}ms per call"
+
+puts "\n=== Cold path comparison (new series each call) ==="
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+100.times do |i|
+  RailsObservatory.record_occurrence("cold_inc_#{i}", labels: { iter: i.to_s })
+end
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "increment cold path: #{(elapsed / 100 * 1000).round(4)}ms per call (creates 1 compaction)"
+
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+100.times do |i|
+  RailsObservatory.record_timing("cold_timing_#{i}", rand(100), labels: { iter: i.to_s })
+end
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "timing cold path:    #{(elapsed / 100 * 1000).round(4)}ms per call (creates 3 compactions)"
+
+puts "\n=== metric_series helper benchmark ==="
+# Test the actual helper that was reported as slow
+require_relative '../app/helpers/rails_observatory/application_helper'
+class HelperTester
+  include RailsObservatory::ApplicationHelper
+end
+helper = HelperTester.new
+
+# First, ensure we have some data
+10.times do |i|
+  RailsObservatory.record_timing("request.latency", rand(100..500), labels: { action: "index", controller: "posts" })
+  RailsObservatory.record_occurrence("request.count", labels: { action: "index", controller: "posts" })
+end
+
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+10.times { helper.metric_series('request.count|sum->60@sum') }
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "metric_series (no time range, no slice): #{(elapsed / 10 * 1000).round(2)}ms per call"
+
+# Query without slice
+builder = RailsObservatory::RedisTimeSeries
+  .query_range('request.count', :sum)
+  .where(compaction: 'sum')
+  .bins(60_000)
+puts "Query (no slice): #{builder.to_redis_command}"
+
+# Query WITH slice (simulating controller context)
+RailsObservatory::RedisTimeSeries.with_slice(1.hour.ago..) do
+  start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  10.times { helper.metric_series('request.count|sum->60@sum') }
+  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+  puts "metric_series (with 1hr slice): #{(elapsed / 10 * 1000).round(2)}ms per call"
+
+  builder = RailsObservatory::RedisTimeSeries
+    .query_range('request.count', :sum)
+    .where(compaction: 'sum')
+    .bins(60_000)
+  puts "Query (with slice): #{builder.to_redis_command}"
+end
+
+puts "\n=== Multi-threaded COLD path test (many unique series) ==="
+# This simulates the scenario where many different label combinations hit timing
+cold_iterations = 10_000
+
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+pool = Concurrent::FixedThreadPool.new(POOL_SIZE)
+cold_iterations.times do |i|
+  pool.post { RailsObservatory.record_occurrence("mt_cold_inc_#{i}", labels: { iter: i.to_s }) }
+end
+pool.shutdown
+pool.wait_for_termination(120)
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "increment #{cold_iterations} unique series: #{elapsed.round(2)}s (#{(cold_iterations / elapsed).round(0)} ops/sec)"
+
+start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+pool = Concurrent::FixedThreadPool.new(POOL_SIZE)
+cold_iterations.times do |i|
+  pool.post { RailsObservatory.record_timing("mt_cold_timing_#{i}", rand(100), labels: { iter: i.to_s }) }
+end
+pool.shutdown
+pool.wait_for_termination(120)
+elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+puts "timing #{cold_iterations} unique series:    #{elapsed.round(2)}s (#{(cold_iterations / elapsed).round(0)} ops/sec)"
