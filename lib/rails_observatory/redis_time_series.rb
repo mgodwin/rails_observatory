@@ -3,7 +3,7 @@ module RailsObservatory
     extend Insertion
     include RedisConnection
 
-    attr_reader :labels, :name, :data
+    attr_reader :key
 
     def self.with_slice(time_range)
       ActiveSupport::IsolatedExecutionState[:observatory_slice] = time_range
@@ -12,67 +12,147 @@ module RailsObservatory
       ActiveSupport::IsolatedExecutionState[:observatory_slice] = nil
     end
 
-    def self.where(**conditions)
-      QueryBuilder.new.where(**conditions)
+    def self.query_range(name, reducer, from: nil, to: nil)
+      QueryRangeBuilder.new(name, reducer, from:, to:)
     end
 
-    def initialize(name:, labels: {}, data:, time_range:, agg_duration:)
-      @name = name
-      @time_range = time_range
-      @agg_duration = agg_duration
-      @labels = labels.deep_symbolize_keys
-      @data = data
-    end
+    # Parses a query string and returns a configured QueryRangeBuilder
+    # Format: "metric_name|compaction->bins@reducer (group_label)"
+    # Examples:
+    #   "request.count|sum->60@sum"
+    #   "request.latency|avg->60@avg (namespace)"
+    def self.query_range_by_string(spec)
+      /\A(?<metric_name>.+?)\|(?<compaction>[^->]+)->(?<buckets>\d+)@(?<rollup_fn>.+?)(?:\s*\((?<group_by>\w+)\))?\z/ =~ spec
 
-    def start_time
-      @time_range.begin.nil? ? Time.utc(2023, 1, 1, 0, 0, 0) : @time_range.begin
-    end
+      raise ArgumentError, "Invalid query spec: #{spec}" unless metric_name
 
-    def start_time_ms
-      start_time.to_i.in_milliseconds
-    end
+      conditions = {}
+      group_label = group_by || 'name'
 
-    def end_time_ms
-      end_time.to_i.in_milliseconds
-    end
-
-    def end_time
-      @time_range.end
-    end
-
-    def filled_data
-      # Align to epoch
-      start_bucket = start_time_ms - (start_time_ms % @agg_duration)
-      # puts "Filling data from #{start_time_ms} to #{end_time_ms} with agg_duration #{@agg_duration}"
-      # puts "Start bucket: #{start_bucket}"
-      Enumerator
-        .produce(start_bucket) { |t| t + @agg_duration }
-        .take_while { |t| t < end_time_ms }
-        .map do |t|
-        match = data.find { |ts, _| ts == t }
-        if match
-          timestamp, val = match
-          [timestamp, val.to_f]
-        else
-          [t, 0]
-        end
+      if group_by && group_by != 'name'
+        conditions[group_by.to_sym] = true
       end
+
+      if compaction == 'all'
+        conditions[:compaction] = true  # Match any compaction (exists filter)
+      else
+        conditions[:compaction] = compaction
+      end
+
+      query_range(metric_name, rollup_fn.to_sym)
+        .where(**conditions)
+        .group(group_label.to_sym)
+        .bins(buckets.to_i * 1000)
     end
 
-    def empty?
-      data.empty?
+    def self.query_value(name, reducer, from: nil, to: nil)
+      QueryValueBuilder.new(name, reducer, from:, to:)
     end
+
+    def self.query_index(name)
+      QueryIndexBuilder.new(name)
+    end
+
+    def initialize(key)
+      @key = key
+    end
+
+    def labels
+      @labels ||= Hash[info['labels']]
+    end
+
+    def name
+      @name ||= labels['name']
+    end
+
+    def first_timestamp
+      @first_timestamp ||= Time.at(info['firstTimestamp'] / 1000)
+    end
+
+    def last_timestamp
+      @last_timestamp ||= Time.at(info['lastTimestamp'] / 1000)
+    end
+
+    def memory_usage_bytes
+      @memory_usage_bytes ||= info['memoryUsage']
+    end
+
+    def total_samples
+      @total_samples ||= info['totalSamples']
+    end
+
+    def chunk_size
+      @chunk_size ||= info['chunkSize']
+    end
+
+    def chunk_count
+      @chunk_count ||= info['chunkCount']
+    end
+
+    def info
+      @info ||= Hash[*redis.call('TS.INFO', @key)]
+    end
+
+    # def filled_data
+    #   # Align to epoch
+    #   start_bucket = start_time_ms - (start_time_ms % @agg_duration)
+    #   # puts "Filling data from #{start_time_ms} to #{end_time_ms} with agg_duration #{@agg_duration}"
+    #   # puts "Start bucket: #{start_bucket}"
+    #   Enumerator
+    #     .produce(start_bucket) { |t| t + @agg_duration }
+    #     .take_while { |t| t < end_time_ms }
+    #     .map do |t|
+    #     match = data.find { |ts, _| ts == t }
+    #     if match
+    #       timestamp, val = match
+    #       [timestamp, val.to_f]
+    #     else
+    #       [t, 0]
+    #     end
+    #   end
+    # end
 
     def value
       @value ||= data.reduce(0) { |sum, (_, value)| sum + value.to_i }
     end
 
-    def to_ms(duration)
-      self.class.to_ms(duration)
-    end
+    def pretty_print(pp)
+      pp.object_address_group(self) do
+        pp.breakable
+        pp.text "@key="
+        pp.pp key
 
-    def self.to_ms(duration)
-      duration.to_i * 1_000
+        pp.breakable
+        pp.text "@labels="
+        pp.nest(2) do
+          pp.breakable
+          pp.pp labels
+        end
+
+        pp.breakable
+        pp.text "@first_timestamp="
+        pp.pp first_timestamp
+
+        pp.breakable
+        pp.text "@last_timestamp="
+        pp.pp last_timestamp
+
+        pp.breakable
+        pp.text "@memory_usage_bytes="
+        pp.pp memory_usage_bytes
+
+        pp.breakable
+        pp.text "@total_samples="
+        pp.pp total_samples
+
+        pp.breakable
+        pp.text "@chunk_size="
+        pp.pp chunk_size
+
+        pp.breakable
+        pp.text "@chunk_count="
+        pp.pp chunk_count
+      end
     end
   end
 end
