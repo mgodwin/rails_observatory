@@ -29,32 +29,22 @@ module RailsObservatory
       RedisTimeSeries.where(name:).sum
     end
 
-    # Pass a metric name like "requests.count|sum->60@avg" or "requests.latency|avg->60@avg"
-    # The format is "<metric_name>|<compaction>-><downsample>@<aggregate_function>"
-    # You can optionally specify child metrics by using a `/*` in the metric name.
-    # # Example: "requests.latency/*|sum->60@avg"
-    #    - would return requests.latency/action_dispatch and requests.latency/active_record, etc.
-    # Additionally you can pass a compaction of `all` to get all compactions for the metric.
-    # # Example: "requests.latency|all->60@avg"
-    #   - returns request.latency|max, request.latency|min, request.latency|avg, request.latency|p95, etc.
-    def metric_series(name)
-      /\A(?<metric_name>.+?)\|(?<compaction>[^->]+)->(?<buckets>\d+)@(?<rollup_fn>.+)\z/ =~ name
-      conditions = { compaction:, name: metric_name }
-      if metric_name =~ /\/\*\z/
-        conditions[:parent] = metric_name.gsub(/\/\*\z/, '')
-        conditions.delete(:name)
-      end
-      conditions.delete(:compaction) if compaction == 'all'
-      RedisTimeSeries
-        .where(**conditions)
-        .downsample(buckets.to_i, using: rollup_fn.to_sym)
-        .to_a
-        .map { |s| { name: s.name.split("/").last, data: s.filled_data } }
+    # Converts a query spec string into chart-ready series data.
+    # See RedisTimeSeries.query_range_by_string for format details.
+    def metric_series(spec)
+      query = RedisTimeSeries.query_range_by_string(spec)
+      group_label = query.group_label.to_s
+      query.to_a.map { |s| { name: s.labels[group_label], data: s.filled_data } }
     end
 
     def metric_value(name:, **labels)
       compaction_name = name.split('_').last
-      RedisTimeSeries.where(name: name.gsub(/_(sum|avg|min|max)$/, ''), **labels.merge(compaction: compaction_name)).downsample(1, using: compaction_name.to_sym).to_a.first&.value
+      metric_name = name.gsub(/_(sum|avg|min|max)$/, '')
+      result = RedisTimeSeries.query_value(metric_name, compaction_name.to_sym)
+                              .where(**labels)
+                              .to_a
+                              .first
+      result&.value&.round(2)
     end
 
     def time_slice_start

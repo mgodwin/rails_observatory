@@ -8,17 +8,18 @@ module RailsObservatory
       @time_range = (duration.seconds.ago..)
 
       if params[:controller_action].blank?
-        @count_by_controller = RedisTimeSeries.where(name: 'request.count', action: '*')
-                                              .slice(@time_range)
-                                              .downsample(1, using: :sum)
+        @count_by_controller = RedisTimeSeries.query_value('request.count', :sum)
+                                              .where(action: true)
+                                              .group('action')
                                               .select { _1.value > 0 }
                                               .sort_by(&:value)
                                               .reverse
 
-        @latency_by_controller = RedisTimeSeries.where(name: 'request.latency', action: '*')
-                                                .slice(@time_range)
-                                                .downsample(1, using: :avg)
-                                                .index_by { _1.labels[:action] }
+        @latency_by_controller = RedisTimeSeries.query_value('request.latency', :avg)
+                                                .where(action: true)
+                                                .group('action')
+                                                .to_a
+                                                .index_by { _1.labels['action'] }
       end
     end
 

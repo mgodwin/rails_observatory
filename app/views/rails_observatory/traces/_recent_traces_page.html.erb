@@ -4,7 +4,7 @@
   ], formatters: {
     time: ->(time, trace) { link_to Time.at(time).to_fs('%H:%M:%S'), trace_by_type_path(trace.class.key_prefix, trace.id), data: { turbo_frame: '_top' } },
     status: ->(status) do
-      if status.to_s.start_with?('2')
+      if status.to_s.start_with?(/[23]/)
         tag.span(status, class: 'status-badge success')
       elsif status.to_s.start_with?('4')
         tag.span(status, class: 'status-badge warning')

@@ -4,17 +4,13 @@
   <div class="summary-panel">
     <dl>
       <dt>Requests</dt>
-      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.count_sum') %></dd>
+      <dd><%= metric_value(name: 'request.count_sum') %></dd>
       <dt>Mean Response Time</dt>
-      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_avg') %>
-        ms
-      </dd>
+      <dd><%= metric_value(name: 'request.latency_avg') %> ms</dd>
       <dt>Max Response Time</dt>
-      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1?labels..."><%= metric_value(name: 'request.latency_max') %>
-        ms
-      </dd>
+      <dd><%= metric_value(name: 'request.latency_max') %> ms</dd>
       <dt>Errors</dt>
-      <dd data-controler="live" data-live-src-value="cable://metrics/request.count_sum/180000212-/1_sum?labels..."><%= metric_value(name: 'request.error_count_sum') %></dd>
+      <dd><%= metric_value(name: 'request.error_count_sum') %></dd>
     </dl>
   </div>
   <div class="charts">
@@ -35,7 +31,7 @@
          data-controller="area-chart"
          data-area-chart-stacked-value="true"
          data-area-chart-group-value="request-charts"
-         data-area-chart-initial-data-value="<%= metric_series('request.latency/*|avg->60@avg').to_json %>"
+         data-area-chart-initial-data-value="<%= metric_series('request.latency|avg->60@avg (namespace)').to_json %>"
          data-area-chart-name-value="Mean Response Time By Namespace"></div>
     <div class="chart"
          id="error-count-chart"
@@ -46,7 +42,9 @@
   </div>
   <% if params[:controller_action].blank? %>
     <section class="layout-requests_index-by_controller">
-      <h2>By Controller Action</h2>
+      <header>
+        <h2>By Controller Action</h2>
+      </header>
       <div class="table-chart ">
         <table>
           <thead>
@@ -59,9 +57,9 @@
           <tbody>
           <% @count_by_controller.each do |series| %>
             <tr>
-              <td><%= link_to series.labels[:action].classify, requests_path(controller_action: series.labels[:action].to_param), class: 'table-chart-row-action' %></td>
-              <td><%= series.data.dig(0, 1) %></td>
-              <td><%= @latency_by_controller[series.labels[:action]]&.data&.dig(0, 1).to_f.round(2) %> ms</td>
+              <td><%= link_to series.labels['action'].classify, requests_path(controller_action: series.labels['action'].to_param), class: 'table-chart-row-action' %></td>
+              <td><%= series.value.to_i %></td>
+              <td><%= @latency_by_controller[series.labels['action']]&.value&.to_f&.round(2) %> ms</td>
             </tr>
           <% end %>
           </tbody>
@@ -76,8 +74,53 @@
       <div class="search-bar">
         <input type="search" placeholder="Search..." />
       </div>
+      <div class="filters">
+        <div class="filter">
+          <button>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
+            </svg>
+            Time Range
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="_chevron-down">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+
+        </div>
+        <div class="filter">
+          <button popovertarget="filter-popover">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
+            </svg>
+            Status
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="_chevron-down">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="filter-popover" popover>
+            <ul>
+              <li><a href="">200</a></li>
+              <li><a href="">304</a></li>
+              <li><a href="">304</a></li>
+              <li><a href="">304</a></li>
+              <li><a href="">304</a></li>
+              <li><a href="">304</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="filter">
+          <button>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            Duration
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="_chevron-down">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </header>
     <turbo-frame id="recent-traces" src="<%= recent_traces_by_type_path('rt') %>" loading="lazy"></turbo-frame>
   </section>
 </main>
-
