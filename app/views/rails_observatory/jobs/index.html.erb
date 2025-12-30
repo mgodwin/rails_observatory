@@ -1,21 +1,96 @@
 <% content_for(:title, 'Jobs') %>
-<main>
-<%#= render 'chart', name: 'Latency', series: @latency_series, type: 'area', aggregate_using: :avg %>
-<div style="padding: 2rem;">
-<%= render 'chart', name: 'Performed', series: { name: 'job.count', aggregate_using: :sum }, type: 'bar' %>
-</div>
+<main class="layout-requests_index">
+  <div class="summary-panel">
+    <dl>
+      <dt>Jobs Performed</dt>
+      <dd><%= metric_value(name: 'job.count_sum') %></dd>
+      <dt>Mean Duration</dt>
+      <dd><%= metric_value(name: 'job.latency_avg') %> ms</dd>
+      <dt>Max Duration</dt>
+      <dd><%= metric_value(name: 'job.latency_max') %> ms</dd>
+      <dt>Errors</dt>
+      <dd><%= metric_value(name: 'job.error_count_sum') %></dd>
+    </dl>
+  </div>
+  <div class="charts">
+    <div class="chart"
+         id="job-count-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('job.count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="job-charts"
+         data-bar-chart-name-value="Jobs Performed"></div>
+    <div class="chart"
+         id="job-duration-chart"
+         data-controller="area-chart"
+         data-area-chart-initial-data-value="<%= metric_series('job.latency|all->60@avg').to_json %>"
+         data-area-chart-group-value="job-charts"
+         data-area-chart-name-value="Mean Duration"></div>
+    <div class="chart"
+         id="job-error-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('job.error_count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="job-charts"
+         data-bar-chart-name-value="Errors"></div>
+  </div>
 
-<%= render 'table_chart', name: 'By Queue', group_by: :queue_name, metrics: { "job.count": :sum, "job.queue_latency": :last } %>
-<%= render 'table_chart', name: 'By Job', group_by: :job_class, metrics: { "job.count": :sum, latency: :avg, "job.error_count": :sum } %>
+  <% if @count_by_queue.any? %>
+    <section class="layout-requests_index-by_controller">
+      <header>
+        <h2>By Queue</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Queue</th>
+            <th>Jobs</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @count_by_queue.each do |series| %>
+            <tr>
+              <td><%= series.labels['queue_name'] %></td>
+              <td><%= series.value.to_i %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
 
-<section>
-  <h2>Recent Jobs</h2>
-  <%= render 'query_table',
-             events: @recent_jobs,
-             fields: [:time, :job_id, :job_class, :duration],
-             formatters: {
-               time: ->(time, event) { link_to Time.at(time).to_fs('%H:%M:%S'), job_path(event.job_id) },
-             }
-  %>
-</section>
+  <% if @count_by_job.any? %>
+    <section class="layout-requests_index-by_controller">
+      <header>
+        <h2>By Job Class</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Job Class</th>
+            <th>Jobs</th>
+            <th>Avg Duration</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @count_by_job.each do |series| %>
+            <tr>
+              <td><%= series.labels['job_class'] %></td>
+              <td><%= series.value.to_i %></td>
+              <td><%= @latency_by_job[series.labels['job_class']]&.value&.to_f&.round(2) %> ms</td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="recent-requests">
+    <header>
+      <h2>Recent Jobs</h2>
+    </header>
+    <turbo-frame id="recent-traces" src="<%= recent_traces_by_type_path('jt') %>" loading="lazy"></turbo-frame>
+  </section>
 </main>

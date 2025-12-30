@@ -14,21 +14,6 @@ module RailsObservatory
       html.to_html
     end
 
-    def series_for(name:, aggregate_using:, time_range: nil, downsample: 60, children: false, **opts)
-      if children
-        series = RedisTimeSeries.where(parent: name, **opts)
-      else
-        series = RedisTimeSeries.where(name:, **opts)
-      end
-      series = series.downsample(downsample, using: aggregate_using)
-      series = series.slice(time_range) if time_range
-      series
-    end
-
-    def series_sum(name:)
-      RedisTimeSeries.where(name:).sum
-    end
-
     # Converts a query spec string into chart-ready series data.
     # See RedisTimeSeries.query_range_by_string for format details.
     def metric_series(spec)
