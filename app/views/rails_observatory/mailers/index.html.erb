@@ -1,11 +1,63 @@
 <% content_for(:title, 'Mailers') %>
-<section>
-  <h2>Email Delivered</h2>
+<main class="layout-requests_index">
+  <div class="summary-panel">
+    <dl>
+      <dt>Emails Sent</dt>
+      <dd><%= metric_value(name: 'mailer.delivery_count_sum') || 0 %></dd>
+    </dl>
+  </div>
 
-  <%= render 'query_table', events: @deliveries, fields: [
-    :time, :to, :from, :subject, :view], formatters: {
-    time: ->(time, event) { Time.at(time).to_fs('%H:%M:%S') },
-    view: ->(view, event) { link_to 'View', preview_mail_path(event.message_id) }
-  }
-  %>
-</section>
+  <% if @count_by_mailer.any? %>
+    <section class="layout-requests_index-by_controller">
+      <header>
+        <h2>By Mailer</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Mailer</th>
+            <th>Emails</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @count_by_mailer.each do |series| %>
+            <tr>
+              <td><%= series.labels['mailer'] %></td>
+              <td><%= series.value.to_i %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="recent-requests">
+    <header>
+      <h2>Recent Deliveries</h2>
+    </header>
+    <table>
+      <thead>
+      <tr>
+        <th>Time</th>
+        <th>Mailer</th>
+        <th>To</th>
+        <th>Subject</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @deliveries.each do |delivery| %>
+        <tr>
+          <td><%= Time.at(delivery.time).strftime('%H:%M:%S') %></td>
+          <td><%= delivery.mailer %></td>
+          <td><%= delivery.to %></td>
+          <td><%= delivery.subject %></td>
+          <td><%= link_to 'View', preview_mail_path(delivery.message_id) %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </section>
+</main>
