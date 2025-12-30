@@ -30,11 +30,28 @@
       </div>
     <% end %>
   </div>
-  <div class="pagination">
-    <button class="secondary" data-href="?page=1">1</button>
-    <button class="secondary" data-href="?page=2">2</button>
-    <button class="secondary" data-href="">3</button>
-    <button class="secondary" data-href="">4</button>
-  </div>
+  <% if local_assigns[:pagination] %>
+    <% page = pagination[:page] %>
+    <% total_pages = pagination[:total_pages] %>
+    <div class="pagination" data-query-table-target="pagination">
+      <button class="secondary" data-action="query-table#goToPage" data-page="1" <%= 'disabled' if page == 1 %>>
+        &laquo;
+      </button>
+      <button class="secondary" data-action="query-table#goToPage" data-page="<%= page - 1 %>" <%= 'disabled' if page == 1 %>>
+        &lsaquo;
+      </button>
+      <span class="pagination-info">Page <%= page %> of <%= total_pages %></span>
+      <button class="secondary" data-action="query-table#goToPage" data-page="<%= page + 1 %>" <%= 'disabled' if page >= total_pages %>>
+        &rsaquo;
+      </button>
+      <button class="secondary" data-action="query-table#goToPage" data-page="<%= total_pages %>" <%= 'disabled' if page >= total_pages %>>
+        &raquo;
+      </button>
+    </div>
+  <% else %>
+    <div class="pagination">
+      <button class="secondary" disabled>1</button>
+    </div>
+  <% end %>
 </div>
 

@@ -2,8 +2,16 @@ module RailsObservatory
   class TracesController < ApplicationController
 
     layout 'rails_observatory/traces/request', only: :show
+    PER_PAGE = 20
+
     def recent
-      @traces = trace_class.all.where(time: 1.hour.ago..).limit(20)
+      @page = [params[:page].to_i, 1].max
+      @per_page = PER_PAGE
+      query = trace_class.all.where(time: 1.hour.ago..)
+      @total_count = query.count
+      @total_pages = (@total_count.to_f / @per_page).ceil
+      @total_pages = 1 if @total_pages < 1
+      @traces = query.offset((@page - 1) * @per_page).limit(@per_page)
       render partial: 'rails_observatory/traces/recent_traces_page', layout: false
     end
 

@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['column', 'resizeHandle']
+  static targets = ['column', 'resizeHandle', 'pagination']
 
   setProperties () {
     const templateCols = []
@@ -87,5 +87,18 @@ export default class extends Controller {
     window.removeEventListener('mousemove', this.boundResize)
     window.removeEventListener('mouseup', this.boundEndResize)
     this.saveToLocalStorage()
+  }
+
+  goToPage (event) {
+    const page = event.currentTarget.dataset.page
+    if (!page) return
+
+    const turboFrame = this.element.closest('turbo-frame')
+    if (turboFrame) {
+      const currentSrc = turboFrame.getAttribute('src') || window.location.href
+      const url = new URL(currentSrc, window.location.origin)
+      url.searchParams.set('page', page)
+      turboFrame.setAttribute('src', url.toString())
+    }
   }
 }

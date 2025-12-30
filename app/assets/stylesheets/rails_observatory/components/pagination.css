@@ -3,6 +3,20 @@
   :scope {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: var(--gap-md);
+    padding: var(--gap-md);
+  }
+
+  .pagination-info {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    min-width: 100px;
+    text-align: center;
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 }
