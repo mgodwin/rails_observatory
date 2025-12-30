@@ -6,7 +6,7 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     trace = RailsObservatory::RequestTrace.find(request.request_id)
-    assert_equal 26, trace.events.size
+    assert_equal 25, trace.events.size
     assert_equal "GET", trace.http_method
   end
 end

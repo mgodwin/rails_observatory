@@ -1,3 +1,5 @@
+require "benchmark"
+
 module RailsObservatory
   module RedisClientInstrumentation
     def call(command, redis_config)
