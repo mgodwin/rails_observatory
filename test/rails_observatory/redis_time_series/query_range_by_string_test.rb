@@ -5,7 +5,10 @@ module RailsObservatory
     # Basic parsing tests
 
     test "parses basic spec" do
-      query = RedisTimeSeries.query_range_by_string("request.count|sum->60@sum")
+      # 1 hour time range with 60 bins = 60 second bins = 60000ms
+      from = Time.now - 1.hour
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.count|sum->60@sum", from: from, to: to)
 
       assert_instance_of RedisTimeSeries::QueryRangeBuilder, query
       assert_equal "name", query.group_label.to_s
@@ -32,16 +35,46 @@ module RailsObservatory
     end
 
     test "parses different reducers" do
-      query = RedisTimeSeries.query_range_by_string("request.latency|max->30@max")
+      # 15 minutes with 30 bins = 30 second bins = 30000ms
+      from = Time.now - 15.minutes
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.latency|max->30@max", from: from, to: to)
 
       assert_includes query.to_redis_command, "compaction=max"
       assert_includes query.to_redis_command, "AGGREGATION MAX 30000"
     end
 
     test "parses different bin durations" do
-      query = RedisTimeSeries.query_range_by_string("request.count|sum->120@sum")
+      # 4 hours with 120 bins = 120 second bins = 120000ms
+      from = Time.now - 4.hours
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.count|sum->120@sum", from: from, to: to)
 
       assert_includes query.to_redis_command, "AGGREGATION SUM 120000"
+    end
+
+    test "calculates bin duration based on time range and target bins" do
+      # 24 hours with 60 bins = 24 minute bins = 1440000ms
+      from = Time.now - 24.hours
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.count|sum->60@sum", from: from, to: to)
+
+      assert_includes query.to_redis_command, "AGGREGATION SUM 1440000"
+    end
+
+    test "enforces minimum 1 second bin duration" do
+      # 30 seconds with 60 bins would be 500ms, but minimum is 1000ms
+      from = Time.now - 30.seconds
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.count|sum->60@sum", from: from, to: to)
+
+      assert_includes query.to_redis_command, "AGGREGATION SUM 1000"
+    end
+
+    test "falls back to 60 second bins when no time range provided" do
+      query = RedisTimeSeries.query_range_by_string("request.count|sum->60@sum")
+
+      assert_includes query.to_redis_command, "AGGREGATION SUM 60000"
     end
 
     # Group label tests

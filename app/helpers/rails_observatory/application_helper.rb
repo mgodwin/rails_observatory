@@ -17,7 +17,8 @@ module RailsObservatory
     # Converts a query spec string into chart-ready series data.
     # See RedisTimeSeries.query_range_by_string for format details.
     def metric_series(spec)
-      query = RedisTimeSeries.query_range_by_string(spec)
+      slice = ActiveSupport::IsolatedExecutionState[:observatory_slice]
+      query = RedisTimeSeries.query_range_by_string(spec, from: slice&.begin, to: slice&.end)
       group_label = query.group_label.to_s
       query.to_a.map { |s| { name: s.labels[group_label], data: s.filled_data } }
     end

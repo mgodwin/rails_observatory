@@ -18,13 +18,27 @@ module RailsObservatory
 
     # Parses a query string and returns a configured QueryRangeBuilder
     # Format: "metric_name|compaction->bins@reducer (group_label)"
+    # The bins value specifies the target number of data points to return.
     # Examples:
-    #   "request.count|sum->60@sum"
+    #   "request.count|sum->60@sum"      - 60 data points
     #   "request.latency|avg->60@avg (namespace)"
-    def self.query_range_by_string(spec)
+    def self.query_range_by_string(spec, from: nil, to: nil)
       /\A(?<metric_name>.+?)\|(?<compaction>[^->]+)->(?<buckets>\d+)@(?<rollup_fn>.+?)(?:\s*\((?<group_by>\w+)\))?\z/ =~ spec
 
       raise ArgumentError, "Invalid query spec: #{spec}" unless metric_name
+
+      # Fall back to IsolatedExecutionState if not provided
+      from ||= ActiveSupport::IsolatedExecutionState[:observatory_slice]&.begin
+      to ||= ActiveSupport::IsolatedExecutionState[:observatory_slice]&.end || Time.now
+
+      target_bins = buckets.to_i
+
+      if from && to
+        bin_duration_ms = ((to.to_i - from.to_i) * 1000 / target_bins).to_i
+        bin_duration_ms = [bin_duration_ms, 1000].max  # Minimum 1 second bins
+      else
+        bin_duration_ms = 60_000  # Fallback: 60 second bins
+      end
 
       conditions = {}
       group_label = group_by || 'name'
@@ -39,10 +53,10 @@ module RailsObservatory
         conditions[:compaction] = compaction
       end
 
-      query_range(metric_name, rollup_fn.to_sym)
+      query_range(metric_name, rollup_fn.to_sym, from: from, to: to)
         .where(**conditions)
         .group(group_label.to_sym)
-        .bins(buckets.to_i * 1000)
+        .bins(bin_duration_ms)
     end
 
     def self.query_value(name, reducer, from: nil, to: nil)
