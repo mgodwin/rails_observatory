@@ -11,3 +11,4 @@
 /test/dummy/tmp/
 node_modules/
 .idea/
+*.local.*
