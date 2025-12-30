@@ -1,15 +1,7 @@
 @layer layout {
-  .layout-requests_index {
-    display: grid;
-
-    grid-template-areas:
-        'summary summary'
-        'chart chart'
-        /*'chart chart'*/
-        'bycontroller bycontroller'
-        'events events';
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: min-content min-content auto auto;
+  .layout-dashboard {
+    display: flex;
+    flex-direction: column;
     gap: var(--gap-xl);
 
     & > .summary-panel {
@@ -18,18 +10,10 @@
     }
 
     & > .charts {
-      grid-area: chart;
       display: grid;
-      grid-template-columns: subgrid;
+      gap: var(--gap-xl);
+      grid-template-columns: 1fr 1fr;
       padding-inline: var(--sp-6);
-    }
-
-    & > .layout-requests_index-by_controller {
-      grid-area: bycontroller;
-    }
-
-    & > section.recent-requests {
-      grid-area: events;
     }
   }
 }

@@ -12,7 +12,7 @@ module RailsObservatory
         start_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         result = nil
         logs = []
-        events = EventCollector.instance.collect_events do
+        events = EventCollector.collect_events do
           logs = LogCollector.collect_logs do
             result = super
           end
