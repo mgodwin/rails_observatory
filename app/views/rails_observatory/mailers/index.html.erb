@@ -7,57 +7,10 @@
     </dl>
   </div>
 
-  <% if @count_by_mailer.any? %>
-    <section class="layout-requests_index-by_controller">
-      <header>
-        <h2>By Mailer</h2>
-      </header>
-      <div class="table-chart">
-        <table>
-          <thead>
-          <tr>
-            <th>Mailer</th>
-            <th>Emails</th>
-          </tr>
-          </thead>
-          <tbody>
-          <% @count_by_mailer.each do |series| %>
-            <tr>
-              <td><%= series.labels['mailer'] %></td>
-              <td><%= series.value.to_i %></td>
-            </tr>
-          <% end %>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  <% end %>
-
   <section class="recent-requests">
     <header>
       <h2>Recent Deliveries</h2>
     </header>
-    <table>
-      <thead>
-      <tr>
-        <th>Time</th>
-        <th>Mailer</th>
-        <th>To</th>
-        <th>Subject</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @deliveries.each do |delivery| %>
-        <tr>
-          <td><%= Time.at(delivery.time).strftime('%H:%M:%S') %></td>
-          <td><%= delivery.mailer %></td>
-          <td><%= delivery.to %></td>
-          <td><%= delivery.subject %></td>
-          <td><%= link_to 'View', preview_mail_path(delivery.message_id) %></td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
+    <turbo-frame id="recent-deliveries" src="<%= recent_mailers_path %>" loading="lazy"></turbo-frame>
   </section>
 </main>

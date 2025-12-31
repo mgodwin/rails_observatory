@@ -1,0 +1,15 @@
+<turbo-frame id="recent-deliveries">
+  <%= render 'query_table',
+    attributes: { id: 'recent-mail-deliveries' },
+    events: @deliveries,
+    fields: [:time, :mailer, :to, :subject],
+    formatters: {
+      time: ->(time, delivery) {
+        link_to Time.at(time).strftime('%H:%M:%S'),
+                preview_mail_path(delivery.message_id),
+                data: { turbo_frame: '_top' }
+      }
+    },
+    pagination: { page: @page, total_pages: @total_pages, per_page: @per_page }
+  %>
+</turbo-frame>
