@@ -1,7 +1,139 @@
-<% content_for(:title, 'Metrics') %>
+<% content_for(:title, 'Metrics Explorer') %>
 
-<main>
-  <div style="padding: 2rem;">
-    <input type="text" />
+<main class="layout-metrics-explorer">
+  <div class="summary-panel">
+    <dl>
+      <dt>Unique Metrics</dt>
+      <dd><%= @unique_metric_names.size %></dd>
+      <dt>Time Series</dt>
+      <dd><%= @total_series_count %></dd>
+      <dt>Counters</dt>
+      <dd><%= @counter_names.size %></dd>
+      <dt>Distributions</dt>
+      <dd><%= @distribution_names.size %></dd>
+    </dl>
   </div>
+
+  <section class="metric-selection"
+           data-controller="metrics-explorer"
+           data-metrics-explorer-autocomplete-url-value="<%= autocomplete_metrics_path %>">
+
+    <div class="metric-input-wrapper">
+      <label for="metric-search">Metric</label>
+      <input type="text"
+             id="metric-search"
+             name="metric"
+             value="<%= @selected_metric %>"
+             placeholder="Search metrics..."
+             autocomplete="off"
+             data-metrics-explorer-target="input"
+             data-action="input->metrics-explorer#onInput focus->metrics-explorer#onFocus blur->metrics-explorer#onBlur keydown->metrics-explorer#onKeydown">
+      <ul class="autocomplete-results"
+          data-metrics-explorer-target="results"
+          hidden></ul>
+    </div>
+
+    <% if @selected_metric.present? %>
+      <div class="metric-controls">
+        <div class="control-group">
+          <label>Aggregation</label>
+          <div class="dropdown">
+            <button class="secondary">
+              <%= @compaction.titleize %>
+              <svg class="chevron" viewBox="0 0 20 20" fill="currentColor" height="16">
+                <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <ul>
+              <% @available_compactions.each do |comp| %>
+                <li>
+                  <%= link_to metrics_path(metric: @selected_metric, compaction: comp, group_by: @group_by, chart_type: @chart_type),
+                              class: ('active' if comp == @compaction) do %>
+                    <span><%= comp.titleize %></span>
+                    <svg height="18" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Group By</label>
+          <div class="dropdown">
+            <button class="secondary">
+              <%= @group_by.present? ? @group_by : 'None' %>
+              <svg class="chevron" viewBox="0 0 20 20" fill="currentColor" height="16">
+                <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <ul>
+              <li>
+                <%= link_to metrics_path(metric: @selected_metric, compaction: @compaction, group_by: nil, chart_type: @chart_type),
+                            class: ('active' if @group_by.blank?) do %>
+                  <span>None</span>
+                  <svg height="18" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                  </svg>
+                <% end %>
+              </li>
+              <% @available_labels.each do |label| %>
+                <li>
+                  <%= link_to metrics_path(metric: @selected_metric, compaction: @compaction, group_by: label, chart_type: @chart_type),
+                              class: ('active' if label == @group_by) do %>
+                    <span><%= label %></span>
+                    <svg height="18" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Chart Type</label>
+          <div class="dropdown">
+            <button class="secondary">
+              <%= @chart_type.titleize %>
+              <svg class="chevron" viewBox="0 0 20 20" fill="currentColor" height="16">
+                <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <ul>
+              <% %w[bar area].each do |type| %>
+                <li>
+                  <%= link_to metrics_path(metric: @selected_metric, compaction: @compaction, group_by: @group_by, chart_type: type),
+                              class: ('active' if type == @chart_type) do %>
+                    <span><%= type.titleize %></span>
+                    <svg height="18" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </section>
+
+  <% if @selected_metric.present? && @chart_data.present? %>
+    <section class="metric-chart">
+      <div class="chart"
+           id="explorer-chart"
+           data-controller="<%= @chart_type %>-chart"
+           data-<%= @chart_type %>-chart-initial-data-value="<%= @chart_data.to_json %>"
+           data-<%= @chart_type %>-chart-name-value="<%= @selected_metric %>"
+           <%= "data-#{@chart_type}-chart-stacked-value=true" if @group_by.present? %>></div>
+    </section>
+  <% elsif @selected_metric.blank? %>
+    <section class="metric-chart-placeholder">
+      <p>Select a metric above to view its chart</p>
+    </section>
+  <% end %>
 </main>

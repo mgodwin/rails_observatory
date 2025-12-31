@@ -1,0 +1,134 @@
+@layer layout {
+  .layout-metrics-explorer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xl);
+
+    & > .summary-panel {
+      margin: var(--sp-6) var(--sp-6) 0;
+    }
+
+    & > .metric-selection {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-lg);
+      padding-inline: var(--sp-6);
+    }
+
+    .metric-input-wrapper {
+      position: relative;
+      max-width: 400px;
+
+      & > label {
+        display: block;
+        margin-bottom: var(--sp-2);
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-sm);
+        color: var(--black-secondary);
+      }
+
+      & > input {
+        width: 100%;
+        padding: var(--sp-2) var(--sp-3);
+        border: var(--border-divider);
+        border-radius: var(--radius-sm);
+        background: var(--surface-card);
+        color: var(--white);
+        font-size: var(--font-size-md);
+        font-family: var(--font-mono);
+
+        &:focus {
+          outline: none;
+          border-color: var(--accent);
+        }
+
+        &::placeholder {
+          color: var(--black-secondary);
+        }
+      }
+
+      & > .autocomplete-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        background: var(--surface-dropdown);
+        border: var(--border-divider);
+        border-radius: var(--radius-sm);
+        margin-top: var(--sp-1);
+        z-index: 100;
+        list-style: none;
+        padding: 0;
+        box-shadow: var(--shadow-md);
+
+        & li {
+          border-bottom: var(--border-divider);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &.selected a,
+          & a:hover {
+            background: var(--surface-hover);
+          }
+
+          & a {
+            display: block;
+            padding: var(--sp-2) var(--sp-3);
+            color: var(--white);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: var(--font-size-sm);
+
+            & mark {
+              background: var(--accent-muted);
+              color: var(--white);
+              padding: 0 var(--sp-1);
+              border-radius: 2px;
+            }
+          }
+        }
+      }
+    }
+
+    .metric-controls {
+      display: flex;
+      gap: var(--gap-lg);
+      flex-wrap: wrap;
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-1);
+
+        & > label {
+          font-size: var(--font-size-sm);
+          color: var(--black-secondary);
+        }
+      }
+    }
+
+    & > .metric-chart {
+      padding-inline: var(--sp-6);
+
+      & .chart {
+        height: 350px;
+      }
+    }
+
+    & > .metric-chart-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      margin-inline: var(--sp-6);
+      border: var(--border-divider);
+      border-radius: var(--rounded);
+      color: var(--black-secondary);
+      font-style: italic;
+    }
+  }
+}
