@@ -1,4 +1,4 @@
-# Preview all emails at http://localhost:3000/rails/mailers/new_user_mailer
+# Exposes a preview of delivered emails stored by RailsObservatory.
 class DeliveredMailPreview < ActionMailer::Preview
 
   def preview

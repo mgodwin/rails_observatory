@@ -4,13 +4,13 @@
   <div class="summary-panel">
     <dl>
       <dt>Requests</dt>
-      <dd><%= metric_value(name: 'request.count_sum') %></dd>
+      <dd><%= metric_value(name: 'request.count_sum')&.to_i %></dd>
       <dt>Mean Response Time</dt>
       <dd><%= metric_value(name: 'request.latency_avg') %> ms</dd>
       <dt>Max Response Time</dt>
       <dd><%= metric_value(name: 'request.latency_max') %> ms</dd>
       <dt>Errors</dt>
-      <dd><%= metric_value(name: 'request.error_count_sum') %></dd>
+      <dd><%= metric_value(name: 'request.error_count_sum')&.to_i %></dd>
     </dl>
   </div>
   <div class="charts">
