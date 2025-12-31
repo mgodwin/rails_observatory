@@ -16,7 +16,7 @@ module RailsObservatory
         description: "Error records and stack traces"
       },
       mail: {
-        patterns: ["maildelivery:*", "maildelivery_mail:*"],
+        patterns: ["mail_delivery:*", "mail_delivery_mail:*"],
         description: "Mail delivery records"
       },
       time_series: {
