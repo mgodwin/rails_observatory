@@ -1,17 +1,19 @@
-<% series = Array.wrap(local_assigns[:series]) %>
-<div id="<%= rand(100) %>"
-     class="_chart"
-     data-controller="sparkline"
-     data-sparkline-name="<%= local_assigns[:name] %>"
-     data-sparkline-type-value="<%= local_assigns[:type] %>"
-     data-sparkline-start-x-value="<%= series.first.start_time.to_i.in_milliseconds %>"
-     data-sparkline-end-x-value="<%= series.first.end_time.to_i.in_milliseconds %>">
-  <% if series.any? %>
+<% series = Array.wrap(local_assigns[:series]).compact %>
+<% if series.any? %>
+  <div id="<%= rand(100) %>"
+       class="_chart"
+       data-controller="sparkline"
+       data-sparkline-name="<%= local_assigns[:name] %>"
+       data-sparkline-type-value="<%= local_assigns[:type] %>"
+       data-sparkline-start-x-value="<%= series.first.start_time.to_i.in_milliseconds %>"
+       data-sparkline-end-x-value="<%= series.first.end_time.to_i.in_milliseconds %>">
     <div data-sparkline-target="chart"></div>
-    <% series.each do |series| %>
-      <script type="application/json" data-sparkline-target="data" data-series-name="<%= series.name.split('/').last %>">
-        <%== series.filled_data.map { |(ts, v)| v.to_i == 0 ? [ts, 0] : [ts,v.to_i]}.to_json %>
+    <% series.each do |s| %>
+      <script type="application/json" data-sparkline-target="data" data-series-name="<%= s.name&.split('/')&.last || 'data' %>">
+        <%== s.filled_data.map { |(ts, v)| v.to_i == 0 ? [ts, 0] : [ts,v.to_i]}.to_json %>
       </script>
     <% end %>
-  <% end %>
-</div>
+  </div>
+<% else %>
+  <div class="_chart _chart--empty"></div>
+<% end %>

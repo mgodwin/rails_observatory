@@ -4,6 +4,8 @@ module RailsObservatory
     class Range
 
       attr_reader :name, :data, :labels, :from, :to, :bin_duration
+      alias_method :start_time, :from
+      alias_method :end_time, :to
 
       def initialize(labels:, data:, bin_duration: nil, from: nil, to: nil)
         @labels = labels
