@@ -26,36 +26,43 @@ module RailsObservatory
 
       start_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
       response = nil
-      events, logs = collect_events_and_logs do
-        response = @app.call(env)
+      exception_raised = nil
+
+      begin
+        events, logs = collect_events_and_logs do
+          response = @app.call(env)
+        end
+      rescue Exception => e
+        # Extract events from the exception (stored by EventCollector)
+        events = e.instance_variable_get(:@_trace_events) || []
+        logs = []
+        exception_raised = e
+
+        # Capture the error before re-raising
+        if request.params[:controller].present?
+          controller_action = "#{request.params[:controller]}##{request.params[:action]}"
+          capture_error(e, controller_action, start_at)
+        end
+
+        raise
       end
 
-
-
-      # if (event = events.find { _1.name == 'process_action.action_controller' && _1.payload[:exception_object] })
-      #   error = Error.new(exception: event.payload[:exception_object], location: controller_action, time: Time.now)
-      #   error.save
-      #   TimeSeries.record_occurrence("error.count", labels: { fingerprint: error.fingerprint })
-      # end
-
-      return response if request.params[:controller].blank? # || request.params[:controller] =~ /rails_observatory/
+      return response if request.params[:controller].blank?
 
       status, headers, body = response
 
       # Using Rack::BodyProxy to ensure timing is recorded after the response is fully processed
       body = ::Rack::BodyProxy.new(body) do
-
-        # TimeSeries.record_occurrence("request.count", labels:)
-        # TimeSeries.record_occurrence("request.error_count", labels:) if status >= 500
-
-        # serialized_events = events.map { Serializer.serialize(_1) }
-        # EventCollection.new(serialized_events).self_time_by_library.each do |library, self_time|
-        #   TimeSeries.record_timing("request.latency/#{library}", self_time, labels: { action: controller_action })
-        # end
         duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - start_at_mono)
+        controller_action = "#{request.params[:controller]}##{request.params[:action]}"
 
         RailsObservatory.worker_pool.post do
           RequestTrace.create_from_request(request, start_at, duration, status, events:, logs: ).save
+
+          # Capture errors from the request (for caught exceptions that became error responses)
+          if (event = events.find { _1.name == 'process_action.action_controller' && _1.payload[:exception_object] })
+            capture_error(event.payload[:exception_object], controller_action, start_at)
+          end
         rescue => e
           puts "Error saving request trace: #{e.message}"
           puts e.backtrace.join("\n")
@@ -66,6 +73,19 @@ module RailsObservatory
       end
 
       [status, headers, body]
+    end
+
+    private
+
+    def capture_error(exception, location, time)
+      RailsObservatory.worker_pool.post do
+        error = Error.new(exception: exception, location: location, time: time.to_f)
+        error.save
+        RedisTimeSeries.record_occurrence("error.count", at: time.to_f, labels: { fingerprint: error.fingerprint })
+      rescue => e
+        Rails.logger.error "Error capturing exception: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+      end
     end
   end
 end

@@ -53,7 +53,9 @@ module RailsObservatory
     end
 
     def exception_string(wrapped_ex)
-      wrapped_ex.exception_class_name + wrapped_ex.exception.backtrace.map { _1.split(":").slice(0..1).join(":") }.join("\n")
+      # Only use application frames for fingerprinting to avoid differences from test/framework code
+      app_trace = wrapped_ex.application_trace.map { _1.split(":").slice(0..1).join(":") }.join("\n")
+      wrapped_ex.exception_class_name + app_trace
     end
 
     def build_fingerprint(wrapped_ex)
