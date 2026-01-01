@@ -54,8 +54,22 @@ module RailsObservatory
 
     def exception_string(wrapped_ex)
       # Only use application frames for fingerprinting to avoid differences from test/framework code
-      app_trace = wrapped_ex.application_trace.map { _1.split(":").slice(0..1).join(":") }.join("\n")
+      app_trace = wrapped_ex.application_trace.map { |frame| normalize_frame(frame) }.join("\n")
       wrapped_ex.exception_class_name + app_trace
+    end
+
+    # Extracts file:method from a Ruby backtrace frame, ignoring line numbers.
+    # This makes fingerprints stable across code changes that don't affect the method.
+    #
+    # Limitation: Multiple raises of the same exception class within a single method
+    # will be grouped together. Use custom exception classes for distinct error types.
+    def normalize_frame(frame)
+      # Ruby backtrace format: "/path/to/file.rb:42:in `method_name'"
+      if frame =~ /\A(.+):\d+:in `(.*)'\z/
+        "#{$1}:#{$2}"
+      else
+        frame
+      end
     end
 
     def build_fingerprint(wrapped_ex)
