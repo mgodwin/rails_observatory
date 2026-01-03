@@ -15,7 +15,8 @@ namespace :observatory do
       {method: :get, path: "/scenarios/not_found", desc: "GET not_found (404)"},
       {method: :post, path: "/scenarios/validation_error", desc: "POST validation (422)"},
       {method: :get, path: "/scenarios/server_error", desc: "GET error (500)"},
-      {method: :get, path: "/scenarios/slow_request", desc: "GET slow (2-3s)"}
+      {method: :get, path: "/scenarios/slow_request", desc: "GET slow (2-3s)"},
+      {method: :post, path: "/scenarios/unpermitted_params", params: {"post[title]" => "Valid", "post[hacker_field]" => "rejected", "post[admin]" => "true"}, desc: "POST unpermitted params"}
     ]
 
     # Job scenarios
@@ -34,13 +35,13 @@ namespace :observatory do
     ]
 
     # Helper to make HTTP requests
-    make_request = lambda do |method, path|
+    make_request = lambda do |method, path, params = {}|
       uri = URI("#{base_url}#{path}")
       case method
       when :get
         Net::HTTP.get_response(uri)
       when :post
-        Net::HTTP.post_form(uri, {})
+        Net::HTTP.post_form(uri, params)
       when :patch
         req = Net::HTTP::Patch.new(uri)
         Net::HTTP.start(uri.hostname, uri.port) { |http| http.request(req) }
@@ -88,7 +89,7 @@ namespace :observatory do
         # Request
         req = requests.sample
         print "[#{count}] REQUEST #{req[:desc]}..."
-        response = make_request.call(req[:method], req[:path])
+        response = make_request.call(req[:method], req[:path], req[:params] || {})
         puts response ? " #{response.code}" : " (unreachable)"
       elsif roll < 90
         # Job

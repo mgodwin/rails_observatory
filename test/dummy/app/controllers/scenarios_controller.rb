@@ -1,4 +1,6 @@
 class ScenariosController < ApplicationController
+  skip_forgery_protection
+
   # GET /scenarios/success - 200 HTML response
   def success
     @message = "Success response"
@@ -58,5 +60,11 @@ class ScenariosController < ApplicationController
     sleep(duration)
     logger.info "Slow request completed"
     render json: {status: "ok", duration: duration.round(2)}
+  end
+
+  # POST /scenarios/unpermitted_params - triggers unpermitted_parameters event
+  def unpermitted_params
+    permitted = params.require(:post).permit(:title)
+    render json: {permitted: permitted.to_h}
   end
 end

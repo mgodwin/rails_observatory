@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       post :validation_error
       get :server_error
       get :slow_request
+      post :unpermitted_params
     end
   end
 end

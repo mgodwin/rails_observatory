@@ -1,0 +1,83 @@
+<%
+  sql_events = @events.only('sql.active_record').to_a
+  sql_total_ms = sql_events.sum { |e| e['duration'] }.round(2)
+
+  view_events = @events.only('render_template.action_view', 'render_partial.action_view', 'render_layout.action_view').to_a
+  view_total_ms = view_events.sum { |e| e['duration'] }.round(2)
+
+  cache_events = @events.only('call.redis').to_a
+
+  start_event = @events.only('start_processing.action_controller').first
+  request_params = start_event&.dig('payload', 'params') || {}
+  request_headers = start_event&.dig('payload', 'request', 'headers') || {}
+
+  unpermitted_events = @events.only('unpermitted_parameters.action_controller').to_a
+  controller = start_event&.dig('payload', 'controller')
+  action = start_event&.dig('payload', 'action')
+  unpermitted_keys = unpermitted_events
+    .select { |e|
+      e.dig('payload', 'context', 'controller') == controller &&
+      e.dig('payload', 'context', 'action') == action
+    }
+    .flat_map { |e| e.dig('payload', 'keys') || [] }
+    .map { |k| k.is_a?(Array) ? k.join('.') : k.to_s }
+    .to_set
+%>
+
+<div class="tab-content overview">
+  <div class="summary-panel">
+    <dl>
+      <dt>Duration</dt>
+      <dd><%= @trace.duration.round(2) %> ms</dd>
+      <dt>SQL Queries</dt>
+      <dd><%= sql_events.size %> (<%= sql_total_ms %> ms)</dd>
+      <dt>Views</dt>
+      <dd><%= view_events.size %> (<%= view_total_ms %> ms)</dd>
+      <dt>Cache/Redis</dt>
+      <dd><%= cache_events.size %> calls</dd>
+      <dt>Allocations</dt>
+      <dd><%= number_with_delimiter(@trace.allocations) %></dd>
+      <dt>Events</dt>
+      <dd><%= @events.size %></dd>
+    </dl>
+  </div>
+
+  <%#= @events.to_series %>
+
+  <section style="margin-top: var(--sp-6);">
+    <h3 style="margin-bottom: var(--sp-3); color: var(--black-secondary);">Parameters</h3>
+    <% flattened_params = flatten_params(request_params) %>
+    <% if flattened_params.any? %>
+      <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
+        <% flattened_params.each do |key, value| %>
+          <% is_unpermitted = key.split('.').any? { |part| unpermitted_keys.include?(part) } %>
+          <dt style="color: <%= is_unpermitted ? 'var(--error)' : 'var(--black-secondary)' %>;"><%= key %></dt>
+          <dd style="margin: 0;<%= ' color: var(--error);' if is_unpermitted %>"><%= value.is_a?(Array) ? value.to_json : value %></dd>
+        <% end %>
+      </dl>
+    <% else %>
+      <p style="color: var(--black-secondary);">No parameters</p>
+    <% end %>
+  </section>
+
+  <details style="margin-top: var(--sp-6);">
+    <summary style="cursor: pointer; display: flex; align-items: center; gap: var(--sp-2);">
+      <svg class="arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+      Request Headers (<%= request_headers.size %>)
+    </summary>
+    <div style="margin-top: var(--sp-3);">
+      <% if request_headers.any? %>
+        <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
+          <% request_headers.each do |key, value| %>
+            <dt style="color: var(--black-secondary);"><%= key %></dt>
+            <dd style="margin: 0; word-break: break-all;"><%= value %></dd>
+          <% end %>
+        </dl>
+      <% else %>
+        <p style="color: var(--black-secondary);">No headers captured</p>
+      <% end %>
+    </div>
+  </details>
+</div>

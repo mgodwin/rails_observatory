@@ -75,6 +75,17 @@ module RailsObservatory
       "/rails/mailers/delivered_mail/preview?message_id=#{message_id}"
     end
 
+    def flatten_params(params, prefix = nil)
+      params.each_with_object({}) do |(key, value), result|
+        full_key = prefix ? "#{prefix}.#{key}" : key.to_s
+        if value.is_a?(Hash)
+          result.merge!(flatten_params(value, full_key))
+        else
+          result[full_key] = value
+        end
+      end
+    end
+
     # {"used_memory"=>"46573752",
     #  "used_memory_human"=>"44.42M",
     #  "used_memory_rss"=>"70778880",
