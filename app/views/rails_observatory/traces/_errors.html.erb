@@ -1,3 +1,66 @@
 <div class="tab-content errors">
-  errors
+  <% exception_event = @events.find { |e| e.dig('payload', 'exception') } %>
+  <% if exception_event %>
+    <% exception = exception_event.dig('payload', 'exception') %>
+    <% class_name, message = exception %>
+
+    <%# Find the Error record by class_name and time %>
+    <% error = Error.all.where(class_name: class_name, time: (@trace.time - 1)..(@trace.time + @trace.duration/1000 + 1)).first %>
+
+    <div class="error-summary">
+      <h3 style="color: var(--red); margin-bottom: var(--sp-2);"><%= class_name %></h3>
+      <p style="color: var(--black-secondary);"><%= message %></p>
+    </div>
+
+    <% if error %>
+      <% app_frame = error.trace.find { |t| t["is_application_trace"] } %>
+      <% if app_frame && error.source_extracts[app_frame["id"]] %>
+        <div class="error-source" style="margin-top: var(--sp-4);">
+          <div style="color: var(--black-secondary); margin-bottom: var(--sp-2);"><%= app_frame["trace"] %></div>
+          <div class="highlight">
+            <%== highlight_source_extract(error.source_extracts[app_frame["id"]]) %>
+          </div>
+        </div>
+      <% end %>
+
+      <div style="margin-top: var(--sp-4);">
+        <%= link_to "View Full Error", error_path(error.fingerprint), class: "button" %>
+      </div>
+    <% end %>
+  <% else %>
+    <p style="color: var(--black-secondary);">No errors occurred during this request</p>
+  <% end %>
 </div>
+
+<style>
+  .errors .highlight {
+    width: 100%;
+    overflow: auto;
+  }
+
+  .errors .highlight table {
+    border-spacing: 0;
+    width: 100%;
+  }
+
+  .errors .highlight tr td:first-child {
+    padding-inline: .25rem;
+    position: sticky;
+    left: 0;
+    background-color: #161b22;
+  }
+
+  .errors .hll {
+    background-color: #49483e;
+  }
+
+  .errors .hll pre > span {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--red);
+  }
+
+  .errors .hll tr td:first-child {
+    background-color: #49483e;
+  }
+</style>
