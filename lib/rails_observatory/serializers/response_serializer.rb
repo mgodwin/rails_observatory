@@ -3,7 +3,7 @@ module RailsObservatory
     def serialize(response)
       {
         status: response.status,
-        # headers: Serializer.serialize(response.headers),
+        headers: Serializer.serialize(response.headers)
       }
     end
 

@@ -11,6 +11,9 @@
   request_params = start_event&.dig('payload', 'params') || {}
   request_headers = start_event&.dig('payload', 'request', 'headers') || {}
 
+  process_action_event = @events.only('process_action.action_controller').first
+  response_headers = process_action_event&.dig('payload', 'response', 'headers') || {}
+
   unpermitted_events = @events.only('unpermitted_parameters.action_controller').to_a
   controller = start_event&.dig('payload', 'controller')
   action = start_event&.dig('payload', 'action')
@@ -71,6 +74,27 @@
       <% if request_headers.any? %>
         <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
           <% request_headers.each do |key, value| %>
+            <dt style="color: var(--black-secondary);"><%= key %></dt>
+            <dd style="margin: 0; word-break: break-all;"><%= value %></dd>
+          <% end %>
+        </dl>
+      <% else %>
+        <p style="color: var(--black-secondary);">No headers captured</p>
+      <% end %>
+    </div>
+  </details>
+
+  <details style="margin-top: var(--sp-6);">
+    <summary style="cursor: pointer; display: flex; align-items: center; gap: var(--sp-2);">
+      <svg class="arrow-right" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+      Response Headers (<%= response_headers.size %>)
+    </summary>
+    <div style="margin-top: var(--sp-3);">
+      <% if response_headers.any? %>
+        <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
+          <% response_headers.each do |key, value| %>
             <dt style="color: var(--black-secondary);"><%= key %></dt>
             <dd style="margin: 0; word-break: break-all;"><%= value %></dd>
           <% end %>

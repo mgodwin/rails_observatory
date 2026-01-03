@@ -62,5 +62,20 @@ module RailsObservatory
       # Verify params exist but none have error styling
       assert_select "dt[style*='var(--error)']", count: 0
     end
+
+    test "overview shows response headers" do
+      get success_scenarios_path
+      request_id = request.request_id
+      sleep 0.1
+
+      get trace_by_type_path(type: "rt", id: request_id, tab: "overview")
+      assert_response :success
+
+      # Verify response headers section exists
+      assert_select "details summary", /Response Headers/
+
+      # Verify common response headers are displayed
+      assert_select "details dl dt", /Content-Type/i
+    end
   end
 end
