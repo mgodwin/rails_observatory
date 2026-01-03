@@ -10,6 +10,12 @@ module RailsObservatory
       @_sorted = false
     end
 
+    def initialize_copy(original)
+      super
+      @events = original.instance_variable_get(:@events).deep_dup
+      @processed = false
+    end
+
     def events
       return @events if @processed
       process_events
