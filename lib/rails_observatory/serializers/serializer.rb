@@ -23,7 +23,7 @@ module RailsObservatory
         when Hash
           serialize_hash(argument)
         when -> (arg) { arg.respond_to?(:permitted?) && arg.respond_to?(:to_h) }
-          serialize_hash(argument.to_h)
+          serialize_hash(argument.respond_to?(:to_unsafe_h) ? argument.to_unsafe_h : argument.to_h)
         when Symbol
           argument.to_s
         else
