@@ -35,9 +35,9 @@ module RailsObservatory
 
       if from && to
         bin_duration_ms = ((to.to_i - from.to_i) * 1000 / target_bins).to_i
-        bin_duration_ms = [bin_duration_ms, 1000].max  # Minimum 1 second bins
+        bin_duration_ms = [bin_duration_ms, 1000].max # Minimum 1 second bins
       else
-        bin_duration_ms = 60_000  # Fallback: 60 second bins
+        bin_duration_ms = 60_000 # Fallback: 60 second bins
       end
 
       conditions = {}
@@ -47,11 +47,11 @@ module RailsObservatory
         conditions[group_by.to_sym] = true
       end
 
-      if compaction == 'all'
-        conditions[:compaction] = true  # Match any compaction (exists filter)
-      else
-        conditions[:compaction] = compaction
-      end
+      conditions[:compaction] = if compaction == 'all'
+                                  true # Match any compaction (exists filter)
+                                else
+                                  compaction
+                                end
 
       query_range(metric_name, rollup_fn.to_sym, from: from, to: to)
         .where(**conditions)

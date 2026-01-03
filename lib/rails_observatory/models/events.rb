@@ -8,6 +8,7 @@ module RailsObservatory
       def events
         attr_value = super
         return nil if attr_value.nil?
+
         EventCollection.new(attr_value)
       end
     end
