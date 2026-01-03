@@ -73,7 +73,7 @@
     <div style="margin-top: var(--sp-3);">
       <% if request_headers.any? %>
         <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
-          <% request_headers.each do |key, value| %>
+          <% request_headers.sort.each do |key, value| %>
             <dt style="color: var(--black-secondary);"><%= key %></dt>
             <dd style="margin: 0; word-break: break-all;"><%= value %></dd>
           <% end %>
@@ -94,7 +94,7 @@
     <div style="margin-top: var(--sp-3);">
       <% if response_headers.any? %>
         <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
-          <% response_headers.each do |key, value| %>
+          <% response_headers.sort.each do |key, value| %>
             <dt style="color: var(--black-secondary);"><%= key %></dt>
             <dd style="margin: 0; word-break: break-all;"><%= value %></dd>
           <% end %>
