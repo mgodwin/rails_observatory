@@ -28,13 +28,6 @@ module RailsObservatory
       render partial: 'rails_observatory/requests/recent_requests', layout: false
     end
 
-    def show
-      @request = RequestTrace.find(params[:id])
-      @middleware_events = @request.events.only('process_middleware.action_dispatch')
-      @events = @request.events
-      @icicle_chart_series = @events.to_series
-    end
-
     private
 
     def ensure_indexed

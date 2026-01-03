@@ -18,12 +18,6 @@ module RailsObservatory
       assert_response :success
     end
 
-    test "show renders successfully" do
-      get posts_path
-      get rails_observatory.request_path(request.request_id)
-      assert_response :success
-    end
-
     test "index renders controller action table when data exists" do
       # Insert test data for request.count and request.latency
       action_name = "test_controller#test_action"
