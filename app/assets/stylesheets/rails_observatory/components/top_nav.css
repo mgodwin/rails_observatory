@@ -30,4 +30,15 @@
     border-radius: var(--radius-sm);
     font-size: var(--font-size-xl);
   }
+
+  &:has(._page-tabs) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 0;
+  }
+
+  ._page-tabs {
+    font-size: var(--font-size-md);
+    margin-inline: calc(-1 * var(--sp-3));
+  }
 }

@@ -68,6 +68,9 @@
     </h1>
   </span>
   <%= yield :top_nav %>
+  <%== content_for?(:page_tabs) ? "<div class=\"_page-tabs\">" : "" %>
+  <%= yield :page_tabs %>
+  <%== content_for?(:page_tabs) ? "</div>" : "" %>
 </nav>
 <%= yield %>
 </body>

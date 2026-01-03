@@ -1,21 +1,41 @@
 @layer layout {
+  .tab-content {
+    padding: var(--sp-4);
+  }
+
   .layout-trace {
+    display: grid;
+    grid-template-rows: min-content 1fr;
+    grid-template-columns: 1fr;
+    height: 100%;
+
+    & > .layout-area_tabs {
+      z-index: 10;
+    }
+
+    & > .layout-area_content {
+      overflow: auto;
+      min-height: 200px;
+    }
+  }
+
+  .events-tab {
     display: grid;
     grid-template-rows: min-content min-content 1fr;
     grid-template-columns: 1fr;
     gap: var(--sp-1);
     height: 100%;
 
-    & > .layout-area_chart {
+    & > .events-tab_chart {
       overflow: auto;
     }
 
-    & > .layout-area_resize {
+    & > .events-tab_resize {
       place-content: center;
       display: flex;
     }
 
-    & > .layout-area_trace-details {
+    & > .events-tab_details {
       overflow: auto;
       min-height: 200px;
     }

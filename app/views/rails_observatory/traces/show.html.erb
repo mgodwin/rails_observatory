@@ -1,25 +1,7 @@
-<main class="layout-trace" data-controller="resizable-grid">
-  <div class="layout-area_chart">
-    <div class="chart"
-         data-controller="icicle-chart"
-         data-icicle-chart-initial-data-value="<%= @events.to_series.to_json %>"
-         data-icicle-chart-selection-frame-id-value="trace-tabs"></div>
-  </div>
-  <div class="layout-area_resize">
-    <div class="resize-handle" data-action="mousedown->resizable-grid#startResizeY"></div>
-  </div>
-  <turbo-frame id="trace-tabs" data-turbo-action="advance" class="layout-area_trace-details">
-    <nav class="tabs --sticky">
-      <%= link_to 'Event Details', filter_params.merge({ tab: 'details' }), class: ['tabs-button', { active: current_tab == 'details' }] %>
-      <%= link_to 'Logs', filter_params.merge({ tab: 'logs' }), class: ['tabs-button', { active: current_tab == 'logs' }] %>
-      <%= link_to 'Mail', filter_params.merge({ tab: 'mail' }), class: ['tabs-button', { active: current_tab == 'mail' }] %>
-      <%= link_to 'Jobs', filter_params.merge({ tab: 'jobs' }), class: ['tabs-button', { active: current_tab == 'jobs' }] %>
-      <%= link_to 'Errors', filter_params.merge({ tab: 'errors' }), class: ['tabs-button', { active: current_tab == 'errors' }] %>
-        <%# if @trace.mail_events.size > 0 %>
-<!--          <span style="color: var(--black-secondary)"><%#= @trace.mail_events.size %></span>-->
-        <%# end %>
-    </nav>
-    <%= render 'event_details' if params[:tab] == 'details' || params[:tab].blank? %>
+<main class="layout-trace">
+  <turbo-frame id="trace-tabs" data-turbo-action="advance" class="layout-area_content">
+    <%= render 'overview' if params[:tab] == 'overview' || params[:tab].blank? %>
+    <%= render 'events' if params[:tab] == 'events' %>
     <%= render 'logs' if params[:tab] == 'logs' %>
     <%= render 'mail' if params[:tab] == 'mail' %>
     <%= render 'jobs' if params[:tab] == 'jobs' %>

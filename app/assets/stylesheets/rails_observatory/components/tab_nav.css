@@ -28,6 +28,11 @@
     }
   }
 
+  &.--page-tabs {
+    border-bottom: 0;
+    padding-inline: 0;
+  }
+
     /*& label:has(:focus) {*/
     /*  outline: -webkit-focus-ring-color auto 1px;*/
     /*}*/

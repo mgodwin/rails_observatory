@@ -29,7 +29,7 @@ module RailsObservatory
     helper_method :filter_params
 
     def current_tab
-      params[:tab].presence_in( %w(details logs mail jobs errors)) || 'details'
+      params[:tab].presence_in(%w(overview events logs mail jobs errors)) || 'overview'
     end
     helper_method :current_tab
 
