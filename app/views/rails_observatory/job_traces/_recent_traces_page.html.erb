@@ -1,0 +1,8 @@
+<turbo-frame id="recent-traces">
+  <%= render 'query_table', attributes: { id: 'recent-job-traces' }, events: @traces, fields: [
+    :time, :job_class, :queue_name, :duration,
+  ], formatters: {
+    time: ->(time, trace) { link_to Time.at(time).to_fs('%H:%M:%S'), job_trace_path(trace.id), data: { turbo_frame: '_top' } },
+    duration: ->(duration) { "#{duration.to_f.round(2)} ms" }
+  }, pagination: { page: @page, total_pages: @total_pages, per_page: @per_page } %>
+</turbo-frame>

@@ -1,0 +1,24 @@
+<div class="tab-content jobs">
+  <%
+    job_events = @trace.events.only('enqueue.active_job')
+                       .reject { |e| e.dig('payload', 'job', 'class') == 'ActionMailer::MailDeliveryJob' }
+  %>
+  <ul class="simple-list">
+    <% if job_events.empty? %>
+      <li>No jobs were enqueued</li>
+    <% end %>
+    <% job_events.each do |event| %>
+      <li>
+        <div class="simple-list-title"><%= event.dig('payload', 'job', 'class') %></div>
+        <div>
+          Enqueued job (
+          <span><%= link_to event.dig('payload', 'job', 'job_id').slice(0...8), job_path(event.dig('payload', 'job', 'job_id')) %></span>
+          ) to
+          <span><%= event.dig('payload', 'job', 'queue_name') %></span>
+          queue at
+          <span><%= Time.at(event['start_at']).strftime('%H:%M:%S') %></span>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

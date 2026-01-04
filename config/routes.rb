@@ -1,8 +1,11 @@
 RailsObservatory::Engine.routes.draw do
   resources :requests, only: :index
 
-  resources :traces, only: [:index, :show], path: 'traces/:type', as: :traces_by_type do
-    get 'recent', on: :collection
+  resources :request_traces, only: [:index, :show] do
+    get "recent", on: :collection
+  end
+  resources :job_traces, only: [:index, :show] do
+    get "recent", on: :collection
   end
 
   resources :metrics, only: :index, param: :name do

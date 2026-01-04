@@ -14,12 +14,6 @@ module RailsObservatory
     config.rails_observatory = ActiveSupport::OrderedOptions.new
     config.rails_observatory.redis = { host: "localhost", port: 6379, db: 0, pool_size: ENV["RAILS_MAX_THREADS"] || 3 }
 
-    initializer 'rails_observatory.inflections' do
-      ActiveSupport::Inflector.inflections do |inflect|
-        inflect.irregular "trace_by_type", "traces_by_type"
-      end
-    end
-
     initializer "rails_observatory.redis" do |app|
       app.config.rails_observatory.redis => pool_size:, **redis_config
       redis_config = RedisClient.config(**redis_config.merge(middlewares: [RedisClientInstrumentation]))

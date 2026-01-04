@@ -1,0 +1,23 @@
+<div class="tab-content mail">
+  <ul class="simple-list">
+    <% if @trace.mail_events.empty? %>
+      <li>No mail enqueued or delivered</li>
+    <% end %>
+    <% @trace.mail_events.each do |e| %>
+      <li>
+        <% if e['name'] == 'deliver.action_mailer' %>
+          <div class="simple-list-title"><%= e.dig('payload', 'mailer') %></div>
+          <div>To: <%= Array(e.dig('payload', 'to')).join(', ') %></div>
+          <div>From: <%= Array(e.dig('payload', 'from')).join(', ') %></div>
+          <div>Subject: <%= e.dig('payload', 'subject') %></div>
+          <% if e.dig('payload', 'message_id') %>
+            <a href="<%= preview_mail_path(e.dig('payload', 'message_id')) %>" target="_blank">View Email</a>
+          <% end %>
+        <% else %>
+          <div class="simple-list-title"><%= e.dig('payload', 'mailer_class') %>#<%= e.dig('payload', 'mailer_method') %></div>
+          <div>Enqueued for delivery</div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

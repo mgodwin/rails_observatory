@@ -1,7 +1,7 @@
 require "test_helper"
 
 module RailsObservatory
-  class TracesControllerTest < ActionDispatch::IntegrationTest
+  class RequestTracesControllerTest < ActionDispatch::IntegrationTest
     include Engine.routes.url_helpers
 
     def setup
@@ -21,8 +21,8 @@ module RailsObservatory
       request_id = request.request_id
       sleep 0.1 # Wait for async worker
 
-      # View the trace via traces controller (uses _overview.html.erb)
-      get trace_by_type_path(type: "rt", id: request_id, tab: "overview")
+      # View the trace via request traces controller (uses _overview.html.erb)
+      get request_trace_path(id: request_id, tab: "overview")
       assert_response :success
 
       # Verify unpermitted param is styled with error color
@@ -44,7 +44,7 @@ module RailsObservatory
       request_id = request.request_id
       sleep 0.1
 
-      get trace_by_type_path(type: "rt", id: request_id, tab: "overview")
+      get request_trace_path(id: request_id, tab: "overview")
       assert_response :success
 
       # Verify nested params are flattened with dot notation
@@ -56,7 +56,7 @@ module RailsObservatory
       request_id = request.request_id
       sleep 0.1
 
-      get trace_by_type_path(type: "rt", id: request_id, tab: "overview")
+      get request_trace_path(id: request_id, tab: "overview")
       assert_response :success
 
       # Verify params exist but none have error styling
@@ -68,7 +68,7 @@ module RailsObservatory
       request_id = request.request_id
       sleep 0.1
 
-      get trace_by_type_path(type: "rt", id: request_id, tab: "overview")
+      get request_trace_path(id: request_id, tab: "overview")
       assert_response :success
 
       # Verify response headers section exists

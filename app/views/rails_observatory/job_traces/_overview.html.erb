@@ -1,0 +1,44 @@
+<%
+  sql_events = @events.only('sql.active_record').to_a
+  sql_total_ms = sql_events.sum { |e| e['duration'] }.round(2)
+
+  view_events = @events.only('render_template.action_view', 'render_partial.action_view', 'render_layout.action_view').to_a
+  view_total_ms = view_events.sum { |e| e['duration'] }.round(2)
+
+  cache_events = @events.only('call.redis').to_a
+%>
+
+<div class="tab-content overview">
+  <div class="summary-panel">
+    <dl>
+      <dt>Duration</dt>
+      <dd><%= @trace.duration.round(2) %> ms</dd>
+      <dt>Queue Latency</dt>
+      <dd><%= @trace.queue_latency.to_f.round(2) %> ms</dd>
+      <dt>SQL Queries</dt>
+      <dd><%= sql_events.size %> (<%= sql_total_ms %> ms)</dd>
+      <dt>Views</dt>
+      <dd><%= view_events.size %> (<%= view_total_ms %> ms)</dd>
+      <dt>Cache/Redis</dt>
+      <dd><%= cache_events.size %> calls</dd>
+      <dt>Allocations</dt>
+      <dd><%= number_with_delimiter(@trace.allocations) %></dd>
+      <dt>Events</dt>
+      <dd><%= @events.size %></dd>
+    </dl>
+  </div>
+
+  <section style="margin-top: var(--sp-6);">
+    <h3 style="margin-bottom: var(--sp-3); color: var(--black-secondary);">Job Details</h3>
+    <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4);">
+      <dt style="color: var(--black-secondary);">Job Class</dt>
+      <dd style="margin: 0;"><%= @trace.job_class %></dd>
+      <dt style="color: var(--black-secondary);">Queue</dt>
+      <dd style="margin: 0;"><%= @trace.queue_name %></dd>
+      <dt style="color: var(--black-secondary);">Adapter</dt>
+      <dd style="margin: 0;"><%= @trace.queue_adapter %></dd>
+      <dt style="color: var(--black-secondary);">Executions</dt>
+      <dd style="margin: 0;"><%= @trace.executions %></dd>
+    </dl>
+  </section>
+</div>

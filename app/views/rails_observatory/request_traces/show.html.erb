@@ -1,0 +1,10 @@
+<main class="layout-trace">
+  <turbo-frame id="trace-tabs" data-turbo-action="advance" class="layout-area_content">
+    <%= render 'overview' if params[:tab] == 'overview' || params[:tab].blank? %>
+    <%= render 'events' if params[:tab] == 'events' %>
+    <%= render 'logs' if params[:tab] == 'logs' %>
+    <%= render 'mail' if params[:tab] == 'mail' %>
+    <%= render 'jobs' if params[:tab] == 'jobs' %>
+    <%= render 'errors' if params[:tab] == 'errors' %>
+  </turbo-frame>
+</main>

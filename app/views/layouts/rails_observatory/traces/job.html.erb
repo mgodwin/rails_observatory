@@ -1,0 +1,18 @@
+<% content_for :title do %>
+  <span style="font-weight:200"><%= @trace.job_class %></span>
+  <br>
+  <span style="font-size: 1rem; font-weight: 200;"><%= time_ago_in_words(Time.at(@trace.time)) %> ago
+    | <%= @trace.duration.round(2) %>ms
+    | Queue: <%= @trace.queue_name %></span>
+<% end %>
+<% content_for :page_tabs do %>
+  <nav class="tabs --page-tabs">
+    <%= link_to 'Overview', filter_params.merge({ tab: 'overview' }), class: ['tabs-button', { active: current_tab == 'overview' }] %>
+    <%= link_to 'Events', filter_params.merge({ tab: 'events' }), class: ['tabs-button', { active: current_tab == 'events' }] %>
+    <%= link_to 'Logs', filter_params.merge({ tab: 'logs' }), class: ['tabs-button', { active: current_tab == 'logs' }] %>
+    <%= link_to 'Mail', filter_params.merge({ tab: 'mail' }), class: ['tabs-button', { active: current_tab == 'mail' }] %>
+    <%= link_to 'Jobs', filter_params.merge({ tab: 'jobs' }), class: ['tabs-button', { active: current_tab == 'jobs' }] %>
+    <%= link_to 'Errors', filter_params.merge({ tab: 'errors' }), class: ['tabs-button', { active: current_tab == 'errors' }] %>
+  </nav>
+<% end %>
+<%= render template: 'layouts/rails_observatory/application' %>
