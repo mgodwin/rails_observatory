@@ -7,7 +7,7 @@
 
     & > .layout-two-column-main {
       grid-area: main;
-      padding: var(--sp-4);
+      padding: var(--padding-lg);
     }
 
     & > .layout-two-column-side-panel {

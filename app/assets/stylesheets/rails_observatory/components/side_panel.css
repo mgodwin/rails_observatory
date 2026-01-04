@@ -1,6 +1,7 @@
 .side-panel {
   color: var(--white);
   padding: var(--padding-lg);
+  border-left: 1px solid var(--divider);
 
   ._occurrence_count {
     font-size: var(--font-size-lg);

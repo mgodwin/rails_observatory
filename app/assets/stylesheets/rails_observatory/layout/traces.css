@@ -1,6 +1,6 @@
 @layer layout {
   .tab-content {
-    padding: var(--sp-4);
+    padding: 0;
   }
 
   .layout-trace {
