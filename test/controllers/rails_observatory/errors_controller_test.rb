@@ -85,7 +85,7 @@ module RailsObservatory
 
     def record_error_count(fingerprint)
       base_time = Time.now
-      labels = { fingerprint: fingerprint }
+      labels = {fingerprint: fingerprint}
 
       # Track the time series keys for cleanup
       digest = Digest::SHA1.hexdigest(labels.sort.flatten.map(&:to_s).join).slice(0, 20)

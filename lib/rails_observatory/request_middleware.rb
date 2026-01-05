@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 # require "active_support/notifications"
-require 'zlib'
+require "zlib"
 
 module RailsObservatory
   class RequestMiddleware
-
     def initialize(app)
       @app = app
     end
@@ -29,7 +28,7 @@ module RailsObservatory
         events, logs = collect_events_and_logs do
           response = @app.call(env)
         end
-      rescue StandardError => e
+      rescue => e
         # Capture the error before re-raising
         if request.params[:controller].present?
           controller_action = "#{request.params[:controller]}##{request.params[:action]}"
@@ -51,14 +50,14 @@ module RailsObservatory
           RequestTrace.create_from_request(request, start_at, duration, status, events:, logs:).save
 
           # Capture errors from the request (for caught exceptions that became error responses)
-          if (event = events.find { _1.name == 'process_action.action_controller' && _1.payload[:exception_object] })
+          if (event = events.find { it.name == "process_action.action_controller" && it.payload[:exception_object] })
             capture_error(event.payload[:exception_object], controller_action, start_at)
           end
-        rescue StandardError => e
+        rescue => e
           puts "Error saving request trace: #{e.message}"
           puts e.backtrace.join("\n")
         end
-      rescue StandardError => e
+      rescue => e
         puts e
         puts e.backtrace.join("\n")
       end
@@ -78,8 +77,8 @@ module RailsObservatory
       RailsObservatory.worker_pool.post do
         error = Error.new(exception: exception, location: location, time: time.to_f)
         error.save
-        RedisTimeSeries.record_occurrence("error.count", at: time.to_f, labels: { fingerprint: error.fingerprint })
-      rescue StandardError => e
+        RedisTimeSeries.record_occurrence("error.count", at: time.to_f, labels: {fingerprint: error.fingerprint})
+      rescue => e
         Rails.logger.error "Error capturing exception: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
       end

@@ -13,7 +13,7 @@ module RailsObservatory
 
     def to=(val)
       if val.is_a?(Array)
-        super(val.join(', '))
+        super(val.join(", "))
       else
         super
       end
@@ -21,11 +21,10 @@ module RailsObservatory
 
     def from=(val)
       if val.is_a?(Array)
-        super(val.join(', '))
+        super(val.join(", "))
       else
         super
       end
-
     end
   end
 end

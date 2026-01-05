@@ -1,6 +1,5 @@
 module RailsObservatory
   class EventCollector
-
     def self.capturing_events?
       ActiveSupport::IsolatedExecutionState[:rails_observatory_capture_events] == true
     end
@@ -22,7 +21,6 @@ module RailsObservatory
       end
     end
 
-
     def self.collect_events
       raise "EventCollector must be started before collecting events" unless @subscriber
       events = []
@@ -30,7 +28,7 @@ module RailsObservatory
       ActiveSupport::IsolatedExecutionState[:rails_observatory_events] = events
       yield
       events
-    rescue Exception => e
+    rescue Exception => e # standard:disable Lint/RescueException
       e.instance_variable_set(:@_trace_events, events)
       raise
     ensure

@@ -41,17 +41,17 @@ module RailsObservatory
       end
 
       conditions = {}
-      group_label = group_by || 'name'
+      group_label = group_by || "name"
 
-      if group_by && group_by != 'name'
+      if group_by && group_by != "name"
         conditions[group_by.to_sym] = true
       end
 
-      conditions[:compaction] = if compaction == 'all'
-                                  true # Match any compaction (exists filter)
-                                else
-                                  compaction
-                                end
+      conditions[:compaction] = if compaction == "all"
+        true # Match any compaction (exists filter)
+      else
+        compaction
+      end
 
       query_range(metric_name, rollup_fn.to_sym, from: from, to: to)
         .where(**conditions)
@@ -72,39 +72,39 @@ module RailsObservatory
     end
 
     def labels
-      @labels ||= Hash[info['labels']]
+      @labels ||= info["labels"].to_h
     end
 
     def name
-      @name ||= labels['name']
+      @name ||= labels["name"]
     end
 
     def first_timestamp
-      @first_timestamp ||= Time.at(info['firstTimestamp'] / 1000)
+      @first_timestamp ||= Time.at(info["firstTimestamp"] / 1000)
     end
 
     def last_timestamp
-      @last_timestamp ||= Time.at(info['lastTimestamp'] / 1000)
+      @last_timestamp ||= Time.at(info["lastTimestamp"] / 1000)
     end
 
     def memory_usage_bytes
-      @memory_usage_bytes ||= info['memoryUsage']
+      @memory_usage_bytes ||= info["memoryUsage"]
     end
 
     def total_samples
-      @total_samples ||= info['totalSamples']
+      @total_samples ||= info["totalSamples"]
     end
 
     def chunk_size
-      @chunk_size ||= info['chunkSize']
+      @chunk_size ||= info["chunkSize"]
     end
 
     def chunk_count
-      @chunk_count ||= info['chunkCount']
+      @chunk_count ||= info["chunkCount"]
     end
 
     def info
-      @info ||= Hash[*redis.call('TS.INFO', @key)]
+      @info ||= Hash[*redis.call("TS.INFO", @key)]
     end
 
     # def filled_data

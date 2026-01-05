@@ -1,6 +1,5 @@
 module RailsObservatory
   class LogCollector < ::Logger
-
     KEY = :observatory_logs
 
     def initialize(*args, **kwargs)
@@ -30,17 +29,16 @@ module RailsObservatory
             progname = @progname
           end
         end
-        logs << { severity:, message:, progname:, time: Time.now.to_f }
+        logs << {severity:, message:, progname:, time: Time.now.to_f}
       end
     end
 
-    alias log add
+    alias_method :log, :add
 
     def <<(message)
       if (logs = ActiveSupport::IsolatedExecutionState[KEY])
-        logs << { severity: UNKNOWN, message:, progname: nil, time: Time.now.to_f }
+        logs << {severity: UNKNOWN, message:, progname: nil, time: Time.now.to_f}
       end
     end
-
   end
 end

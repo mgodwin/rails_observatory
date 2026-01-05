@@ -23,7 +23,7 @@ class ErrorCaptureTest < ActionDispatch::IntegrationTest
   def make_error_request
     get server_error_scenarios_path
     flunk "Expected StandardError to be raised"
-  rescue StandardError => e
+  rescue => e
     assert_equal "Simulated server error for testing", e.message
     # Give the worker pool time to save
     sleep 0.1

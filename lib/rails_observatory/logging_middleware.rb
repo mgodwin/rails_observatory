@@ -9,7 +9,7 @@ module RailsObservatory
       if command.first == "SCRIPT"
         puts "[Redis] #{command.first}"
       else
-        puts "[Redis] #{command.first} #{command[1..-1].join(" ")}"
+        puts "[Redis] #{command.first} #{command[1..].join(" ")}"
       end
       super
     end

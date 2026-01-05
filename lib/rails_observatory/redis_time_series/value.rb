@@ -5,7 +5,7 @@ module RailsObservatory
 
       def initialize(labels:, value:)
         @labels = labels
-        @name = labels['name']
+        @name = labels["name"]
         @value = value
       end
 

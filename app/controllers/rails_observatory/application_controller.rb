@@ -1,6 +1,5 @@
 module RailsObservatory
   class ApplicationController < ::ActionController::Base
-
     before_action :set_session_time_defaults
     before_action :update_session_time
     around_action :set_time_range
@@ -26,13 +25,12 @@ module RailsObservatory
       end
     end
 
-
     def update_session_time
       return if params.slice(:ts, :te, :duration).values.all?(&:blank?)
 
       clear_session_time
 
-      if params[:ts].present? and params[:te].present?
+      if params[:ts].present? && params[:te].present?
         session[:ts] = params[:ts].to_i
         session[:te] = params[:te].to_i
       elsif params[:duration].present?
@@ -67,6 +65,5 @@ module RailsObservatory
       @time_slice ||= Range.new(time_start, time_end)
     end
     helper_method :time_slice, :time_start, :time_end, :relative_time_slice?
-
   end
 end

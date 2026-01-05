@@ -3,7 +3,7 @@ module RailsObservatory
     class QueryIndexBuilder < QueryBuilder
       def initialize(name)
         super()
-        @conditions = { name: name, compaction: true }
+        @conditions = {name: name, compaction: true}
         @name = name
       end
 
@@ -14,7 +14,7 @@ module RailsObservatory
       end
 
       def to_redis_args
-        ['TS.QUERYINDEX', *redis_filters]
+        ["TS.QUERYINDEX", *redis_filters]
       end
 
       def to_redis_command
@@ -29,7 +29,6 @@ module RailsObservatory
           yield RedisTimeSeries.new(key)
         end
       end
-
     end
   end
 end

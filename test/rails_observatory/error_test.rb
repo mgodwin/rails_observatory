@@ -124,9 +124,9 @@ module RailsObservatory
 
       outer = begin
         raise inner
-      rescue => e
+      rescue
         begin
-          raise RuntimeError, "Outer error"
+          raise "Outer error"
         rescue => outer_error
           outer_error
         end

@@ -1,4 +1,4 @@
-require 'zlib'
+require "zlib"
 
 # RedisModel is a base class for models that interact with Redis.
 # Internally it uses Redis Full Text Search (FT) for indexing and querying.
@@ -65,7 +65,7 @@ module RailsObservatory
     end
 
     def self.count
-      total, *results = redis.call("FT.SEARCH", index_name, '*', "SORTBY", "time", "DESC")
+      total, *_ = redis.call("FT.SEARCH", index_name, "*", "SORTBY", "time", "DESC")
       total
     end
 
@@ -82,7 +82,7 @@ module RailsObservatory
         attrs.merge!(attr => JSON.parse(Zlib.gunzip(val)))
       end
 
-      self.new(attrs)
+      new(attrs)
     end
 
     ATTRIBUTE_TYPE_TO_REDIS_TYPE = {
@@ -98,15 +98,15 @@ module RailsObservatory
 
     def self.create_redis_index
       schema = indexed_attributes.flat_map do |attr|
-        ["$.#{attr}", "AS", "#{attr}", ATTRIBUTE_TYPE_TO_REDIS_TYPE[attribute_types[attr.to_s].type]]
+        ["$.#{attr}", "AS", attr.to_s, ATTRIBUTE_TYPE_TO_REDIS_TYPE[attribute_types[attr.to_s].type]]
       end
       redis.call("FT.CREATE", index_name, "ON", "JSON", "PREFIX", "1", key_prefix, "SCHEMA", *schema)
     end
 
     def self.index_info
       info = Hash[*redis.call("FT.INFO", index_name)]
-      info['attributes'] = info['attributes'].map { Hash[*_1] }
-      info['index_definition'] = Hash[*info['index_definition']]
+      info["attributes"] = info["attributes"].map { Hash[*it] }
+      info["index_definition"] = Hash[*info["index_definition"]]
       info
     end
 
@@ -130,6 +130,5 @@ module RailsObservatory
         end
       end
     end
-
   end
 end

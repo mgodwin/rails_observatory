@@ -4,7 +4,6 @@ module RailsObservatory
       broadcast_to channel_key, latest_data
     end
 
-
     def subscribed
       stream_for channel_key
     end
@@ -25,7 +24,7 @@ module RailsObservatory
 
     def latest_data
       series = RedisTimeSeries.where(**labels).slice(duration.seconds.ago..).downsample(40, using: agg_method.to_sym)
-      series.map { |s| { name: s.name.split("/").last, data: s.filled_data } }
+      series.map { |s| {name: s.name.split("/").last, data: s.filled_data} }
     end
 
     def agg_method
@@ -51,6 +50,5 @@ module RailsObservatory
           label_params
         end
     end
-
   end
 end

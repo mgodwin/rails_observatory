@@ -66,5 +66,5 @@ Rails.application.configure do
   # config.action_cable.disable_request_forgery_protection = true
 
   # Rails observatory configuration
-  config.rails_observatory.redis = { host: "localhost", port: 6379, db: 0, middlewares: [], pool_size: ENV["RAILS_MAX_THREADS"] || 5 }
+  config.rails_observatory.redis = {host: "localhost", port: 6379, db: 0, middlewares: [], pool_size: ENV["RAILS_MAX_THREADS"] || 5}
 end

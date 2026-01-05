@@ -18,7 +18,7 @@ module RailsObservatory
 
     test "increment creates time series on first call (cold path)" do
       name = "test.increment.cold"
-      labels = { action: "index", controller: "posts" }
+      labels = {action: "index", controller: "posts"}
 
       RedisTimeSeries.increment(name, at: @base_time, labels: labels)
 
@@ -46,7 +46,7 @@ module RailsObservatory
 
     test "increment adds value on hot path" do
       name = "test.increment.hot"
-      labels = { action: "show" }
+      labels = {action: "show"}
 
       # First call creates the series
       RedisTimeSeries.increment(name, at: @base_time, labels: labels)
@@ -69,7 +69,7 @@ module RailsObservatory
 
     test "increment uses ON_DUPLICATE SUM for same timestamp" do
       name = "test.increment.duplicate"
-      labels = { action: "create" }
+      labels = {action: "create"}
       timestamp = @base_time
 
       # Multiple increments at the same timestamp should sum
@@ -89,8 +89,8 @@ module RailsObservatory
 
     test "increment creates different series for different labels" do
       name = "test.increment.labels"
-      labels1 = { action: "index" }
-      labels2 = { action: "show" }
+      labels1 = {action: "index"}
+      labels2 = {action: "show"}
 
       RedisTimeSeries.increment(name, at: @base_time, labels: labels1)
       RedisTimeSeries.increment(name, at: @base_time, labels: labels2)
@@ -116,7 +116,7 @@ module RailsObservatory
 
     test "distribution creates time series with avg/min/max compactions on first call" do
       name = "test.distribution.cold"
-      labels = { action: "index", controller: "posts" }
+      labels = {action: "index", controller: "posts"}
 
       RedisTimeSeries.distribution(name, 100.5, at: @base_time, labels: labels)
 
@@ -144,7 +144,7 @@ module RailsObservatory
 
     test "distribution adds value on hot path" do
       name = "test.distribution.hot"
-      labels = { action: "show" }
+      labels = {action: "show"}
 
       # First call creates the series
       RedisTimeSeries.distribution(name, 50.0, at: @base_time, labels: labels)
@@ -165,7 +165,7 @@ module RailsObservatory
 
     test "distribution uses ON_DUPLICATE LAST for same timestamp" do
       name = "test.distribution.duplicate"
-      labels = { action: "create" }
+      labels = {action: "create"}
       timestamp = @base_time
 
       RedisTimeSeries.distribution(name, 10.0, at: timestamp, labels: labels)
@@ -185,8 +185,8 @@ module RailsObservatory
 
     test "distribution creates different series for different labels" do
       name = "test.distribution.labels"
-      labels1 = { action: "index" }
-      labels2 = { action: "show" }
+      labels1 = {action: "index"}
+      labels2 = {action: "show"}
 
       RedisTimeSeries.distribution(name, 100.0, at: @base_time, labels: labels1)
       RedisTimeSeries.distribution(name, 200.0, at: @base_time, labels: labels2)

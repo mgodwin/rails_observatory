@@ -37,14 +37,14 @@ module RailsObservatory
       end
 
       def count
-        total, *_rest = redis.call("FT.SEARCH", @model_class.index_name, *build_query_conditions, "LIMIT", '0', '0')
+        total, *_rest = redis.call("FT.SEARCH", @model_class.index_name, *build_query_conditions, "LIMIT", "0", "0")
         total
       end
 
       def each
         _total, *results = redis.call("FT.SEARCH", @model_class.index_name, *build_query_conditions, "SORTBY", "time", "DESC", "LIMIT", @offset, @limit)
-        Hash[*results].values.map(&:last).map { JSON.parse(_1) }.each do
-          yield @model_class.new(_1)
+        Hash[*results].values.map(&:last).map { JSON.parse(it) }.each do
+          yield @model_class.new(it)
         end
       end
 
@@ -53,7 +53,7 @@ module RailsObservatory
       end
 
       def to_query_s
-        ["FT.SEARCH", @model_class.index_name, *build_query_conditions.map { "\"#{_1}\""}]
+        ["FT.SEARCH", @model_class.index_name, *build_query_conditions.map { "\"#{it}\"" }]
       end
 
       private
@@ -62,14 +62,14 @@ module RailsObservatory
         query_conditions = @conditions.map do |field, condition|
           "@#{field}:#{condition_to_s(field, condition)}"
         end
-        query_conditions << '*' if query_conditions.empty?
+        query_conditions << "*" if query_conditions.empty?
         query_conditions
       end
 
       def condition_to_s(field, condition)
         if condition.is_a? Range
-          range_start = condition.begin.nil? ? '-inf' : type_cast_value(condition.begin, field)
-          range_end = condition.end.nil? ? '+inf' : type_cast_value(condition.end, field)
+          range_start = condition.begin.nil? ? "-inf" : type_cast_value(condition.begin, field)
+          range_end = condition.end.nil? ? "+inf" : type_cast_value(condition.end, field)
           "[#{range_start} #{range_end}]"
         else
           type_cast_value(condition.to_s, field)

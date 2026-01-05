@@ -1,16 +1,14 @@
 module RailsObservatory
-
   class RedisTimeSeries
     class Range
-
       attr_reader :name, :data, :labels, :from, :to, :bin_duration
       alias_method :start_time, :from
       alias_method :end_time, :to
 
       def initialize(labels:, data:, bin_duration: nil, from: nil, to: nil)
         @labels = labels
-        @name = @labels['name']
-        @source = @labels['__source__']
+        @name = @labels["name"]
+        @source = @labels["__source__"]
         @data = data
         @bin_duration = bin_duration
         # Use provided boundaries, fall back to data boundaries
@@ -32,7 +30,6 @@ module RailsObservatory
           .take_while { |t| t <= end_ms }
           .map { |t| [t, data_hash[t]&.to_f || 0.0] }
       end
-
 
       def pretty_print(pp)
         pp.object_address_group(self) do
@@ -60,8 +57,6 @@ module RailsObservatory
           pp.pp data.size
         end
       end
-
     end
   end
-
 end

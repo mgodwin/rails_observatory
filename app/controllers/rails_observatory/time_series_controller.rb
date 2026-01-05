@@ -1,22 +1,20 @@
 module RailsObservatory
   class TimeSeriesController < ApplicationController
-
     before_action :ensure_name
 
     def index
-
       series = RedisTimeSeries.where(**labels)
-                              .slice(duration.seconds.ago..)
-                              .downsample(samples, using: agg_method)
+        .slice(duration.seconds.ago..)
+        .downsample(samples, using: agg_method)
 
-      render json: series.map { |s| { name: s.name.split("/").last, data: s.filled_data } }, status: :ok
+      render json: series.map { |s| {name: s.name.split("/").last, data: s.filled_data} }, status: :ok
     end
 
     private
 
     def ensure_name
       unless params[:name].present?
-        render json: { error: "name is required" }, status: :bad_request
+        render json: {error: "name is required"}, status: :bad_request
       end
     end
 

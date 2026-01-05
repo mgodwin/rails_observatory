@@ -5,10 +5,10 @@ module RailsObservatory
 
       def initialize(name, reducer, from: nil, to: nil)
         super()
-        @conditions = { name: name, compaction: reducer }
+        @conditions = {name: name, compaction: reducer}
         @samples = nil
         @name = name
-        @group_label = 'name'
+        @group_label = "name"
         @base_reducer = reducer.to_s
         @bin_reducer = reducer.to_s
         @group_reducer = reducer.to_s
@@ -38,11 +38,11 @@ module RailsObservatory
 
       def to_redis_args
         # agg_duration = build_agg_duration
-        mrange_args = ['TS.MRANGE', from_ts, to_ts, 'WITHLABELS']
-        mrange_args.push('LATEST')
-        mrange_args.push("ALIGN", '0')
+        mrange_args = ["TS.MRANGE", from_ts, to_ts, "WITHLABELS"]
+        mrange_args.push("LATEST")
+        mrange_args.push("ALIGN", "0")
         mrange_args.push("AGGREGATION", @bin_reducer.to_s.upcase, @bin_duration, "EMPTY")
-        mrange_args.push('FILTER', *redis_filters)
+        mrange_args.push("FILTER", *redis_filters)
         mrange_args.push("GROUPBY", @group_label, "REDUCE", @group_reducer.upcase)
         mrange_args
       end
@@ -58,8 +58,8 @@ module RailsObservatory
         # Convert timestamps to Time objects for Range
         from_timestamp = from_ts
         to_timestamp = to_ts
-        range_from = from_timestamp == "-" ? nil : Time.at(from_timestamp / 1000)
-        range_to = to_timestamp == "+" ? Time.now : Time.at(to_timestamp / 1000)
+        range_from = (from_timestamp == "-") ? nil : Time.at(from_timestamp / 1000)
+        range_to = (to_timestamp == "+") ? Time.now : Time.at(to_timestamp / 1000)
 
         res.each do |_, labels, data|
           yield RedisTimeSeries::Range.new(
@@ -99,7 +99,6 @@ module RailsObservatory
           range_end.to_i * 1000
         end
       end
-
     end
   end
 end

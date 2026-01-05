@@ -1,4 +1,4 @@
-require 'importmap-rails'
+require "importmap-rails"
 require "zeitwerk"
 
 loader = Zeitwerk::Loader.for_gem
@@ -19,11 +19,10 @@ module RailsObservatory
         name: "RailsObservatory",
         min_threads: 1,
         max_threads: 4,
-        max_queue: 0,
+        max_queue: 0
       )
     end
   end
-
 
   module_function def record_occurrence(...)
     RedisTimeSeries.record_occurrence(...)
@@ -32,5 +31,4 @@ module RailsObservatory
   module_function def record_timing(...)
     RedisTimeSeries.record_timing(...)
   end
-
 end

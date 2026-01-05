@@ -33,7 +33,7 @@ module RailsObservatory
         http_method: request.method,
         route_pattern: request.route_uri_pattern,
         action: controller_action,
-        error: events.any? { _1.payload[:exception] },
+        error: events.any? { it.payload[:exception] },
         format: request.format,
         duration:,
         time: start_at.to_f,
@@ -46,16 +46,15 @@ module RailsObservatory
     private
 
     def record_metrics
-      labels = { action:, format:, status:, http_method: }
+      labels = {action:, format:, status:, http_method:}
       RedisTimeSeries.record_occurrence("request.count", at: time, labels:)
       RedisTimeSeries.record_occurrence("request.error_count", at: time, labels:) if status >= 500
       RedisTimeSeries.record_timing("request.latency", duration, at: time, labels:)
 
       # Record per-library latency breakdown for namespace chart
       events.self_time_by_library.each do |library, self_time|
-        RedisTimeSeries.record_timing("request.latency", self_time, at: time, labels: { action:, namespace: library })
+        RedisTimeSeries.record_timing("request.latency", self_time, at: time, labels: {action:, namespace: library})
       end
     end
-
   end
 end

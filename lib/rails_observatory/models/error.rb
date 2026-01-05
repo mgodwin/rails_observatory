@@ -1,7 +1,6 @@
-require 'digest'
+require "digest"
 module RailsObservatory
   class Error < RedisModel
-
     attribute :time, :float
     attribute :fingerprint, :string
     attribute :has_causes, :boolean, indexed: false
@@ -14,14 +13,14 @@ module RailsObservatory
 
     alias_attribute :id, :fingerprint
 
-    attr_accessor :exception
+    attr_reader :exception
 
     def exception=(ex)
       ex_wrapper = ActionDispatch::ExceptionWrapper.new(Rails.backtrace_cleaner, ex)
       payload = payload_for_wrapped_exception(ex_wrapper)
       assign_attributes(payload)
       self.has_causes = ex_wrapper.has_cause?
-      self.causes = ex_wrapper.wrapped_causes.map { payload_for_wrapped_exception(_1) }
+      self.causes = ex_wrapper.wrapped_causes.map { payload_for_wrapped_exception(it) }
       self.fingerprint = build_fingerprint(ex_wrapper)
     end
 
@@ -33,7 +32,7 @@ module RailsObservatory
           exception_object_id: wrapped_ex.exception.object_id,
           id: idx,
           trace: trace,
-          is_application_trace: wrapped_ex.application_trace.include?(trace),
+          is_application_trace: wrapped_ex.application_trace.include?(trace)
         }
       end
     end
@@ -43,7 +42,7 @@ module RailsObservatory
         class_name: wrapped_ex.exception_class_name,
         message: wrapped_ex.message,
         source_extracts: wrapped_ex.source_extracts,
-        trace: trace_for_ex(wrapped_ex),
+        trace: trace_for_ex(wrapped_ex)
       }
     end
 
@@ -75,8 +74,7 @@ module RailsObservatory
     def build_fingerprint(wrapped_ex)
       exceptions = [wrapped_ex]
       exceptions.push(*wrapped_ex.wrapped_causes) if wrapped_ex.has_cause?
-      Digest::SHA256.hexdigest(exceptions.map { exception_string(_1) }.join("\n"))
+      Digest::SHA256.hexdigest(exceptions.map { exception_string(it) }.join("\n"))
     end
-
   end
 end

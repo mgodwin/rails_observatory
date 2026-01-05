@@ -61,7 +61,7 @@ namespace :observatory do
       when :failing
         begin
           FailingJob.perform_now(reason: "Simulated error #{rand(1000)}")
-        rescue StandardError
+        rescue
           # Expected
         end
       when :slow

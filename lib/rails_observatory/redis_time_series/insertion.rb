@@ -1,11 +1,9 @@
-require 'digest'
+require "digest"
 module RailsObservatory
-
   class RedisTimeSeries
     module Insertion
-
       def distribution(name, value, at: Time.now, labels: {})
-        prefixed_name = defined?(self::PREFIX) ? [self::PREFIX, name].join('.') : name
+        prefixed_name = defined?(self::PREFIX) ? [self::PREFIX, name].join(".") : name
         timestamp_ms = (at.to_f * 1000).to_i
         labels_flat = labels.sort.flatten.map(&:to_s)
         digest = Digest::SHA1.hexdigest(labels_flat.join).slice(0, 20)
@@ -19,7 +17,7 @@ module RailsObservatory
               %w[avg min max].each do |agg|
                 comp_key = "#{ts_name}_#{agg}"
                 r.call("TS.CREATE", comp_key, "RETENTION", 31_536_000_000, "CHUNK_SIZE", 4_096,
-                       "LABELS", "name", prefixed_name, "compaction", agg, *labels_flat)
+                  "LABELS", "name", prefixed_name, "compaction", agg, *labels_flat)
                 r.call("TS.CREATERULE", ts_name, comp_key, "AGGREGATION", agg, 10_000)
               end
             end
@@ -44,7 +42,7 @@ module RailsObservatory
             redis.pipelined do |r|
               r.call("TS.CREATE", ts_name, "RETENTION", 10_000, "CHUNK_SIZE", 4_096)
               r.call("TS.CREATE", comp_key, "RETENTION", 31_536_000_000, "CHUNK_SIZE", 4_096,
-                     "LABELS", "name", name, "compaction", "sum", *labels_flat)
+                "LABELS", "name", name, "compaction", "sum", *labels_flat)
               r.call("TS.CREATERULE", ts_name, comp_key, "AGGREGATION", "sum", 10_000)
             end
           end

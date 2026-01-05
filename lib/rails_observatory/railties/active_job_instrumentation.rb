@@ -1,10 +1,9 @@
 module RailsObservatory
   module Railties
     module ActiveJobInstrumentation
-
       def perform_now
-        RedisTimeSeries.distribution("job.queue_latency", Time.now - enqueued_at, labels: { queue_name: }) unless enqueued_at.nil?
-        labels = { job_class: self.class.name, queue_name: }
+        RedisTimeSeries.distribution("job.queue_latency", Time.now - enqueued_at, labels: {queue_name:}) unless enqueued_at.nil?
+        labels = {job_class: self.class.name, queue_name:}
         RedisTimeSeries.increment("job.count", labels:)
         RedisTimeSeries.increment("job.retry_count", labels:) if executions > 1
 
@@ -19,7 +18,7 @@ module RailsObservatory
         end
         end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         result
-      rescue Exception => error
+      rescue Exception => error # standard:disable Lint/RescueException
         events = error.instance_variable_get(:@_trace_events)
         end_at_mono = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
         RedisTimeSeries.increment("job.error_count", labels:)
@@ -35,12 +34,11 @@ module RailsObservatory
           executions:,
           job_class: self.class.name,
           queue_name:,
-          events: events.map { Serializer.serialize(_1) },
+          events: events.map { Serializer.serialize(it) },
           logs:,
           error: error.present?
         ).save
       end
-
     end
   end
 end

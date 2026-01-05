@@ -1,10 +1,8 @@
 module RailsObservatory
   class RedisTimeSeries
     class QueryBuilder
-
       include RedisConnection
       include Enumerable
-
 
       protected
 
@@ -16,7 +14,7 @@ module RailsObservatory
           when false
             "#{k}="
           when Array
-            "#{k}=(#{v.join(',')})"
+            "#{k}=(#{v.join(",")})"
           else
             "#{k}=#{v}"
           end

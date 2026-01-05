@@ -1,6 +1,6 @@
 module RailsObservatory
   class ErrorsController < ApplicationController
-    layout 'rails_observatory/application_time_slice'
+    layout "rails_observatory/application_time_slice"
 
     def index
       Error.ensure_index
@@ -11,21 +11,21 @@ module RailsObservatory
 
       if fingerprints.any?
         @count_by_fingerprint = RedisTimeSeries
-          .query_value('error.count', :sum)
+          .query_value("error.count", :sum)
           .where(fingerprint: true)
-          .group('fingerprint')
+          .group("fingerprint")
           .to_a
-          .index_by { _1.labels['fingerprint'] }
+          .index_by { it.labels["fingerprint"] }
           .transform_values(&:value)
 
         # Get sparkline data for each error (12 bins)
         @series_by_fingerprint = RedisTimeSeries
-          .query_range('error.count', :sum)
+          .query_range("error.count", :sum)
           .where(fingerprint: true)
-          .group('fingerprint')
+          .group("fingerprint")
           .bins(calculate_bin_duration(12))
           .to_a
-          .index_by { _1.labels['fingerprint'] }
+          .index_by { it.labels["fingerprint"] }
       else
         @count_by_fingerprint = {}
         @series_by_fingerprint = {}
@@ -37,7 +37,7 @@ module RailsObservatory
 
       # Get total count for this error
       count_result = RedisTimeSeries
-        .query_value('error.count', :sum)
+        .query_value("error.count", :sum)
         .where(fingerprint: @error.fingerprint)
         .to_a
         .first
@@ -68,7 +68,7 @@ module RailsObservatory
       duration_ms = [duration_ms, 1000].max
 
       RedisTimeSeries
-        .query_range('error.count', :sum, from: from_time, to: to_time)
+        .query_range("error.count", :sum, from: from_time, to: to_time)
         .where(fingerprint: fingerprint)
         .bins(duration_ms)
         .to_a

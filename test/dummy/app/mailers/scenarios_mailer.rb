@@ -12,6 +12,6 @@ class ScenariosMailer < ApplicationMailer
 
   def newsletter(recipients:)
     @recipients = Array(recipients)
-    mail(to: recipients, subject: "Monthly Newsletter - #{Date.current.strftime('%B %Y')}")
+    mail(to: recipients, subject: "Monthly Newsletter - #{Date.current.strftime("%B %Y")}")
   end
 end

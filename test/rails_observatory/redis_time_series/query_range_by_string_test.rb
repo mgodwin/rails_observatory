@@ -100,7 +100,7 @@ module RailsObservatory
       assert_equal "name", query.group_label.to_s
       # Should not have a duplicate name!= filter
       command = query.to_redis_command
-      assert_equal 1, command.scan(/name/).count { |m| m == "name" } - command.scan(/name=/).count
+      assert_equal 1, command.scan("name").count { |m| m == "name" } - command.scan("name=").count
     end
 
     # Error handling tests

@@ -1,7 +1,7 @@
 # simulate_traffic.rb
 
-require 'active_support/notifications'
-require 'faker'
+require "active_support/notifications"
+require "faker"
 
 # Possible HTTP methods and statuses
 HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"]
@@ -18,7 +18,7 @@ trap("SIGINT") do
 end
 
 emitted_count = 0
-while true do
+loop do
   # Use Faker to generate controller names like "UsersController", "ProductsController", etc.
   controller_name = "#{names.sample}Controller"
 
@@ -31,7 +31,7 @@ while true do
   payload = {
     controller: controller_name,
     action: controller_actions.sample, # Generate random action name
-    params: { "id" => id },
+    params: {"id" => id},
     format: :html,
     method: method,
     path: "/#{controller_name.underscore}/#{id}",
@@ -41,12 +41,12 @@ while true do
   }
 
   # Publish the event
-  ActiveSupport::Notifications.instrument('process_action.action_controller', payload) do
+  ActiveSupport::Notifications.instrument("process_action.action_controller", payload) do
     # Simulate some work
     sleep(rand(0.1..0.8))
   end
 
-  emitted_count +=1
+  emitted_count += 1
 
   if emitted_count % 1000 == 0
     puts "Emitted #{emitted_count} events"

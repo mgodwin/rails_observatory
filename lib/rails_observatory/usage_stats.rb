@@ -132,15 +132,13 @@ module RailsObservatory
           cursor, keys = redis.call("SCAN", cursor, "MATCH", pattern, "COUNT", 100)
 
           keys.each do |key|
-            begin
-              # Try to get TS.INFO - if it succeeds, it's a time series
-              info = redis.call("TS.INFO", key)
-              info_hash = Hash[*info]
-              total_bytes += info_hash["memoryUsage"].to_i
-              key_count += 1
-            rescue
-              # Not a time series key, skip
-            end
+            # Try to get TS.INFO - if it succeeds, it's a time series
+            info = redis.call("TS.INFO", key)
+            info_hash = Hash[*info]
+            total_bytes += info_hash["memoryUsage"].to_i
+            key_count += 1
+          rescue
+            # Not a time series key, skip
           end
 
           break if cursor == "0"
@@ -155,18 +153,16 @@ module RailsObservatory
       index_details = {}
 
       CATEGORIES[:indexes][:names].each do |idx_name|
-        begin
-          info = redis.call("FT.INFO", idx_name)
-          info_hash = Hash[*info]
-          # FT.INFO returns inverted_sz_mb as a float in MB
-          bytes = (info_hash["inverted_sz_mb"].to_f * 1024 * 1024).to_i
-          # Also add doc_table_size_mb if available
-          bytes += (info_hash["doc_table_size_mb"].to_f * 1024 * 1024).to_i
-          index_details[idx_name] = bytes
-          total_bytes += bytes
-        rescue
-          # Index may not exist
-        end
+        info = redis.call("FT.INFO", idx_name)
+        info_hash = Hash[*info]
+        # FT.INFO returns inverted_sz_mb as a float in MB
+        bytes = (info_hash["inverted_sz_mb"].to_f * 1024 * 1024).to_i
+        # Also add doc_table_size_mb if available
+        bytes += (info_hash["doc_table_size_mb"].to_f * 1024 * 1024).to_i
+        index_details[idx_name] = bytes
+        total_bytes += bytes
+      rescue
+        # Index may not exist
       end
 
       {bytes: total_bytes, index_details: index_details, key_count: index_details.size, sampled: false}
@@ -186,7 +182,7 @@ module RailsObservatory
     end
 
     def env_max
-      ENV["RAILS_OBSERVATORY_MAX_MEMORY"]&.to_i&.then { |v| v > 0 ? v : nil }
+      ENV["RAILS_OBSERVATORY_MAX_MEMORY"]&.to_i&.then { |v| (v > 0) ? v : nil }
     end
   end
 end

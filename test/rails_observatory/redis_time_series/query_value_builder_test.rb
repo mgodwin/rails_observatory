@@ -83,7 +83,7 @@ module RailsObservatory
       values = RedisTimeSeries.query_value("test_value_requests", :sum)
         .where(action: true)
         .group("action")
-        .select { _1.value > 0 }
+        .select { it.value > 0 }
 
       assert values.any?, "Expected some values with value > 0"
     end
