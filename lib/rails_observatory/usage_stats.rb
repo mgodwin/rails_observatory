@@ -4,12 +4,9 @@ module RailsObservatory
 
     CATEGORIES = {
       traces: {
-        patterns: ["rt:*", "jt:*"],
-        description: "Request and job trace documents"
-      },
-      logs_events: {
-        patterns: ["rt_events:*", "rt_logs:*", "jt_events:*", "jt_logs:*"],
-        description: "Compressed logs and events"
+        patterns: ["rt:*", "jt:*", "rt_events:*", "rt_logs:*", "jt_events:*", "jt_logs:*"],
+        primary_patterns: ["rt:*", "jt:*"],
+        description: "Request and job traces"
       },
       errors: {
         patterns: ["error:*", "error_causes:*", "error_trace:*", "error_source_extracts:*"],
@@ -23,7 +20,7 @@ module RailsObservatory
         description: "Metrics and time series data"
       },
       indexes: {
-        names: ["rt-idx", "jt-idx", "error-idx", "maildelivery-idx"],
+        names: ["rt-idx", "jt-idx", "error-idx", "mail_delivery-idx"],
         description: "Full-text search indexes"
       }
     }.freeze
@@ -67,8 +64,10 @@ module RailsObservatory
 
     def calculate_all_categories
       {
-        traces: calculate_pattern_memory(CATEGORIES[:traces][:patterns]),
-        logs_events: calculate_pattern_memory(CATEGORIES[:logs_events][:patterns]),
+        traces: calculate_pattern_memory(
+          CATEGORIES[:traces][:patterns],
+          primary_patterns: CATEGORIES[:traces][:primary_patterns]
+        ),
         errors: calculate_pattern_memory(CATEGORIES[:errors][:patterns]),
         mail: calculate_pattern_memory(CATEGORIES[:mail][:patterns]),
         time_series: calculate_time_series_memory,
@@ -76,46 +75,57 @@ module RailsObservatory
       }
     end
 
-    def calculate_pattern_memory(patterns)
+    def calculate_pattern_memory(patterns, primary_patterns: nil)
       total_bytes = 0
       key_count = 0
-      sample_count = 0
-      sampled_bytes = 0
+      primary_key_count = 0
+      sampled = false
+      primary_patterns_set = primary_patterns&.to_set
 
       patterns.each do |pattern|
+        is_primary = primary_patterns_set.nil? || primary_patterns_set.include?(pattern)
+        pattern_keys = 0
+        pattern_sample_count = 0
+        pattern_sampled_bytes = 0
+
         cursor = "0"
         loop do
           cursor, keys = redis.call("SCAN", cursor, "MATCH", pattern, "COUNT", 100)
-          key_count += keys.size
+          pattern_keys += keys.size
 
-          # Sample keys for memory estimation
-          keys_to_sample = if sample_count < MAX_SAMPLES
-            keys.sample([MAX_SAMPLES - sample_count, keys.size].min)
-          else
-            []
-          end
-
-          keys_to_sample.each do |key|
-            mem = redis.call("MEMORY", "USAGE", key)
-            if mem
-              sampled_bytes += mem
-              sample_count += 1
+          # Sample up to MAX_SAMPLES per pattern
+          if pattern_sample_count < MAX_SAMPLES
+            keys_to_sample = keys.sample([MAX_SAMPLES - pattern_sample_count, keys.size].min)
+            keys_to_sample.each do |key|
+              mem = redis.call("MEMORY", "USAGE", key)
+              if mem
+                pattern_sampled_bytes += mem
+                pattern_sample_count += 1
+              end
             end
           end
 
           break if cursor == "0"
         end
+
+        # Extrapolate this pattern's memory
+        if pattern_sample_count > 0
+          if pattern_sample_count < pattern_keys
+            sampled = true
+            avg = pattern_sampled_bytes.to_f / pattern_sample_count
+            total_bytes += (avg * pattern_keys).to_i
+          else
+            total_bytes += pattern_sampled_bytes
+          end
+        end
+
+        key_count += pattern_keys
+        primary_key_count += pattern_keys if is_primary
       end
 
-      # Extrapolate from samples if needed
-      if sample_count > 0 && sample_count < key_count
-        avg_per_key = sampled_bytes.to_f / sample_count
-        total_bytes = (avg_per_key * key_count).to_i
-      else
-        total_bytes = sampled_bytes
-      end
-
-      {bytes: total_bytes, key_count: key_count, sampled: sample_count < key_count && key_count > 0}
+      result = {bytes: total_bytes, key_count: key_count, sampled: sampled}
+      result[:primary_key_count] = primary_key_count if primary_patterns
+      result
     end
 
     def calculate_time_series_memory
@@ -124,7 +134,7 @@ module RailsObservatory
 
       # Time series keys follow pattern: metric.name:hash or metric.name:hash_compaction
       # Common prefixes: request.*, job.*
-      ts_patterns = ["request.*", "job.*"]
+      ts_patterns = ["request.*", "job.*", "error.*", "mailer.*"]
 
       ts_patterns.each do |pattern|
         cursor = "0"
@@ -141,6 +151,20 @@ module RailsObservatory
             # Not a time series key, skip
           end
 
+          break if cursor == "0"
+        end
+      end
+
+      # Also count init:* lock keys used for time series initialization
+      ts_patterns.each do |pattern|
+        cursor = "0"
+        loop do
+          cursor, keys = redis.call("SCAN", cursor, "MATCH", "init:#{pattern}", "COUNT", 100)
+          keys.each do |key|
+            mem = redis.call("MEMORY", "USAGE", key)
+            total_bytes += mem.to_i if mem
+            key_count += 1
+          end
           break if cursor == "0"
         end
       end

@@ -44,7 +44,8 @@
               </td>
               <td><%= number_to_human_size(stats[:bytes]) %></td>
               <td><%= number_with_delimiter(stats[:key_count]) %></td>
-              <td><%= stats[:key_count] > 0 ? number_to_human_size(stats[:bytes] / stats[:key_count]) : 'N/A' %></td>
+              <% avg_divisor = stats[:primary_key_count] || stats[:key_count] %>
+              <td><%= avg_divisor > 0 ? number_to_human_size(stats[:bytes] / avg_divisor) : 'N/A' %></td>
               <td>
                 <% pct = @usage_stats.total_used_bytes > 0 ? (stats[:bytes].to_f / @usage_stats.total_used_bytes * 100).round(1) : 0 %>
                 <%= pct %>%
