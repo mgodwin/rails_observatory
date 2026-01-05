@@ -13,11 +13,18 @@ module RailsObservatory
       end
     end
 
-
-
     def mail_events
-      events.only('enqueue.action_job', 'deliver.action_mailer')
-            .reject { _1['name'] == 'enqueue.action_job' && _1.dig('payload', 'job', 'class') != 'ActionMailer::MailDeliveryJob' }
+      events.only("enqueue.action_job", "deliver.action_mailer")
+        .reject { it["name"] == "enqueue.action_job" && it.dig("payload", "job", "class") != "ActionMailer::MailDeliveryJob" }
+    end
+
+    def job_events
+      events.only("enqueue.active_job")
+        .reject { it.dig("payload", "job", "class") == "ActionMailer::MailDeliveryJob" }
+    end
+
+    def has_errors?
+      events.any? { it.dig("payload", "exception") }
     end
   end
 end

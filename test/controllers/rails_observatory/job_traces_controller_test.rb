@@ -27,9 +27,9 @@ module RailsObservatory
       get job_trace_path(id: job_id, tab: "overview")
       assert_response :success
 
-      # Verify job-specific details are shown
-      assert_select ".summary-panel dt", text: "Duration"
-      assert_select ".summary-panel dt", text: "Queue Latency"
+      # Verify job-specific details are shown in sidebar
+      assert_select ".side-panel dt", text: "Duration"
+      assert_select ".side-panel dt", text: "Queue Latency"
       assert_select "section h3", text: "Job Details"
       assert_select "section dl dt", text: "Job Class"
       assert_select "section dl dt", text: "Queue"
@@ -65,7 +65,7 @@ module RailsObservatory
 
     test "recent returns job traces" do
       # Perform a job to create a trace
-      job = SuccessfulJob.perform_later(name: "Recent Test Job")
+      SuccessfulJob.perform_later(name: "Recent Test Job")
       perform_enqueued_jobs
       sleep 0.1
 

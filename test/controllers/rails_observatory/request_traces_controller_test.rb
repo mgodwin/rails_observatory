@@ -77,5 +77,33 @@ module RailsObservatory
       # Verify common response headers are displayed
       assert_select "details dl dt", /Content-Type/i
     end
+
+    test "tabs are contextual - only shows available tabs" do
+      get success_scenarios_path
+      request_id = request.request_id
+      sleep 0.1
+
+      get request_trace_path(id: request_id)
+      assert_response :success
+
+      # These tabs should always appear in page tabs nav
+      assert_select "nav.tabs a", text: "Overview"
+      assert_select "nav.tabs a", text: "Events"
+      assert_select "nav.tabs a", text: "Logs"
+
+      # Mail, Jobs, Errors tabs should not appear in page tabs for a simple success request
+      assert_select "nav.tabs a", text: "Mail", count: 0
+      assert_select "nav.tabs a", text: "Jobs", count: 0
+      assert_select "nav.tabs a", text: "Errors", count: 0
+    end
+
+    test "redirects to overview when accessing unavailable tab" do
+      get success_scenarios_path
+      request_id = request.request_id
+      sleep 0.1
+
+      get request_trace_path(id: request_id, tab: "mail")
+      assert_redirected_to request_trace_path(id: request_id, tab: "overview")
+    end
   end
 end

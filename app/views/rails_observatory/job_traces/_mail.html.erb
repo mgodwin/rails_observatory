@@ -1,8 +1,5 @@
 <div class="tab-content mail">
   <ul class="simple-list">
-    <% if @trace.mail_events.empty? %>
-      <li>No mail enqueued or delivered</li>
-    <% end %>
     <% @trace.mail_events.each do |e| %>
       <li>
         <% if e['name'] == 'deliver.action_mailer' %>

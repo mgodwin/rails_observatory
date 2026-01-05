@@ -14,9 +14,15 @@
     <%= link_to 'Overview', filter_params.merge({ tab: 'overview' }), class: ['tabs-button', { active: current_tab == 'overview' }] %>
     <%= link_to 'Events', filter_params.merge({ tab: 'events' }), class: ['tabs-button', { active: current_tab == 'events' }] %>
     <%= link_to 'Logs', filter_params.merge({ tab: 'logs' }), class: ['tabs-button', { active: current_tab == 'logs' }] %>
-    <%= link_to 'Mail', filter_params.merge({ tab: 'mail' }), class: ['tabs-button', { active: current_tab == 'mail' }] %>
-    <%= link_to 'Jobs', filter_params.merge({ tab: 'jobs' }), class: ['tabs-button', { active: current_tab == 'jobs' }] %>
-    <%= link_to 'Errors', filter_params.merge({ tab: 'errors' }), class: ['tabs-button', { active: current_tab == 'errors' }] %>
+    <% if @available_tabs.include?('mail') %>
+      <%= link_to 'Mail', filter_params.merge({ tab: 'mail' }), class: ['tabs-button', { active: current_tab == 'mail' }] %>
+    <% end %>
+    <% if @available_tabs.include?('jobs') %>
+      <%= link_to 'Jobs', filter_params.merge({ tab: 'jobs' }), class: ['tabs-button', { active: current_tab == 'jobs' }] %>
+    <% end %>
+    <% if @available_tabs.include?('errors') %>
+      <%= link_to 'Errors', filter_params.merge({ tab: 'errors' }), class: ['tabs-button', { active: current_tab == 'errors' }] %>
+    <% end %>
   </nav>
 <% end %>
 <%= render template: 'layouts/rails_observatory/application' %>
