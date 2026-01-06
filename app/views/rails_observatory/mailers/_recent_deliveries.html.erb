@@ -1,8 +1,8 @@
-<turbo-frame id="recent-deliveries">
+<turbo-frame id="recent-<%= @direction %>-deliveries">
   <%= render 'query_table',
-    attributes: { id: 'recent-mail-deliveries' },
+    attributes: { id: "recent-mail-deliveries-#{@direction}" },
     events: @deliveries,
-    fields: [:time, :mailer, :to, :subject],
+    fields: [:time, :mailer, :from, :to, :subject],
     formatters: {
       time: ->(time, delivery) {
         link_to Time.at(time).strftime('%H:%M:%S'),
@@ -10,6 +10,6 @@
                 data: { turbo_frame: '_top' }
       }
     },
-    pagination: { page: @page, total_pages: @total_pages, per_page: @per_page }
+    pagination: { page: @page, total_pages: @total_pages, per_page: @per_page, params: { direction: @direction } }
   %>
 </turbo-frame>
