@@ -1,0 +1,92 @@
+<% content_for(:title, 'Storage') %>
+<main class="layout-dashboard">
+  <div class="summary-panel">
+    <dl>
+      <dt>Uploads</dt>
+      <dd><%= metric_value(name: 'storage.upload_count_sum')&.to_i || 0 %></dd>
+      <dt>Downloads</dt>
+      <dd><%= metric_value(name: 'storage.download_count_sum')&.to_i || 0 %></dd>
+      <dt>Deletes</dt>
+      <dd><%= metric_value(name: 'storage.delete_count_sum')&.to_i || 0 %></dd>
+      <dt>Avg Upload Time</dt>
+      <dd><%= metric_value(name: 'storage.upload_latency_avg')&.round(2) || 0 %> ms</dd>
+      <dt>Avg Download Time</dt>
+      <dd><%= metric_value(name: 'storage.download_latency_avg')&.round(2) || 0 %> ms</dd>
+    </dl>
+  </div>
+  <div class="charts">
+    <div class="chart"
+         id="upload-count-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('storage.upload_count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="storage-charts"
+         data-bar-chart-name-value="Uploads"></div>
+    <div class="chart"
+         id="download-count-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('storage.download_count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="storage-charts"
+         data-bar-chart-name-value="Downloads"></div>
+    <div class="chart"
+         id="upload-latency-chart"
+         data-controller="area-chart"
+         data-area-chart-initial-data-value="<%= metric_series('storage.upload_latency|all->60@avg').to_json %>"
+         data-area-chart-group-value="storage-charts"
+         data-area-chart-name-value="Upload Latency"></div>
+    <div class="chart"
+         id="download-latency-chart"
+         data-controller="area-chart"
+         data-area-chart-initial-data-value="<%= metric_series('storage.download_latency|all->60@avg').to_json %>"
+         data-area-chart-group-value="storage-charts"
+         data-area-chart-name-value="Download Latency"></div>
+  </div>
+
+  <% if @upload_count_by_service.any? || @download_count_by_service.any? %>
+    <section class="layout-storage_index-by_service">
+      <header>
+        <h2>Operations by Service</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Service</th>
+            <th>Uploads</th>
+            <th>Avg Upload Time</th>
+            <th>Downloads</th>
+            <th>Avg Download Time</th>
+            <th>Deletes</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% services = (@upload_count_by_service.map { |s| s.labels['service'] } +
+                         @download_count_by_service.map { |s| s.labels['service'] }).uniq %>
+          <% services.each do |service| %>
+            <% upload = @upload_count_by_service.find { |s| s.labels['service'] == service } %>
+            <% download = @download_count_by_service.find { |s| s.labels['service'] == service } %>
+            <% delete = @delete_count_by_service.find { |s| s.labels['service'] == service } %>
+            <tr>
+              <td><%= service %></td>
+              <td><%= upload&.value&.to_i || 0 %></td>
+              <td><%= @upload_latency_by_service[service]&.value&.to_f&.round(2) || 0 %> ms</td>
+              <td><%= download&.value&.to_i || 0 %></td>
+              <td><%= @download_latency_by_service[service]&.value&.to_f&.round(2) || 0 %> ms</td>
+              <td><%= delete&.value&.to_i || 0 %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% else %>
+    <section class="empty-state">
+      <div class="empty-state-content">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+        </svg>
+        <h3>No Storage Activity</h3>
+        <p>No Active Storage operations have been detected yet. If your application uses Active Storage, operations will appear here automatically.</p>
+      </div>
+    </section>
+  <% end %>
+</main>
