@@ -69,6 +69,13 @@ module RailsObservatory
       config.action_mailer.preview_paths << "#{config.root}/lib/rails_observatory/mailer_previews"
     end
 
+    initializer "rails_observatory.active_storage_instrumentation" do |app|
+      ActiveSupport.on_load(:active_storage_blob) do
+        # Ensure the subscriber is loaded when Active Storage is available
+        RailsObservatory::ActiveStorageSubscriber
+      end
+    end
+
     initializer "rails_observatory.assets" do |app|
       app.config.assets.paths << root.join("app/assets/stylesheets")
       app.config.assets.paths << root.join("app/javascript")
