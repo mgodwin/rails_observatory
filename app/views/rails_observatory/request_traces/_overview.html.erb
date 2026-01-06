@@ -25,10 +25,52 @@
     .flat_map { |e| e.dig('payload', 'keys') || [] }
     .map { |k| k.is_a?(Array) ? k.join('.') : k.to_s }
     .to_set
+
+  rate_limit_events = @events.only('rate_limit.action_controller').to_a
 %>
 
 <div class="tab-content overview layout-two-column">
   <div class="layout-two-column-main">
+    <% if rate_limit_events.any? %>
+      <section class="rate-limit-section" style="margin-bottom: var(--sp-6); padding: var(--sp-4); background: var(--error-bg, #fef2f2); border: 1px solid var(--error-border, #fecaca); border-radius: var(--border-radius);">
+        <h3 style="margin-bottom: var(--sp-3); color: var(--error, #dc2626); margin-top: 0; display: flex; align-items: center; gap: var(--sp-2);">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+          Rate Limited
+        </h3>
+        <% rate_limit_events.each do |event| %>
+          <% payload = event['payload'] || {} %>
+          <dl style="display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-4); margin: 0;">
+            <% if payload['name'].present? %>
+              <dt style="color: var(--black-secondary);">Name</dt>
+              <dd style="margin: 0; font-weight: 500;"><%= payload['name'] %></dd>
+            <% end %>
+            <% if payload['count'] && payload['to'] %>
+              <dt style="color: var(--black-secondary);">Request Count</dt>
+              <dd style="margin: 0;">
+                <span style="color: var(--error, #dc2626); font-weight: 500;"><%= payload['count'] %></span>
+                <span style="color: var(--black-secondary);">/</span>
+                <span><%= payload['to'] %> allowed</span>
+              </dd>
+            <% end %>
+            <% if payload['within'].present? %>
+              <dt style="color: var(--black-secondary);">Time Window</dt>
+              <dd style="margin: 0;"><%= distance_of_time_in_words(payload['within']) %></dd>
+            <% end %>
+            <% if payload['by'].present? %>
+              <dt style="color: var(--black-secondary);">Limited By</dt>
+              <dd style="margin: 0; font-family: var(--font-mono); font-size: 0.9em;"><%= payload['by'] %></dd>
+            <% end %>
+            <% if payload['scope'].present? %>
+              <dt style="color: var(--black-secondary);">Scope</dt>
+              <dd style="margin: 0;"><%= payload['scope'] %></dd>
+            <% end %>
+          </dl>
+        <% end %>
+      </section>
+    <% end %>
+
     <section>
       <h3 style="margin-bottom: var(--sp-3); color: var(--black-secondary); margin-top:0;">Parameters</h3>
       <% flattened_params = flatten_params(request_params) %>
@@ -90,6 +132,15 @@
 
   <div class="layout-two-column-side-panel side-panel">
     <dl>
+      <% if rate_limit_events.any? %>
+        <dt style="color: var(--error, #dc2626);">Rate Limited</dt>
+        <dd style="color: var(--error, #dc2626); font-weight: 500;">
+          <% rate_limit_events.each do |event| %>
+            <% payload = event['payload'] || {} %>
+            <%= payload['count'] %>/<%= payload['to'] %> requests
+          <% end %>
+        </dd>
+      <% end %>
       <dt>Duration</dt>
       <dd><%= @trace.duration.round(2) %> ms</dd>
       <dt>Events</dt>
