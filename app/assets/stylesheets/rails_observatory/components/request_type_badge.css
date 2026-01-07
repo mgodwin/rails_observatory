@@ -1,0 +1,26 @@
+.request-type-badge {
+  font-size: var(--font-size-xs);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+
+  &.page {
+    background-color: var(--surface-active);
+    color: var(--white);
+  }
+
+  &.xhr {
+    background-color: color-mix(in oklab, #6366f1 70%, var(--black));
+    color: var(--white);
+  }
+
+  &.turbo-frame {
+    background-color: color-mix(in oklab, #8b5cf6 70%, var(--black));
+    color: var(--white);
+  }
+
+  &.turbo-stream {
+    background-color: color-mix(in oklab, #06b6d4 70%, var(--black));
+    color: var(--white);
+  }
+}
