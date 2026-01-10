@@ -50,14 +50,23 @@
         }
 
 
-        &:not(.active):hover {
+        &:not(.active):hover,
+        &.focused {
+          background-color: var(--surface-hover);
+        }
+
+        &:focus {
+          outline: none;
           background-color: var(--surface-hover);
         }
       }
     }
   }
 
-  &:focus-within {
+  /* Fallback for non-JS: use focus-within */
+  &:not([data-controller="dropdown"]):focus-within,
+  /* JS-controlled: use data-dropdown-open */
+  &[data-dropdown-open] {
     & > ul {
       opacity: 100;
       visibility: visible;

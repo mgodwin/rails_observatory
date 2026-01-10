@@ -1,6 +1,10 @@
 <% content_for :top_nav do %>
-  <div class="dropdown">
-    <button class="secondary">
+  <div class="dropdown" data-controller="dropdown">
+    <button class="secondary"
+            data-dropdown-target="button"
+            data-action="click->dropdown#toggle keydown->dropdown#onButtonKeydown"
+            aria-haspopup="true"
+            aria-expanded="false">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" height="20">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -15,10 +19,15 @@
       </svg>
     </button>
 
-    <ul>
+    <ul role="menu" data-dropdown-target="menu">
       <% [5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hour, 4.hours, 1.day, 2.days, 7.days, 1.month].each do |time_frame| %>
-        <li>
-          <a href="?duration=<%= time_frame %>" class="<%= 'active' if time_frame == duration %>">
+        <li role="none">
+          <a href="?duration=<%= time_frame %>"
+             class="<%= 'active' if time_frame == duration %>"
+             role="menuitem"
+             tabindex="-1"
+             data-dropdown-target="option"
+             data-action="keydown->dropdown#onOptionKeydown">
             <span>Past <%= time_frame.inspect %></span>
             <svg height="18" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
@@ -26,7 +35,7 @@
           </a>
         </li>
       <% end %>
-      <li><a>Custom Time Range</a></li>
+      <li role="none"><a role="menuitem" tabindex="-1">Custom Time Range</a></li>
     </ul>
   </div>
 <% end %>
