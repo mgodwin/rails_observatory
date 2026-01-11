@@ -7,6 +7,7 @@ module RailsObservatory
     attribute :to, :string
     attribute :from, :string
     attribute :subject, :string
+    attribute :direction, :string # 'outbound' or 'inbound'
     attribute :mail, compressed: true, indexed: false
 
     alias_attribute :id, :message_id

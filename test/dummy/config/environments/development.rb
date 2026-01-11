@@ -67,4 +67,7 @@ Rails.application.configure do
 
   # Rails observatory configuration
   config.rails_observatory.redis = {host: "localhost", port: 6379, db: 0, middlewares: [], pool_size: ENV["RAILS_MAX_THREADS"] || 5}
+
+  # ActionMailbox configuration
+  config.action_mailbox.ingress = :relay
 end

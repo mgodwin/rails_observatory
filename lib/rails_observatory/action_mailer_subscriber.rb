@@ -4,7 +4,7 @@ module RailsObservatory
 
     def deliver(event)
       event.payload => {mail:, mailer:, to:, from:, subject:, message_id:}
-      MailDelivery.new(mail:, mailer:, to:, from:, subject:, message_id:, time: Time.now.to_f, duration: event.duration).save
+      MailDelivery.new(mail:, mailer:, to:, from:, subject:, message_id:, time: Time.now.to_f, duration: event.duration, direction: "outbound").save
 
       RedisTimeSeries.record_occurrence("mailer.delivery_count", labels: {mailer:})
     end

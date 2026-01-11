@@ -27,11 +27,21 @@ namespace :observatory do
       {type: :retry, desc: "RetryJob"}
     ]
 
-    # Mailer scenarios
-    mailers = [
+    # Outbound mailer scenarios
+    outbound_mailers = [
       {action: :welcome, args: -> { {user_email: "user#{rand(1000)}@example.com"} }, desc: "welcome"},
       {action: :notification, args: -> { {user_email: "user#{rand(1000)}@example.com", message: "Notification #{rand(1000)}"} }, desc: "notification"},
       {action: :newsletter, args: -> { {recipients: ["list#{rand(100)}@example.com"]} }, desc: "newsletter"}
+    ]
+
+    # Inbound email scenarios
+    inbound_email_subjects = [
+      "Customer Support Request",
+      "Product Inquiry",
+      "Feedback on Recent Order",
+      "Question About Pricing",
+      "Bug Report",
+      "Feature Request"
     ]
 
     # Helper to make HTTP requests
@@ -83,26 +93,47 @@ namespace :observatory do
     while running
       count += 1
 
-      # Pick event type: 60% request, 30% job, 10% mailer
+      # Pick event type: 50% request, 30% job, 10% outbound mail, 10% inbound mail
       roll = rand(100)
-      if roll < 60
+      if roll < 50
         # Request
         req = requests.sample
         print "[#{count}] REQUEST #{req[:desc]}..."
         response = make_request.call(req[:method], req[:path], req[:params] || {})
         puts response ? " #{response.code}" : " (unreachable)"
-      elsif roll < 90
+      elsif roll < 80
         # Job
         job = jobs.sample
         print "[#{count}] JOB #{job[:desc]}..."
         run_job.call(job[:type])
         puts " done"
-      else
-        # Mailer
-        mailer = mailers.sample
-        print "[#{count}] MAIL #{mailer[:desc]}..."
+      elsif roll < 90
+        # Outbound Mailer
+        mailer = outbound_mailers.sample
+        print "[#{count}] MAIL OUTBOUND #{mailer[:desc]}..."
         ScenariosMailer.send(mailer[:action], **mailer[:args].call).deliver_now
         puts " done"
+      else
+        # Inbound Email
+        subject = inbound_email_subjects.sample
+        from = "customer#{rand(1000)}@example.com"
+        print "[#{count}] MAIL INBOUND #{subject}..."
+        inbound_email = ActionMailbox::InboundEmail.create_and_extract_message_id!(<<~EMAIL)
+          From: #{from}
+          To: support@example.com
+          Subject: #{subject}
+          Date: #{Time.now.rfc2822}
+          Message-ID: <auto-#{SecureRandom.uuid}@example.com>
+
+          This is an automated test inbound email.
+
+          #{["Please help with this issue.", "I have a question about your service.", "Great product!", "Looking forward to hearing from you."].sample}
+
+          Thanks,
+          Customer
+        EMAIL
+        inbound_email.deliver
+        puts " delivered"
       end
 
       sleep(rand(0.1..0.5)) if running
