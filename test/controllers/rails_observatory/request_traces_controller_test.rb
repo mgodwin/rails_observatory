@@ -105,5 +105,49 @@ module RailsObservatory
       get request_trace_path(id: request_id, tab: "mail")
       assert_redirected_to request_trace_path(id: request_id, tab: "overview")
     end
+
+    test "overview shows rate limiting information when request was blocked" do
+      # Clear any existing rate limit counter
+      Rails.cache.clear
+
+      # First request succeeds (under the limit)
+      get rate_limited_scenarios_path
+      assert_response :success
+
+      # Second request exceeds the limit and triggers the rate_limit.action_controller event
+      get rate_limited_scenarios_path
+      assert_response :too_many_requests
+      request_id = request.request_id
+      sleep 0.1
+
+      # View the trace via request traces controller
+      get request_trace_path(id: request_id, tab: "overview")
+      assert_response :success
+
+      # Verify rate limiting section is displayed
+      assert_select "section.rate-limit-section h3", /Request Rejected.*Rate Limited/
+      assert_select "section.rate-limit-section p", /exceeded the rate limit.*blocked with a 429/
+
+      # Verify rate limit details are shown
+      assert_select "section.rate-limit-section dt", "Limit Name"
+      assert_select "section.rate-limit-section dd", "test_rate_limit"
+
+      # Verify side panel shows rate limited indicator
+      assert_select ".side-panel dt", /Rate Limited/
+      assert_select ".side-panel dd", /Blocked.*429/
+    end
+
+    test "overview does not show rate limiting section for normal requests" do
+      get success_scenarios_path
+      request_id = request.request_id
+      sleep 0.1
+
+      get request_trace_path(id: request_id, tab: "overview")
+      assert_response :success
+
+      # Verify rate limiting section is NOT displayed
+      assert_select "section.rate-limit-section", count: 0
+      assert_select ".side-panel dt", text: /Rate Limited/, count: 0
+    end
   end
 end
