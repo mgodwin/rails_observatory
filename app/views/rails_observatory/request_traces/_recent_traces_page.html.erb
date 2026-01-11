@@ -1,8 +1,23 @@
 <turbo-frame id="recent-traces">
   <%= render 'query_table', attributes: { id: 'recent-request-traces' }, events: @traces, fields: [
-    :time, :http_method, :action, :route_pattern, :duration, :status,
+    :time, :http_method, :action, :route_pattern, :request_type, :duration, :status,
   ], formatters: {
     time: ->(time, trace) { link_to Time.at(time).to_fs('%H:%M:%S'), request_trace_path(trace.id), data: { turbo_frame: '_top' } },
+    request_type: ->(type) do
+      label = case type
+      when 'turbo_stream' then 'Turbo Stream'
+      when 'turbo_frame' then 'Turbo Frame'
+      when 'xhr' then 'XHR'
+      else 'Page'
+      end
+      css_class = case type
+      when 'turbo_stream' then 'turbo-stream'
+      when 'turbo_frame' then 'turbo-frame'
+      when 'xhr' then 'xhr'
+      else 'page'
+      end
+      tag.span(label, class: "request-type-badge #{css_class}")
+    end,
     status: ->(status) do
       if status.to_s.start_with?(/[23]/)
         tag.span(status, class: 'status-badge success')
