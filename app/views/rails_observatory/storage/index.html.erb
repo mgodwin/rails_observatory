@@ -1,0 +1,116 @@
+<% content_for(:title, 'Storage') %>
+<main class="layout-dashboard">
+  <div class="summary-panel">
+    <dl>
+      <dt>Uploads</dt>
+      <dd><%= metric_value(name: 'storage.upload_count_sum')&.to_i || 0 %></dd>
+      <dt>Downloads</dt>
+      <dd><%= metric_value(name: 'storage.download_count_sum')&.to_i || 0 %></dd>
+      <dt>Deletes</dt>
+      <dd><%= metric_value(name: 'storage.delete_count_sum')&.to_i || 0 %></dd>
+      <dt>Bytes Uploaded</dt>
+      <dd><%= number_to_human_size(metric_value(name: 'storage.upload_bytes_sum') || 0) %></dd>
+      <dt>Avg Upload Duration</dt>
+      <dd><%= metric_value(name: 'storage.upload_duration_avg')&.round(2) || 0 %> ms</dd>
+    </dl>
+  </div>
+
+  <div class="charts">
+    <div class="chart"
+         id="storage-upload-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('storage.upload_count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="storage-charts"
+         data-bar-chart-name-value="Uploads"></div>
+    <div class="chart"
+         id="storage-download-chart"
+         data-controller="bar-chart"
+         data-bar-chart-initial-data-value="<%= metric_series('storage.download_count|sum->60@sum').to_json %>"
+         data-bar-chart-group-value="storage-charts"
+         data-bar-chart-name-value="Downloads"></div>
+    <div class="chart"
+         id="storage-bytes-chart"
+         data-controller="area-chart"
+         data-area-chart-initial-data-value="<%= metric_series('storage.upload_bytes|all->60@sum').to_json %>"
+         data-area-chart-group-value="storage-charts"
+         data-area-chart-name-value="Bytes Uploaded"></div>
+  </div>
+
+  <% if @upload_count_by_service.any? %>
+    <section class="layout-requests_index-by_controller">
+      <header>
+        <h2>Uploads by Service</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Service</th>
+            <th>Uploads</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @upload_count_by_service.each do |series| %>
+            <tr>
+              <td><%= series.labels['service'] %></td>
+              <td><%= series.value.to_i %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @download_count_by_service.any? %>
+    <section class="layout-requests_index-by_controller">
+      <header>
+        <h2>Downloads by Service</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Service</th>
+            <th>Downloads</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @download_count_by_service.each do |series| %>
+            <tr>
+              <td><%= series.labels['service'] %></td>
+              <td><%= series.value.to_i %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @delete_count_by_service.any? %>
+    <section class="layout-requests_index-by_controller">
+      <header>
+        <h2>Deletes by Service</h2>
+      </header>
+      <div class="table-chart">
+        <table>
+          <thead>
+          <tr>
+            <th>Service</th>
+            <th>Deletes</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @delete_count_by_service.each do |series| %>
+            <tr>
+              <td><%= series.labels['service'] %></td>
+              <td><%= series.value.to_i %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+</main>

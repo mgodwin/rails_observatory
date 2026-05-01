@@ -18,6 +18,7 @@ RailsObservatory::Engine.routes.draw do
     get "recent", on: :collection
   end
   resources :errors, only: [:index, :show]
+  resources :storage, only: [:index]
   resources :time_series, only: [:index]
   resources :updates, only: [:index]
   get "usage", to: "usage#index", as: :usage
