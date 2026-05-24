@@ -4,13 +4,22 @@
     <dl>
       <dt>Emails Sent</dt>
       <dd><%= metric_value(name: 'mailer.delivery_count_sum') || 0 %></dd>
+      <dt>Emails Received</dt>
+      <dd><%= metric_value(name: 'mailer.inbound_count_sum') || 0 %></dd>
     </dl>
   </div>
 
   <section class="recent-requests">
     <header>
-      <h2>Recent Deliveries</h2>
+      <h2>Outbound Deliveries</h2>
     </header>
-    <turbo-frame id="recent-deliveries" src="<%= recent_mailers_path %>" loading="lazy"></turbo-frame>
+    <turbo-frame id="recent-outbound-deliveries" src="<%= recent_mailers_path(direction: 'outbound') %>" loading="lazy"></turbo-frame>
+  </section>
+
+  <section class="recent-requests">
+    <header>
+      <h2>Inbound Deliveries</h2>
+    </header>
+    <turbo-frame id="recent-inbound-deliveries" src="<%= recent_mailers_path(direction: 'inbound') %>" loading="lazy"></turbo-frame>
   </section>
 </main>
