@@ -59,4 +59,7 @@ Rails.application.configure do
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   config.rails_observatory.redis = {host: "localhost", port: 6399, db: 0, middlewares: [], pool_size: 1}
+
+  # ActionMailbox configuration
+  config.action_mailbox.ingress = :test
 end

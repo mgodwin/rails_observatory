@@ -12,7 +12,9 @@ module RailsObservatory
       MailDelivery.ensure_index
       @page = [params[:page].to_i, 1].max
       @per_page = PER_PAGE
-      query = MailDelivery.all
+      @direction = params[:direction] || "outbound"
+
+      query = MailDelivery.where(direction: @direction)
       @total_count = query.count
       @total_pages = (@total_count.to_f / @per_page).ceil
       @total_pages = 1 if @total_pages < 1
