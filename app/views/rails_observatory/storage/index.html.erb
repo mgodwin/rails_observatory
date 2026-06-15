@@ -2,16 +2,26 @@
 <main class="layout-dashboard">
   <div class="summary-panel">
     <dl>
-      <dt>Uploads</dt>
-      <dd><%= metric_value(name: 'storage.upload_count_sum')&.to_i || 0 %></dd>
-      <dt>Downloads</dt>
-      <dd><%= metric_value(name: 'storage.download_count_sum')&.to_i || 0 %></dd>
-      <dt>Deletes</dt>
-      <dd><%= metric_value(name: 'storage.delete_count_sum')&.to_i || 0 %></dd>
-      <dt>Bytes Uploaded</dt>
-      <dd><%= number_to_human_size(metric_value(name: 'storage.upload_bytes_sum') || 0) %></dd>
-      <dt>Avg Upload Duration</dt>
-      <dd><%= metric_value(name: 'storage.upload_duration_avg')&.round(2) || 0 %> ms</dd>
+      <div class="stat">
+        <dt>Uploads</dt>
+        <dd><%= metric_value(name: 'storage.upload_count_sum')&.to_i || 0 %></dd>
+      </div>
+      <div class="stat">
+        <dt>Downloads</dt>
+        <dd><%= metric_value(name: 'storage.download_count_sum')&.to_i || 0 %></dd>
+      </div>
+      <div class="stat">
+        <dt>Deletes</dt>
+        <dd><%= metric_value(name: 'storage.delete_count_sum')&.to_i || 0 %></dd>
+      </div>
+      <div class="stat">
+        <dt>Bytes Uploaded</dt>
+        <dd><%= number_to_human_size(metric_value(name: 'storage.upload_bytes_sum') || 0) %></dd>
+      </div>
+      <div class="stat">
+        <dt>Avg Upload Duration</dt>
+        <dd><%= metric_value(name: 'storage.upload_duration_avg')&.round(2) || 0 %> ms</dd>
+      </div>
     </dl>
   </div>
 

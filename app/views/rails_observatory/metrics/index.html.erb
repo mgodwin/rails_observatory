@@ -3,14 +3,22 @@
 <main class="layout-metrics-explorer">
   <div class="summary-panel">
     <dl>
-      <dt>Unique Metrics</dt>
-      <dd><%= @unique_metric_names.size %></dd>
-      <dt>Time Series</dt>
-      <dd><%= @total_series_count %></dd>
-      <dt>Counters</dt>
-      <dd><%= @counter_names.size %></dd>
-      <dt>Distributions</dt>
-      <dd><%= @distribution_names.size %></dd>
+      <div class="stat">
+        <dt>Unique Metrics</dt>
+        <dd><%= @unique_metric_names.size %></dd>
+      </div>
+      <div class="stat">
+        <dt>Time Series</dt>
+        <dd><%= @total_series_count %></dd>
+      </div>
+      <div class="stat">
+        <dt>Counters</dt>
+        <dd><%= @counter_names.size %></dd>
+      </div>
+      <div class="stat">
+        <dt>Distributions</dt>
+        <dd><%= @distribution_names.size %></dd>
+      </div>
     </dl>
   </div>
 
