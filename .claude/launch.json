@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Rails server (Puma)",
+      "runtimeExecutable": "bin/rails",
+      "runtimeArgs": ["server"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "esbuild asset watch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "watch"]
+    }
+  ]
+}
