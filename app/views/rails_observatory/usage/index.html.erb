@@ -4,14 +4,22 @@
   <section class="usage-overview">
     <div class="summary-panel">
       <dl>
-        <dt>Used Memory</dt>
-        <dd><%= number_to_human_size(@usage_stats.total_used_bytes) %></dd>
-        <dt>Max Memory</dt>
-        <dd><%= @usage_stats.max_memory_bytes ? number_to_human_size(@usage_stats.max_memory_bytes) : 'Unbounded' %></dd>
-        <dt>Remaining</dt>
-        <dd><%= @usage_stats.remaining_capacity ? number_to_human_size(@usage_stats.remaining_capacity) : 'N/A' %></dd>
-        <dt>Total Keys</dt>
-        <dd><%= number_with_delimiter(@usage_stats.total_keys) %></dd>
+        <div class="stat">
+          <dt>Used Memory</dt>
+          <dd><%= number_to_human_size(@usage_stats.total_used_bytes) %></dd>
+        </div>
+        <div class="stat">
+          <dt>Max Memory</dt>
+          <dd><%= @usage_stats.max_memory_bytes ? number_to_human_size(@usage_stats.max_memory_bytes) : 'Unbounded' %></dd>
+        </div>
+        <div class="stat">
+          <dt>Remaining</dt>
+          <dd><%= @usage_stats.remaining_capacity ? number_to_human_size(@usage_stats.remaining_capacity) : 'N/A' %></dd>
+        </div>
+        <div class="stat">
+          <dt>Total Keys</dt>
+          <dd><%= number_with_delimiter(@usage_stats.total_keys) %></dd>
+        </div>
       </dl>
     </div>
 
@@ -62,12 +70,18 @@
     <h2>Additional Info</h2>
     <div class="summary-panel">
       <dl>
-        <dt>Memory RSS</dt>
-        <dd><%= @usage_stats.memory_info['used_memory_rss_human'] %></dd>
-        <dt>Fragmentation Ratio</dt>
-        <dd><%= @usage_stats.memory_info['mem_fragmentation_ratio'] %></dd>
-        <dt>Max Memory Policy</dt>
-        <dd><%= @usage_stats.memory_info['maxmemory_policy'] %></dd>
+        <div class="stat">
+          <dt>Memory RSS</dt>
+          <dd><%= @usage_stats.memory_info['used_memory_rss_human'] %></dd>
+        </div>
+        <div class="stat">
+          <dt>Fragmentation Ratio</dt>
+          <dd><%= @usage_stats.memory_info['mem_fragmentation_ratio'] %></dd>
+        </div>
+        <div class="stat">
+          <dt>Max Memory Policy</dt>
+          <dd><%= @usage_stats.memory_info['maxmemory_policy'] %></dd>
+        </div>
       </dl>
     </div>
   </section>

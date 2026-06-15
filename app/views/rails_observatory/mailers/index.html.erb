@@ -2,8 +2,10 @@
 <main class="layout-dashboard">
   <div class="summary-panel">
     <dl>
-      <dt>Emails Sent</dt>
-      <dd><%= metric_value(name: 'mailer.delivery_count_sum') || 0 %></dd>
+      <div class="stat">
+        <dt>Emails Sent</dt>
+        <dd><%= metric_value(name: 'mailer.delivery_count_sum') || 0 %></dd>
+      </div>
     </dl>
   </div>
 

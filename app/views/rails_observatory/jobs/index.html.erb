@@ -2,14 +2,22 @@
 <main class="layout-dashboard">
   <div class="summary-panel">
     <dl>
-      <dt>Jobs Performed</dt>
-      <dd><%= metric_value(name: 'job.count_sum') %></dd>
-      <dt>Mean Duration</dt>
-      <dd><%= metric_value(name: 'job.latency_avg') %> ms</dd>
-      <dt>Max Duration</dt>
-      <dd><%= metric_value(name: 'job.latency_max') %> ms</dd>
-      <dt>Errors</dt>
-      <dd><%= metric_value(name: 'job.error_count_sum') %></dd>
+      <div class="stat">
+        <dt>Jobs Performed</dt>
+        <dd><%= metric_value(name: 'job.count_sum') %></dd>
+      </div>
+      <div class="stat">
+        <dt>Mean Duration</dt>
+        <dd><%= metric_value(name: 'job.latency_avg') %> ms</dd>
+      </div>
+      <div class="stat">
+        <dt>Max Duration</dt>
+        <dd><%= metric_value(name: 'job.latency_max') %> ms</dd>
+      </div>
+      <div class="stat">
+        <dt>Errors</dt>
+        <dd><%= metric_value(name: 'job.error_count_sum') %></dd>
+      </div>
     </dl>
   </div>
   <div class="charts">

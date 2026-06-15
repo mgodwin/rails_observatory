@@ -7,12 +7,19 @@
 
     dl {
       display: grid;
-      grid-template-rows: auto auto;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      grid-auto-flow: column;
-      column-gap: var(--sp-6);
+      gap: var(--gap-md) var(--sp-6);
       padding: var(--sp-2) var(--sp-6);
+      margin: 0;
     }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-md);
+      min-width: 0;
+    }
+
     dt {
       /*font-weight: 600;*/
       color: var(--black-secondary);
@@ -20,7 +27,6 @@
 
     dd {
       margin: 0;
-      margin-top: var(--gap-md);
       padding: 0;
       font-weight: var(--font-weight-bold);
     }
