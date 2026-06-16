@@ -1,0 +1,26 @@
+/* Loading spinner for turbo-frames that haven't rendered content yet — shown
+   while a lazy frame is fetching, and kept up while we retry a failed fetch
+   (e.g. the server is briefly down) instead of reloading the whole page. */
+turbo-frame[busy]:empty,
+turbo-frame[aria-busy="true"]:empty {
+  display: grid;
+  place-items: center;
+  min-height: 8rem;
+}
+
+turbo-frame[busy]:empty::after,
+turbo-frame[aria-busy="true"]:empty::after {
+  content: "";
+  width: var(--sp-6);
+  height: var(--sp-6);
+  border: 3px solid var(--divider-active);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: ro-frame-spin 0.8s linear infinite;
+}
+
+@keyframes ro-frame-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
