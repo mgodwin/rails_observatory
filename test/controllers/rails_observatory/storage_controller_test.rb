@@ -58,8 +58,8 @@ module RailsObservatory
       track("storage.upload_count", {service: "local"}, %w[sum])
       track("storage.download_count", {service: "amazon"}, %w[sum])
       track("storage.delete_count", {service: "local"}, %w[sum])
-      track("storage.upload_bytes", {service: "amazon"}, %w[avg min max])
-      track("storage.upload_duration", {service: "amazon"}, %w[avg min max])
+      track("storage.upload_bytes", {service: "amazon"}, %w[avg min max std.p])
+      track("storage.upload_duration", {service: "amazon"}, %w[avg min max std.p])
 
       get storage_index_path
       assert_response :success

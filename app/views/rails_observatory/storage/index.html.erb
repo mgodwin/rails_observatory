@@ -44,6 +44,12 @@
          data-area-chart-initial-data-value="<%= metric_series('storage.upload_bytes|all->60@sum').to_json %>"
          data-area-chart-group-value="storage-charts"
          data-area-chart-name-value="Bytes Uploaded"></div>
+    <div class="chart"
+         id="storage-upload-duration-chart"
+         data-controller="band-area-chart"
+         data-band-area-chart-initial-data-value="<%= latency_band_series('storage.upload_duration').to_json %>"
+         data-band-area-chart-group-value="storage-charts"
+         data-band-area-chart-name-value="Upload Duration (± σ)"></div>
   </div>
 
   <% if @upload_count_by_service.any? %>

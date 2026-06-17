@@ -22,9 +22,37 @@ module RailsObservatory
       query.to_a.map { |s| {name: s.labels[group_label], data: s.filled_data} }
     end
 
+    # Builds chart-ready series for a latency metric with a variance band.
+    # Returns a combined ApexCharts series: a translucent rangeArea spanning
+    # avg ± std.p (population standard deviation) plus the mean line on top.
+    # The lower bound is clamped at 0 since timings can't be negative.
+    def latency_band_series(metric, bins: 60)
+      slice = ActiveSupport::IsolatedExecutionState[:observatory_slice]
+      from = slice&.begin
+      to = slice&.end
+
+      avg = RedisTimeSeries.query_range_by_string("#{metric}|avg->#{bins}@avg", from: from, to: to).to_a.first
+      return [] if avg.nil?
+
+      std = RedisTimeSeries.query_range_by_string("#{metric}|std.p->#{bins}@avg", from: from, to: to).to_a.first
+      std_lookup = (std&.filled_data || []).to_h
+
+      mean_data = avg.filled_data
+      band_data = mean_data.map do |ts, mean|
+        sd = std_lookup[ts] || 0.0
+        {x: ts, y: [[mean - sd, 0.0].max.round(2), (mean + sd).round(2)]}
+      end
+      line_data = mean_data.map { |ts, mean| {x: ts, y: mean.round(2)} }
+
+      [
+        {name: "± σ", type: "rangeArea", data: band_data},
+        {name: "Mean", type: "line", data: line_data}
+      ]
+    end
+
     def metric_value(name:, **labels)
       compaction_name = name.split("_").last
-      metric_name = name.gsub(/_(sum|avg|min|max)$/, "")
+      metric_name = name.gsub(/_(sum|avg|min|max|std\.p)$/, "")
       result = RedisTimeSeries.query_value(metric_name, compaction_name.to_sym)
         .where(**labels)
         .to_a

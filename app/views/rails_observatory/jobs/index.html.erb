@@ -29,10 +29,10 @@
          data-bar-chart-name-value="Jobs Performed"></div>
     <div class="chart"
          id="job-duration-chart"
-         data-controller="area-chart"
-         data-area-chart-initial-data-value="<%= metric_series('job.latency|all->60@avg').to_json %>"
-         data-area-chart-group-value="job-charts"
-         data-area-chart-name-value="Mean Duration"></div>
+         data-controller="band-area-chart"
+         data-band-area-chart-initial-data-value="<%= latency_band_series('job.latency').to_json %>"
+         data-band-area-chart-group-value="job-charts"
+         data-band-area-chart-name-value="Mean Duration (± σ)"></div>
     <div class="chart"
          id="job-error-chart"
          data-controller="bar-chart"

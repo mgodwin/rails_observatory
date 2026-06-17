@@ -34,6 +34,24 @@ module RailsObservatory
       assert_includes command, "compaction!="
     end
 
+    test "parses std.p compaction" do
+      from = Time.now - 15.minutes
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.latency|std.p->30@avg", from: from, to: to)
+
+      command = query.to_redis_command
+      assert_includes command, "compaction=std.p"
+      assert_includes command, "AGGREGATION AVG 30000"
+    end
+
+    test "parses std.p reducer" do
+      from = Time.now - 15.minutes
+      to = Time.now
+      query = RedisTimeSeries.query_range_by_string("request.latency|all->30@std.p", from: from, to: to)
+
+      assert_includes query.to_redis_command, "AGGREGATION STD.P 30000"
+    end
+
     test "parses different reducers" do
       # 15 minutes with 30 bins = 30 second bins = 30000ms
       from = Time.now - 15.minutes

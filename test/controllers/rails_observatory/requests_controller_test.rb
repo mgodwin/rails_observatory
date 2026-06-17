@@ -41,6 +41,7 @@ module RailsObservatory
         "request.latency:#{latency_digest}_avg",
         "request.latency:#{latency_digest}_min",
         "request.latency:#{latency_digest}_max",
+        "request.latency:#{latency_digest}_std.p",
         "init:request.latency:#{latency_digest}"
       ]
 

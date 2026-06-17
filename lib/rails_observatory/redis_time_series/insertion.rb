@@ -14,7 +14,7 @@ module RailsObservatory
           if redis.call("SETNX", "init:#{ts_name}", 1) == 1
             redis.pipelined do |r|
               r.call("TS.CREATE", ts_name, "RETENTION", 10_000, "CHUNK_SIZE", 4_096)
-              %w[avg min max].each do |agg|
+              %w[avg min max std.p].each do |agg|
                 comp_key = "#{ts_name}_#{agg}"
                 r.call("TS.CREATE", comp_key, "RETENTION", 31_536_000_000, "CHUNK_SIZE", 4_096,
                   "LABELS", "name", prefixed_name, "compaction", agg, *labels_flat)
