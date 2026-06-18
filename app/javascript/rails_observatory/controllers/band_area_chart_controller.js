@@ -9,10 +9,10 @@ export default class extends ApplicationChartController {
     const baseOptions = super.chartOptions()
     baseOptions.chart.type = 'rangeArea'
     baseOptions.legend = { show: false }
-    // Tie the band and the line to the same hue: band index 0, line index 1.
-    baseOptions.colors = ['#008FFB', '#008FFB']
-    baseOptions.fill = { opacity: [0.24, 1] }
-    baseOptions.stroke = { width: [0, 2], curve: 'straight' }
+    // Gray, dashed-outline variance band (index 0); accent mean line (index 1).
+    baseOptions.colors = ['#9ca3af', '#008FFB']
+    baseOptions.fill = { opacity: [0.15, 1] }
+    baseOptions.stroke = { width: [1.5, 2], dashArray: [4, 0], curve: 'straight' }
     baseOptions.tooltip = { ...baseOptions.tooltip, shared: true, intersect: false }
     return baseOptions
   }
