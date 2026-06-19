@@ -8,7 +8,7 @@ RailsObservatory::Engine.routes.draw do
     get "recent", on: :collection
   end
 
-  resources :metrics, only: :index, param: :name do
+  resources :metrics, only: :index, param: :name, constraints: { name: /[^\/]+/ } do
     get "autocomplete", on: :collection
     get "labels", on: :member
   end

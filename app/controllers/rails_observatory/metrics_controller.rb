@@ -4,7 +4,11 @@ module RailsObservatory
 
     def index
       @all_series = begin
-        RedisTimeSeries.query_index(true).to_a
+        # Requires at least one equality filter for TS.QUERYINDEX (Redis TS 1.8+).
+        # Filter by known compaction types to satisfy this constraint while returning all metrics.
+        RedisTimeSeries.query_index(true)
+          .where(compaction: %w[sum avg min max])
+          .to_a
       rescue RedisClient::CommandError
         []
       end
@@ -57,8 +61,8 @@ module RailsObservatory
     def labels
       metric_name = params[:name]
       series = begin
-        RedisTimeSeries.query_index(true)
-          .select { |s| s.name == metric_name }
+        # query_index(metric_name) generates name=metric_name (equality filter), satisfying Redis TS 1.8+ requirement.
+        RedisTimeSeries.query_index(metric_name).to_a
       rescue RedisClient::CommandError
         []
       end

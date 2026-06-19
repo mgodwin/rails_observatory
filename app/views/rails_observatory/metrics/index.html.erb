@@ -139,7 +139,11 @@
            data-<%= @chart_type %>-chart-name-value="<%= @selected_metric %>"
            <%= "data-#{@chart_type}-chart-stacked-value=true" if @group_by.present? %>></div>
     </section>
-  <% elsif @selected_metric.blank? %>
+  <% elsif @selected_metric.present? %>
+    <section class="metric-chart-placeholder">
+      <p>No data for <strong><%= @selected_metric %></strong> in the selected time range</p>
+    </section>
+  <% else %>
     <section class="metric-chart-placeholder">
       <p>Select a metric above to view its chart</p>
     </section>
