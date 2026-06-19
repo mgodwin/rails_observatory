@@ -30,10 +30,10 @@
          data-bar-chart-name-value="Requests"></div>
     <div class="chart"
          id="mean-response-time-chart"
-         data-controller="area-chart"
-         data-area-chart-initial-data-value="<%= metric_series('request.latency|all->60@avg').to_json %>"
-         data-area-chart-group-value="request-charts"
-         data-area-chart-name-value="Mean Response Time"></div>
+         data-controller="band-area-chart"
+         data-band-area-chart-initial-data-value="<%= latency_band_series('request.latency').to_json %>"
+         data-band-area-chart-group-value="request-charts"
+         data-band-area-chart-name-value="Mean Response Time (± σ)"></div>
     <div class="chart"
          id="stacked-response-time-chart"
          data-controller="area-chart"

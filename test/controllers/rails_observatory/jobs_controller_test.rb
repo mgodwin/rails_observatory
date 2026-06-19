@@ -42,6 +42,7 @@ module RailsObservatory
         "job.latency:#{latency_digest}_avg",
         "job.latency:#{latency_digest}_min",
         "job.latency:#{latency_digest}_max",
+        "job.latency:#{latency_digest}_std.p",
         "init:job.latency:#{latency_digest}"
       ]
 

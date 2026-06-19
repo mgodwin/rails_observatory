@@ -20,8 +20,8 @@ module RailsObservatory
 
     test "service_upload records count, bytes, and duration with service label" do
       ts_count = track("storage.upload_count", {service: "amazon"}, %w[sum])
-      ts_bytes = track("storage.upload_bytes", {service: "amazon"}, %w[avg min max])
-      ts_duration = track("storage.upload_duration", {service: "amazon"}, %w[avg min max])
+      ts_bytes = track("storage.upload_bytes", {service: "amazon"}, %w[avg min max std.p])
+      ts_duration = track("storage.upload_duration", {service: "amazon"}, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "service_upload.active_storage",
@@ -36,8 +36,8 @@ module RailsObservatory
 
     test "service_upload derives service name from service object class" do
       ts_count = track("storage.upload_count", {service: "fake_s3_service"}, %w[sum])
-      track("storage.upload_bytes", {service: "fake_s3_service"}, %w[avg min max])
-      track("storage.upload_duration", {service: "fake_s3_service"}, %w[avg min max])
+      track("storage.upload_bytes", {service: "fake_s3_service"}, %w[avg min max std.p])
+      track("storage.upload_duration", {service: "fake_s3_service"}, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "service_upload.active_storage",
@@ -48,9 +48,9 @@ module RailsObservatory
     end
 
     test "service_upload defaults bytesize to 0 when missing from payload" do
-      ts_bytes = track("storage.upload_bytes", {service: "amazon"}, %w[avg min max])
+      ts_bytes = track("storage.upload_bytes", {service: "amazon"}, %w[avg min max std.p])
       track("storage.upload_count", {service: "amazon"}, %w[sum])
-      track("storage.upload_duration", {service: "amazon"}, %w[avg min max])
+      track("storage.upload_duration", {service: "amazon"}, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "service_upload.active_storage",
@@ -98,7 +98,7 @@ module RailsObservatory
 
     test "preview records count and duration" do
       ts_count = track("storage.preview_count", {service: "amazon"}, %w[sum])
-      ts_duration = track("storage.preview_duration", {service: "amazon"}, %w[avg min max])
+      ts_duration = track("storage.preview_duration", {service: "amazon"}, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "preview.active_storage",
@@ -111,7 +111,7 @@ module RailsObservatory
 
     test "transform records count and duration" do
       ts_count = track("storage.transform_count", {service: "amazon"}, %w[sum])
-      ts_duration = track("storage.transform_duration", {service: "amazon"}, %w[avg min max])
+      ts_duration = track("storage.transform_duration", {service: "amazon"}, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "transform.active_storage",
@@ -125,7 +125,7 @@ module RailsObservatory
     test "analyze records count and duration with service and analyzer labels" do
       labels = {analyzer: "image_analyzer", service: "amazon"}
       ts_count = track("storage.analyze_count", labels, %w[sum])
-      ts_duration = track("storage.analyze_duration", labels, %w[avg min max])
+      ts_duration = track("storage.analyze_duration", labels, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "analyze.active_storage",
@@ -139,7 +139,7 @@ module RailsObservatory
     test "analyze derives analyzer name from analyzer object class" do
       labels = {analyzer: "fake_image_analyzer", service: "amazon"}
       ts_count = track("storage.analyze_count", labels, %w[sum])
-      track("storage.analyze_duration", labels, %w[avg min max])
+      track("storage.analyze_duration", labels, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "analyze.active_storage",
@@ -151,7 +151,7 @@ module RailsObservatory
 
     test "preview labels service as unknown when payload has no service" do
       ts_count = track("storage.preview_count", {service: "unknown"}, %w[sum])
-      track("storage.preview_duration", {service: "unknown"}, %w[avg min max])
+      track("storage.preview_duration", {service: "unknown"}, %w[avg min max std.p])
 
       ActiveSupport::Notifications.instrument(
         "preview.active_storage",

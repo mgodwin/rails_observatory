@@ -114,7 +114,7 @@ module RailsObservatory
 
     # distribution tests
 
-    test "distribution creates time series with avg/min/max compactions on first call" do
+    test "distribution creates time series with avg/min/max/std.p compactions on first call" do
       name = "test.distribution.cold"
       labels = {action: "index", controller: "posts"}
 
@@ -125,13 +125,13 @@ module RailsObservatory
       ts_name = "#{name}:#{digest}"
 
       @test_keys << ts_name
-      %w[avg min max].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
+      %w[avg min max std.p].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
 
       # Verify raw series exists
       assert_equal 1, @redis.call("EXISTS", ts_name), "Raw time series should exist"
 
       # Verify all compaction series exist
-      %w[avg min max].each do |agg|
+      %w[avg min max std.p].each do |agg|
         comp_key = "#{ts_name}_#{agg}"
         assert_equal 1, @redis.call("EXISTS", comp_key), "#{agg} compaction should exist"
 
@@ -157,7 +157,7 @@ module RailsObservatory
       ts_name = "#{name}:#{digest}"
 
       @test_keys << ts_name
-      %w[avg min max].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
+      %w[avg min max std.p].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
 
       result = @redis.call("TS.GET", ts_name)
       assert_equal 75.0, result[1].to_f, "Should have latest value"
@@ -177,7 +177,7 @@ module RailsObservatory
       ts_name = "#{name}:#{digest}"
 
       @test_keys << ts_name
-      %w[avg min max].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
+      %w[avg min max std.p].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
 
       result = @redis.call("TS.GET", ts_name)
       assert_equal 30.0, result[1].to_f, "Value should be last written (LAST policy)"
@@ -199,7 +199,7 @@ module RailsObservatory
 
       @test_keys << ts_name1
       @test_keys << ts_name2
-      %w[avg min max].each do |agg|
+      %w[avg min max std.p].each do |agg|
         @test_keys << "#{ts_name1}_#{agg}"
         @test_keys << "#{ts_name2}_#{agg}"
       end
@@ -245,7 +245,7 @@ module RailsObservatory
       ts_name = "#{name}:#{digest}"
 
       @test_keys << ts_name
-      %w[avg min max].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
+      %w[avg min max std.p].each { |agg| @test_keys << "#{ts_name}_#{agg}" }
 
       assert_equal 1, @redis.call("EXISTS", ts_name)
     end
