@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       get :server_error
       get :slow_request
       post :unpermitted_params
+      get :rate_limited
     end
   end
 end

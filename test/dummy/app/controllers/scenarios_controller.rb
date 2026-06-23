@@ -67,4 +67,11 @@ class ScenariosController < ApplicationController
     permitted = params.require(:post).permit(:title)
     render json: {permitted: permitted.to_h}
   end
+
+  # GET /scenarios/rate_limited - triggers rate_limit.action_controller event
+  # Uses a limit of 1 request per minute so the second request triggers the event
+  rate_limit to: 1, within: 1.minute, only: :rate_limited, name: "test_rate_limit"
+  def rate_limited
+    render json: {status: "ok", message: "Request allowed"}
+  end
 end
