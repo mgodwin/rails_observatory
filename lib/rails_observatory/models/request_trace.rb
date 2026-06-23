@@ -9,6 +9,7 @@ module RailsObservatory
     attribute :path, :string
     attribute :action, :string
     attribute :format, :string
+    attribute :request_type, :string
     attribute :error, :boolean
     attribute :route_pattern, :string
     attribute :time, :float
@@ -35,12 +36,26 @@ module RailsObservatory
         action: controller_action,
         error: events.any? { it.payload[:exception] },
         format: request.format,
+        request_type: detect_request_type(request),
         duration:,
         time: start_at.to_f,
         path: request.path,
         events: serialized_events,
         logs:
       )
+    end
+
+    def self.detect_request_type(request)
+      accept = request.headers["Accept"] || ""
+      if accept.include?("text/vnd.turbo-stream.html")
+        "turbo_stream"
+      elsif request.headers["Turbo-Frame"].present?
+        "turbo_frame"
+      elsif request.xhr?
+        "xhr"
+      else
+        "page"
+      end
     end
 
     private

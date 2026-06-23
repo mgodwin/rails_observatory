@@ -90,6 +90,24 @@
 
   <div class="layout-two-column-side-panel side-panel">
     <dl>
+      <dt>Request Type</dt>
+      <dd>
+        <%
+          type_label = case @trace.request_type
+          when 'turbo_stream' then 'Turbo Stream'
+          when 'turbo_frame' then 'Turbo Frame'
+          when 'xhr' then 'XHR'
+          else 'Page'
+          end
+          type_class = case @trace.request_type
+          when 'turbo_stream' then 'turbo-stream'
+          when 'turbo_frame' then 'turbo-frame'
+          when 'xhr' then 'xhr'
+          else 'page'
+          end
+        %>
+        <span class="request-type-badge <%= type_class %>"><%= type_label %></span>
+      </dd>
       <dt>Duration</dt>
       <dd><%= @trace.duration.round(2) %> ms</dd>
       <dt>Events</dt>
